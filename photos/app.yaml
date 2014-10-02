@@ -1,0 +1,51 @@
+application: photos
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /api/.*
+  script: backend.app
+#  login: required
+#  secure: always
+
+#- url: /index.html
+#  script: backend.app
+#  secure: always
+#  login: required
+
+#- url: /
+#  script: backend.app
+#  secure: always
+#  login: required
+
+- url: /
+  static_files: static/index.html
+  upload: static/index.html
+  login: required
+  secure: always
+
+- url: /
+  static_dir: static
+  login: required
+  secure: always
+
+#skip_files:
+#- .*/lxml/.*$
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+
+#- name: jinja2
+#  version: "2.6"
+
+- name: PIL
+  version: "1.1.7"
+
+#- name: lxml
+#  version: "2.3"
+
+builtins:
+- deferred: on
