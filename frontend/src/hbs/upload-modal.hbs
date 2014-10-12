@@ -1,8 +1,7 @@
- {{#modal-base title='Settings' ok='save' close='closeModal'}}
-        <form {{action 'ok' on='submit' target=view}}>
-          <div class="form-group">
-            <label>Name</label>
-            {{input class="form-control" value=name}}
-          </div>
-        </form>
-      {{/modal-base}}
+{{#modal-base model=model ok='save' close='closeModal'}}
+    <form {{action 'ok' on='submit' target=view}}>
+        <h4>Upload to '{{model.name}}'</h4>
+        <div class="form-group">
+        </div>
+    </form>
+{{/modal-base}}

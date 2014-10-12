@@ -31,10 +31,11 @@ App.ApplicationRoute = Em.Route.extend({
             var view = this.container.lookup('view:loading').append();
             this.router.one('didTransition', view, 'destroy');
         },
-        openModal: function (modalName) {
+        openModalModel: function (modalName,controller) {
             return this.render(modalName, {
                 into: 'application',
-                outlet: 'modal'
+                outlet: 'modal',
+                model: controller
             });
         },
         closeModal: function () {
