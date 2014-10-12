@@ -18,7 +18,7 @@ config = {
 
 OWNER_PERMISSIONS = {
     'GET': PERMISSION_ANYONE,
-    'POST': PERMISSION_LOGGED_IN_USER,
+    'POST': PERMISSION_ANYONE,
     'PUT': PERMISSION_ANYONE,
     'DELETE': PERMISSION_ADMIN
 }
@@ -41,6 +41,7 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/init',InitHandler),
         RESTHandler('/api/users',User,permissions=OWNER_PERMISSIONS,user_object=User),
         RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User),
+        RESTHandler('/api/albums',Album,permissions=OWNER_PERMISSIONS,user_object=User),
       ],
     debug=True,
     config=config

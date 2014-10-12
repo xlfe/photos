@@ -1,7 +1,7 @@
 
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
-    <div class="container-fluid">
+    <div class="container">
 
         <div class="navbar-header">
 
@@ -20,6 +20,13 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
             <ul class="nav navbar-nav navbar-left">
+
+                    {{#link-to "albums" tagName="li" class="menu-link"}}
+                        <a {{bind-attr href="view.href"}}>
+                        <i class="fa fa-lg fa-folder-o"></i>
+                        Your albums
+                        </a>
+                    {{/link-to}}
 
                     {{#link-to "upload" tagName="li" class="menu-link"}}
                         <a {{bind-attr href="view.href"}}>
@@ -49,6 +56,9 @@
 </nav>
 
 {{outlet}}
+{{outlet modal}}
+
+
 
 <div class="navbar navbar-fixed-bottom app-footer">
     <div class="container-fluid">

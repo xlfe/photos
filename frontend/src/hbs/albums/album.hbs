@@ -1,0 +1,23 @@
+<div class="container-fluid edge-to-edge">
+
+<div class="your-photos">
+
+{{#each photos}}
+{{photo-grid-photo photo=this save="save"}}
+
+{{else}}
+
+<div class="box-middle-center">
+
+<span>
+<a {{action 'openModal' 'upload-modal'}}>
+    No photos found - would you like to upload some photos?
+    </a>
+    </span>
+
+</div>
+
+{{/each}}
+</div>
+
+</div>

@@ -28,7 +28,8 @@ class Photo(ndb.Model):
     taken = ndb.DateTimeProperty()
     blob = ndb.BlobProperty()
 
-
+class Album(ndb.Model):
+    name = ndb.StringProperty()
 
 
 

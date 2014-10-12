@@ -3,20 +3,22 @@ var attr = DS.attr;
 
 App.Photo = DS.Model.extend({
     title: attr(),
-    caption: attr()
-});
+    caption: attr(),
 
-App.PhotosRoute = Em.Route.extend({
-    model: function(){
-        console.log('getting photos')
-        return this.get('store').find('photo');
+    save_me: function() {
+        var _this =this;
+        this.set('saving',true);
+        this.save().then(function(){
+            _this.set('saving',false);
+        })
     },
-    actions: {
-        save: function(obj) {
-            obj.set('saving',true);
-            obj.save().then(function(o){
-                o.set('saving',false);
-            });
+    watch_keeper: function() {
+
+        if (this.get('saving') == true){
+            return;
         }
-    }
-})
+
+        Em.run.debounce(this,'save_me',4000);
+
+    }.observes('title')
+});

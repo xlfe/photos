@@ -1,0 +1,19 @@
+<div class="container">
+
+<h3> Your albums
+</h3>
+
+{{#each}}
+    {{album-cover album=this}}
+{{/each}}
+
+
+<a href="" {{action 'new_album'}}>
+
+<i class="fa fa-lg fa-plus"></i>
+
+New album
+</a>
+
+
+</div>
