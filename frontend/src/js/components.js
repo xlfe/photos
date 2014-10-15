@@ -25,29 +25,33 @@ App.ModalBaseComponent = Ember.Component.extend({
     }.on('didInsertElement')
 });
 
+Dropzone.autoDiscover = false;
+
 App.UploadModalView = Ember.View.extend({
+    upload: function() {
+//      myDropzone.processQueue()
+    },
     setupFileupload: function() {
 
-        $('#fileupload').fileupload({
-            url: '/',
-            dataType: 'json',
-            done: function (e, data) {
-                $.each(data.result.files, function (index, file) {
-                    $('<p/>').text(file.name).appendTo('#files');
+        new Dropzone('#upload-box',{
+            url: '/upload',
+            acceptedFiles: 'image/*',
+            parallelUploads:3,
+            autoProcessQueue: false,
+            init: function() {
+                this.on("processingfile", function(file) {
+                    console.log('processing',file);
+//                    this.options.url = "/some-other-url";
                 });
-            },
-            progressall: function (e, data) {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                $('#progress .progress-bar').css(
-                    'width',
-                        progress + '%'
-                );
-            }
-        }).prop('disabled', !$.support.fileInput)
-            .parent().addClass($.support.fileInput ? undefined : 'disabled');
+                    this.on("addedfile", function(file) {
+                        console.log(file);
+                        this.options.url = "/some-other-url";
+                        return false;
+                    });
 
-    }.on('didInsertElement'),
-    willDestroyElement: function() {
-        $('#fileupload').fileupload('destroy');
-    }
-})
+            }
+        });
+    }.on('didInsertElement')
+});
+
+
