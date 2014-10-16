@@ -31,24 +31,75 @@ App.UploadModalView = Ember.View.extend({
     upload: function() {
 //      myDropzone.processQueue()
     },
+    files:[],
+    files_observer: function() {
+        var dz = this.get('dz');
+        console.log(this.get('files'));
+        this.get('files').forEach(function(file){
+            console.log(file.status,file.accepted);
+            if (file.status !== 'ADDED' || file.accepted != true){
+                return;
+            }
+            dz.enqueueFile(file);
+        });
+        dz.processQueue();
+    }.observes('files.[]'),
     setupFileupload: function() {
+        var um = this;
+
 
         new Dropzone('#upload-box',{
             url: '/upload',
             acceptedFiles: 'image/*',
-            parallelUploads:3,
-            autoProcessQueue: false,
+            uploadMultiple: false,
+            parallelUploads: 3,
+            thumbnailWidth:250,
+            thumbnailHeight:150,
+            autoProcessQueue: true,
+            autoQueue: false,
             init: function() {
-                this.on("processingfile", function(file) {
-                    console.log('processing',file);
-//                    this.options.url = "/some-other-url";
-                });
-                    this.on("addedfile", function(file) {
-                        console.log(file);
-                        this.options.url = "/some-other-url";
-                        return false;
-                    });
+                um.set('dz',this);
+            },
+            accept: function (file,done) {
+                console.log('accept',file);
+                done();
+                um.get('files').pushObject(file);
 
+//                $.ajax({
+//                    url: '/prepare-upload',
+//                    data: {filename: file.name},
+//                    type: 'POST',
+//                    success: function (response) {
+//                        console.log('success',response);
+//                        file.postData = {test:'ready'};
+//                        done();
+//                    },
+//                    error: function(response) {
+//                        setTimeout(function(){
+//                        console.log('error',response);
+//
+//                        if (response.responseText) {
+//                            response = parseJsonMsg(response.responseText);
+//                        }
+//                        if (response.message) {
+//
+//                            done(response.message);
+//                        } else {
+//                            done('error preparing the file');
+//                        }
+//                        },2000);
+//                    }
+//                });
+            },
+
+//            addedfile: function(file){
+//                console.log('added',file);
+//            },
+            sending: function(file, xhr, formData) {
+                console.log('sending',file);
+                $.each(file.postData, function(k, v){
+                    formData.append(k, v);
+                });
             }
         });
     }.on('didInsertElement')
