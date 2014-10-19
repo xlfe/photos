@@ -51,14 +51,22 @@ App.UploadModalView = Ember.View.extend({
         var dz = this.get('dz'),
             album = this.get('context.model.id');
 
-        console.log(files,album);
 
         $.ajax({
-            url: '/prepare-upload',
-            data: {album: album},
-            type: 'POST',
+            url: '/api/prepare-upload',
+            data: {count: files.length},
+            type: 'GET',
             success: function (response) {
-                console.log('success',response);
+
+                for (var i = 0; i < response.length; i++){
+                    files[i].postUrl = response[i];
+                    files[i].status = 'added';
+                    files[i].postData = {
+//                        name: files[i].name,
+                        album: album
+                    };
+                    dz.enqueueFile(files[i]);
+                }
             },
             error: function(response) {
                 console.log('error',response);
@@ -66,8 +74,8 @@ App.UploadModalView = Ember.View.extend({
         });
     },
     setupFileupload: function() {
-        var um = this;
-        var dz = new Dropzone('#upload-box',{
+        var _this = this,
+            dz = new Dropzone('#upload-box',{
             url: '/upload',
             acceptedFiles: 'image/*',
             uploadMultiple: false,
@@ -77,26 +85,24 @@ App.UploadModalView = Ember.View.extend({
             autoProcessQueue: true,
             autoQueue: false,
             accept: function (file,done) {
-                console.log(this.files);
 
-                if (this.files.length) {
-                   var _i, _len;
-                   for (_i = 0, _len = this.files.length; _i < _len; _i++) {
-                      if(this.files[_i].name === file.name && this.files[_i].size === file.size){
+                var files = _this.get('files');
+
+                for (var i =0; i < files.length; i++) {
+                    if (files[i].name === file.name && files[i].size === file.size){
+                        added_already = true;
                         done('Duplicate file');
-                      } else {
-                          done();
-                          um.get('files').pushObject(file);
-                      }
+                        return;
                     }
                 }
+
+                done();
+                _this.get('files').pushObject(file);
             },
             processing: function(file){
-//                console.log('processing',file);
                 this.options.url = file.postUrl;
             },
             sending: function(file, xhr, formData) {
-//                console.log('sending',file,xhr);
                 $.each(file.postData, function(k, v){
                     formData.append(k, v);
                 });
@@ -104,6 +110,7 @@ App.UploadModalView = Ember.View.extend({
         });
 
         this.set('dz',dz);
+        this.set('files',[]);
     }.on('didInsertElement')
 });
 

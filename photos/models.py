@@ -2,9 +2,12 @@
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from google.appengine.ext.deferred import defer
+from google.appengine.api import images
 import logging
 # from webapp2_extras.security import generate_random_string
 import datetime
+
+
 
 class User(ndb.Model):
 
@@ -14,6 +17,9 @@ class User(ndb.Model):
     def current_user(self):
         return None
 
+
+class Album(ndb.Model):
+    name = ndb.StringProperty()
 
 class Photo(ndb.Model):
 
@@ -26,10 +32,15 @@ class Photo(ndb.Model):
     tags = ndb.StringProperty(repeated=True)
 
     taken = ndb.DateTimeProperty()
-    blob = ndb.BlobProperty()
+    blob = ndb.BlobKeyProperty()
+    filename = ndb.StringProperty()
+    album = ndb.KeyProperty(Album)
 
-class Album(ndb.Model):
-    name = ndb.StringProperty()
+    @property
+    def serving_url(self):
+        return images.get_serving_url(blob_key=self.blob)
+
+
 
 
 

@@ -12,6 +12,10 @@ App.AlbumView = Em.View.extend({
 App.AlbumRoute = Em.Route.extend({
     setupController: function(controller,model){
         controller.set('model',model);
+//        console.log(model);
+        this.get('store').find('photo',{album:model.get('id')}).then(function(photos){
+            model.set('photos',photos);
+        });
         return controller;
 
     },
