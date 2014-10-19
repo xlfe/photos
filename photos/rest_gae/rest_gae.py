@@ -63,14 +63,16 @@ class NDBEncoder(json.JSONEncoder):
         elif isinstance(obj, datetime) or isinstance(obj, date) or isinstance(obj, time):
             return obj.isoformat()
 
-        elif isinstance(obj, ndb.Key):
+        elif isinstance(obj, ndb.Key) or isinstance(obj,ndb.KeyProperty):
             return self._decode_key(obj)
 
         elif isinstance(obj, ndb.GeoPt):
             return str(obj)
 
+        elif isinstance(obj,ndb.BlobKey):
+            return str(obj)
         else:
-            return super(NDBEncoder,self).default(self, obj)
+            return super(NDBEncoder,self).default(obj)
 
 class RESTException(Exception):
     """REST methods exception"""
@@ -327,70 +329,35 @@ class BaseRESTHandler(webapp2.RequestHandler):
             # No query given - return as-is
             return self.model.query()
 
-        # Translate any property names
-        translation_table = get_translation_table(self.model, 'input')
-        # orders = []
         try:
-
             for param,value in get_params.iteritems():
 
-                if len(value) == 0:
-                    continue
+                if param.endswith('[]'):
+                    if param == 'ids[]':
+                        column = getattr(self.model,'key')
+                    else:
+                        column = getattr(self.model,param[:-2],None)
+                        assert column is not None,param[:-2]
 
-                if param in translation_table:
-                    param = translation_table[param]
 
-                if param == 'ids[]':
-
-                    params = [
-                        self.model.key == ndb.Key(urlsafe=v)
-                        for v in value.split(',')
-                    ]
+                    params.extend([ndb.OR(column == ndb.Key(urlsafe=v)) for v in value.split(',')])
+                    logging.info(params)
 
                 else:
                     column = getattr(self.model,param,None)
 
-                    if column is None and getattr(self.model,'RESTMeta',None) is not None \
-                        and getattr(self.model.RESTMeta,'is_expando',False):
+                    assert column is not None,"Unable to find column {0}".format(param)
+
+                    if type(column.property.columns[0]) == ndb.Key:
+                        k = ndb.Key(kind=self.model._get_kind(),urlsafe=value)
+                        value = k._id
+
+                    params.append(column == value)
 
 
-                        column = ndb.GenericProperty(param)
-
-                        try:
-                            ct = getattr(self.model.RESTMeta,'convert_types',{})[param]
-                            value = self._value_to_property(value,ct)
-                            # logging.info('{0} converted to {1}'.format(param,value))
-                        except:
-                            # logging.info('No conversion for {0}'.format(param))
-                            pass
-
-                        # logging.info(column,param,value)
-                        try:
-                            f = getattr(self.model.RESTMeta,'special_params',{})[param]
-                            params.append(f((column,value)))
-                        except:
-                            params.append(column == value)
-
-                    else:
-                        assert column is not None,param
-                        value = self._value_to_property(value,column)
-
-
-                        params.append(column == value)
-
-            logging.info(params)
-
-
-            if 'in_flight' in get_params:
-                return self.model.query().filter(*params).order(-self.model.key)
-            elif 'unmet_requirements' in get_params:
-                return self.model.query().filter(*params).order(ndb.GenericProperty('earliest_unmet'),-self.model.key)
-
-            return self.model.query().filter(*params)
+                return self.model.query().filter(*params)
         except Exception, exc:
             raise
-            # Invalid query
-            raise RESTException('Invalid query param - "%s"' % self.request.GET)
 
     def _fetch_query(self, query):
         """Fetches the query results for a given limit (if provided by user) and for a specific results page (if given by user).

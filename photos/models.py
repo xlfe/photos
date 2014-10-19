@@ -23,6 +23,10 @@ class Album(ndb.Model):
 
 class Photo(ndb.Model):
 
+    class RESTMeta:
+
+        excluded_properties = ['blob']
+
     owner = ndb.KeyProperty(kind=User, required=False)
     uploaded = ndb.DateTimeProperty(auto_now_add=True)
     modified = ndb.DateTimeProperty(auto_now=True)
@@ -36,8 +40,10 @@ class Photo(ndb.Model):
     filename = ndb.StringProperty()
     album = ndb.KeyProperty(Album)
 
+    serving_url = ndb.ComputedProperty(lambda k: k._serving_url)
+
     @property
-    def serving_url(self):
+    def _serving_url(self):
         return images.get_serving_url(blob_key=self.blob)
 
 

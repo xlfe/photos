@@ -59,7 +59,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         blob_info = upload_files[0]
 
         name = self.request.get('name')
-        album = ndb.Key('Album',self.request.get('album'))
+        album = ndb.Key(urlsafe=self.request.get('album'))
 
         photo = Photo(blob=blob_info.key(),filename=name,album=album)
         photo.put()
