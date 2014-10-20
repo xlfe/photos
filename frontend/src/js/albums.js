@@ -69,18 +69,22 @@ App.AlbumView = Em.View.extend({
 
 App.PhotosController = Em.ArrayController.extend({
     sortProperties: ['title'],
-    sortAscending: false,
+    sortAscending: true,
     sp_observer: function() {
 
         if (Em.none(this.get('album'))){
-            console.log('No album')
-            this.set('sortProperties', ['title']);
+//            console.log('No album')
+//            this.set('sortProperties', ['title']);
+//            this.set('sortProperties', true);
+            return;
         }
 
-        console.log(this.get('album.sortProperties'));
+//        console.log(this.get('album.sortProperties'));
 
         this.set('sortProperties', [this.get('album.sortProperties')]);
-    }.observes('album','album.sortProperties')
+        this.set('sortAscending', [this.get('album.sortAscending')]);
+        console.log('sp_observer')
+    }.observes('album','album.sortProperties','album.sortAscending')
 })
 
 App.AlbumRoute = Em.Route.extend({
