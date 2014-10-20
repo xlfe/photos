@@ -1,25 +1,17 @@
 <div class="container-fluid edge-to-edge">
-
-<div class="your-photos">
-
-{{#each photos}}
-{{photo-grid-photo photo=this save="save"}}
-
-{{else}}
-
-<div class="box-middle-center">
-
-<span>
-    No photos found - would you like to
-<a href="#" {{action 'openModalModel' 'upload-modal' model}}>
-    upload some photos
-    </a>
-    ?
-    </span>
-
-</div>
-
-{{/each}}
-</div>
-
+    <div class="your-photos">
+        {{#each photos}}
+            {{photo-grid-photo photo=this save="save"}}
+        {{else}}
+            <div class="box-middle-center">
+                <span>
+                    No photos found - would you like to
+                    <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+                        upload some photos
+                    </a>
+                    ?
+                </span>
+            </div>
+        {{/each}}
+    </div>
 </div>

@@ -4,7 +4,10 @@ var attr = DS.attr;
 App.Photo = DS.Model.extend({
     title: attr(),
     caption: attr(),
-
+    saving: true,
+    am_loaded: function() {
+        this.set('saving',false);
+    }.on('didLoad'),
     save_me: function() {
         var _this =this;
         this.set('saving',true);

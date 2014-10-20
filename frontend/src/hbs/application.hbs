@@ -13,14 +13,13 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="#"> Photos
+            <a class="navbar-brand" href="#"> <i class="fa fa-lg fa-picture-o"></i> Slidenight
             </a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
             <ul class="nav navbar-nav navbar-left">
-
                     {{#link-to "albums" tagName="li" class="menu-link"}}
                         <a {{bind-attr href="view.href"}}>
                         <i class="fa fa-lg fa-folder-o"></i>
@@ -28,17 +27,8 @@
                         </a>
                     {{/link-to}}
 
-                    {{#link-to "upload" tagName="li" class="menu-link"}}
-                        <a {{bind-attr href="view.href"}}>
-                        <i class="fa fa-lg fa-upload"></i>
-                        Upload
-                        </a>
-                    {{/link-to}}
-
-
             </ul>
-
-
+            {{outlet menu}}
 
             <ul class="nav navbar-nav navbar-right">
 
@@ -62,7 +52,7 @@
 
 <div class="navbar navbar-fixed-bottom app-footer">
     <div class="container-fluid">
-        <p class="footer-item"> Photos and stuff
+        <p class="footer-item"> &copy; Slidenight
         </p>
     </div>
 </div>
