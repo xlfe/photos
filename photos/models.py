@@ -20,8 +20,8 @@ class User(ndb.Model):
 
 class Album(ndb.Model):
     name = ndb.StringProperty()
-    sortProperties = ndb.StringProperty(default='uploaded')
-    sortAscending = ndb.BooleanProperty(default=True)
+    sortProperties = ndb.StringProperty()
+    sortAscending = ndb.BooleanProperty()
 
 class Photo(ndb.Model):
 

@@ -68,7 +68,19 @@ App.AlbumView = Em.View.extend({
 });
 
 App.PhotosController = Em.ArrayController.extend({
-    sortProperties: ['title']
+    sortProperties: ['title'],
+    sortAscending: false,
+    sp_observer: function() {
+
+        if (Em.none(this.get('album'))){
+            console.log('No album')
+            this.set('sortProperties', ['title']);
+        }
+
+        console.log(this.get('album.sortProperties'));
+
+        this.set('sortProperties', [this.get('album.sortProperties')]);
+    }.observes('album','album.sortProperties')
 })
 
 App.AlbumRoute = Em.Route.extend({
@@ -95,7 +107,12 @@ App.AlbumRoute = Em.Route.extend({
         controller.set('model', model);
         console.log(model);
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
-            model.set('photos', App.PhotosController.create({content:photos}));
+                var p = App.PhotosController.create({
+                content:photos,
+                album: model
+            });
+            p.sp_observer();
+            model.set('photos', p);
         });
         return controller;
 
@@ -123,7 +140,11 @@ App.AlbumsIndexRoute = Em.Route.extend({
                 return;
             }
 
-            this.get('store').createRecord('album', {name: name}).save().then(function (_) {
+            this.get('store').createRecord('album', {
+                name: name,
+                sortProperties: 'uploaded',
+                sortAscending: true
+            }).save().then(function (_) {
                 _this.transitionTo('album', _);
             });
         }
