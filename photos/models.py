@@ -30,6 +30,7 @@ class Photo(ndb.Model):
     owner = ndb.KeyProperty(kind=User, required=False)
     uploaded = ndb.DateTimeProperty(auto_now_add=True)
     modified = ndb.DateTimeProperty(auto_now=True)
+    original_metadata = ndb.JsonProperty()
 
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)

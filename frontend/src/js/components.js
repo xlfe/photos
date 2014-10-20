@@ -21,9 +21,6 @@ App.ModalBaseComponent = Ember.Component.extend({
 Dropzone.autoDiscover = false;
 
 App.UploadModalView = Ember.View.extend({
-//    upload: function() {
-//      myDropzone.processQueue()
-//    },
     title: function() {
         return 'Upload to ' + this.get('context.model.name');
     }.property('context.model.name'),
@@ -44,13 +41,9 @@ App.UploadModalView = Ember.View.extend({
         }
     },
     upload_helper: function(files){
-//            file.postData = {test:true};
-//            file.postUrl = '/upload/' + file.name;
-//            dz.enqueueFile(file);
 
         var dz = this.get('dz'),
             album = this.get('context.model.id');
-
 
         $.ajax({
             url: '/api/prepare-upload',
@@ -62,9 +55,9 @@ App.UploadModalView = Ember.View.extend({
                     files[i].postUrl = response[i];
                     files[i].status = 'added';
                     files[i].postData = {
-//                        name: files[i].name,
                         album: album
                     };
+//                    console.log(response[i])
                     dz.enqueueFile(files[i]);
                 }
             },
@@ -101,11 +94,21 @@ App.UploadModalView = Ember.View.extend({
             },
             processing: function(file){
                 this.options.url = file.postUrl;
+//                console.log(this.options.url);
             },
             sending: function(file, xhr, formData) {
                 $.each(file.postData, function(k, v){
                     formData.append(k, v);
                 });
+            },
+            success: function(file,success){
+                console.log(success);
+                var store = _this.get('context.model.photos.store');
+
+                var photo = store.push('photo',success);
+                console.log(photo);
+                _this.get('context.model.photos').pushObject(photo);
+
             }
         });
 
