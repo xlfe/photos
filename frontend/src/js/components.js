@@ -1,8 +1,3 @@
-App.PhotoGridPhotoComponent = Em.Component.extend({
-    saveDelay: 3000,
-    tagName: 'div',
-    classNameBindings: [':photo', 'context.photo.saving:'],
-})
 
 App.ModalBaseComponent = Ember.Component.extend({
     actions: {
@@ -102,13 +97,16 @@ App.UploadModalView = Ember.View.extend({
                 });
             },
             success: function(file,success){
-                console.log(success);
-                var store = _this.get('context.model.photos.store');
-
+                console.log(_this.get('context.model'))
+                var store = _this.get('context.model.store');
                 var photo = store.push('photo',success);
-                console.log(photo);
-                _this.get('context.model.photos').pushObject(photo);
-
+                _this.get('context.model.photos.content').pushObject(photo);
+                if (file.previewElement) {
+                    file.previewElement.classList.add("dz-success");
+                }
+            },
+            totaluploadprogress: function(progress,total,sent){
+                _this.set('progress',progress);
             }
         });
 

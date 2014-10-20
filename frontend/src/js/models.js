@@ -68,3 +68,18 @@ App.IsodatetimeTransform = DS.Transform.extend({
 })
 
 
+App.ApplicationSerializer = DS.RESTSerializer.extend({
+  serializeAttribute: function(record, json, key, attribute) {
+    if (attribute.options.transient) {
+      return;
+    }
+    return this._super(record, json, key, attribute);
+  },
+  serializeBelongsTo: function(record, json, relationship) {
+      if (relationship.options.transient){
+          return;
+      }
+
+      return this._super(record,json,relationship);
+  }
+});

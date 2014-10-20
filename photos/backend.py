@@ -59,7 +59,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         blob_info = upload_files[0]
 
-        name = self.request.get('name')
+        name = blob_info.filename
         album = ndb.Key(urlsafe=self.request.get('album'))
 
         img = images.Image(blob_key=blob_info.key())
@@ -112,12 +112,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             title=name,
             filename=name,
             album=album,
+            width=img.width,
+            height= img.height,
             original_metadata=img.get_original_metadata()
         )
         photo.put()
 
-        # _photo = json.dumps(photo,cls=NDBEncoder)
-        # _photo['id'] = photo.key.urlsafe()
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(photo,cls=NDBEncoder))
 

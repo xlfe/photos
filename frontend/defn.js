@@ -14,10 +14,10 @@ exports.versions = {
     ember_data: '1.0.0b9',
 //    jserrorlog: '1.4.2',
 //    typeahead: '10.2',
-//    moment: '2.7.0',
+    moment: '2.7.0',
 //    model_fragments: '0.2.0',
 //    jquery_daterangepicker: '0.5',
-//    moment_timezone_with_data: '0.1.0',
+    moment_timezone_with_data: '0.1.0',
 //    tagit: '2.0',
     handlebars_runtime: '1.3.0',
     bootstrap: '3.1.1'

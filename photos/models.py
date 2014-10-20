@@ -20,6 +20,8 @@ class User(ndb.Model):
 
 class Album(ndb.Model):
     name = ndb.StringProperty()
+    sortProperties = ndb.StringProperty(default='uploaded')
+    sortAscending = ndb.BooleanProperty(default=True)
 
 class Photo(ndb.Model):
 
@@ -31,6 +33,8 @@ class Photo(ndb.Model):
     uploaded = ndb.DateTimeProperty(auto_now_add=True)
     modified = ndb.DateTimeProperty(auto_now=True)
     original_metadata = ndb.JsonProperty()
+    width = ndb.IntegerProperty()
+    height = ndb.IntegerProperty()
 
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)

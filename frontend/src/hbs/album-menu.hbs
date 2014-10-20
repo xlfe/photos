@@ -5,11 +5,18 @@
     </a>
 {{/link-to}}
 
-<li class="menu-link">
 
-<a href="#" {{action 'openModalModel' 'upload-modal' model}}>
-    <i class="fa fa-lg fa-upload"></i>
-        Upload
+<li class="menu-link">
+    <a href="#" {{action 'openModalModel' 'sort-modal' controller.model}}>
+        <i class="fa fa-lg fa-sort"></i>
+        Sort
+    </a>
+</li>
+
+<li class="menu-link">
+    <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+        <i class="fa fa-lg fa-upload"></i>
+            Upload
     </a>
 </li>
 

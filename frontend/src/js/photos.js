@@ -4,6 +4,12 @@ var attr = DS.attr;
 App.Photo = DS.Model.extend({
     title: attr(),
     caption: attr(),
+    width: attr(),
+    height: attr(),
+    uploaded: attr('isodatetime'),
+    serving_url: attr('string',{transient: true}),
+
+
     saving: true,
     am_loaded: function() {
         this.set('saving',false);
@@ -21,7 +27,33 @@ App.Photo = DS.Model.extend({
             return;
         }
 
-        Em.run.debounce(this,'save_me',4000);
+        Em.run.debounce(this,'save_me',5000);
 
-    }.observes('title')
+    }.observes('title'),
+    img_src: function(){
+        return this.get('serving_url') + '=s300';
+    }.property('serving_url')
 });
+
+App.PhotoGridPhotoComponent = Em.Component.extend({
+    tagName: 'div',
+    classNameBindings: [':photo', 'context.photo.saving:'],
+    background_img: function(){
+        var img_src = 'url(' + this.get('photo.img_src') + ')';
+        this.$().css({'background-image':img_src});
+    }.observes('photo.img_src').on('didInsertElement'),
+    setup: function() {
+        var sz = this.get('photo.display_sz'),
+            w = sz[0],
+            h = sz[1];
+
+        this.$().css({
+            height: h + 'px',
+            width:  w + 'px'
+        });
+
+    }.observes('photo.display_sz').on('didInsertElement'),
+    click: function() {
+        console.log('clicked')
+    },
+})

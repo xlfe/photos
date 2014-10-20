@@ -1,7 +1,9 @@
 //Album
 
 App.Album = DS.Model.extend({
-    name: DS.attr('string')
+    name: DS.attr('string'),
+    sortProperties: DS.attr('string'),
+    sortAscending: DS.attr('boolean')
 });
 
 App.AlbumController = Em.Controller.extend({
@@ -14,19 +16,72 @@ App.AlbumMenuView = Em.View.extend({
 
 App.AlbumView = Em.View.extend({
     templateName: 'albums/album',
+    didInsertElement: function() {
+        var _this = this;
+        window.onresize = function(){
+            Em.run.debounce(_this,_this.size_photos,100);
+        }
+    },
+    size_photos: function() {
+
+        if (this.$('edge-to-edge') === undefined || this.get('controller.model.photos') === undefined){
+            return;
+        }
+
+        var w = this.$('.edge-to-edge').width(),
+            p = this.get('controller.model.photos.content'),
+            this_row = [],
+            aspect = 16/ 9,
+            _basis = Math.floor(w/320),HTML
+            basis = (w - 2*_basis)/_basis,
+            height = basis/aspect;
+
+//        console.log(w,aspect,_basis,basis,height)
+
+        //Try and get each photo as close to 320px wide and 180px high
+
+        var row_portraits = function(row){
+            var rp = 0;
+            row.forEach(function(__){
+                if (__.height > __.width){
+                    rp += 1;
+                }
+            })
+            return rp;
+        }
+
+        p.forEach(function(_) {
+
+            if (this_row.length == _basis){
+
+            }
+
+
+
+            _.set('display_sz',[basis,height]);
+        });
+
+
+
+//        console.log(this.$().width(), p.length);
+    }.on('didInsertElement').observes('controller.model.photos.[]')
 });
+
+App.PhotosController = Em.ArrayController.extend({
+    sortProperties: ['title']
+})
 
 App.AlbumRoute = Em.Route.extend({
     renderTemplate: function () {
         var c = this.get('controller');
-
-        this.render();
 
         this.render('album-menu', {
             into: 'application',
             outlet: 'menu',
             controller: c
         });
+
+        this.render();
 
     },
 //    willDestroyElement: function () {
@@ -40,7 +95,7 @@ App.AlbumRoute = Em.Route.extend({
         controller.set('model', model);
         console.log(model);
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
-            model.set('photos', photos);
+            model.set('photos', App.PhotosController.create({content:photos}));
         });
         return controller;
 
@@ -63,6 +118,10 @@ App.AlbumsIndexRoute = Em.Route.extend({
         new_album: function () {
             var name = prompt('New album name?'),
                 _this = this;
+
+            if ($.trim(name).length==0){
+                return;
+            }
 
             this.get('store').createRecord('album', {name: name}).save().then(function (_) {
                 _this.transitionTo('album', _);
