@@ -28,6 +28,7 @@ App.AlbumView = Em.View.extend({
             return;
         }
 
+
         var w = this.$('.edge-to-edge').width(),
             p = this.get('controller.model.photos.content'),
             this_row = [],

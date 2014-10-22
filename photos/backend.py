@@ -107,6 +107,15 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # u'DigitalZoomRatio': 1
         # }
 
+        orientation = int(img.get_original_metadata()['Orientation'])
+
+        if orientation == 8:
+            img.rotate(-90)
+            blob_info.key.delete()
+
+            blob_info = blobstore.blobstore.cre
+
+
         photo = Photo(
             blob=blob_info.key(),
             title=name,
@@ -117,6 +126,11 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             original_metadata=img.get_original_metadata()
         )
         photo.put()
+
+        logging.info(img.get_original_metadata())
+        logging.info(orientation)
+        logging.info(img.width)
+        logging.info(img.height)
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(photo,cls=NDBEncoder))
