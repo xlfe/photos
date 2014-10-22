@@ -122,6 +122,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # if orientation in orient_map:
         #     orient_map[orientation](img)
 
+        logging.info('Loaded {} WxH {}x{} and orientation {}'.format(name,img.width,img.height,orientation))
+
         photo = Photo(
             blob=blob_info.key(),
             title=name,
@@ -133,9 +135,9 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             original_metadata=img.get_original_metadata(),
         )
 
-        if orientation in [6,8]:
-            photo.width = img.height
-            photo.height = img.width
+        # if orientation in [6,8]:
+        #     photo.width = img.height
+        #     photo.height = img.width
 
         photo.put()
 

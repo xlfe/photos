@@ -4,8 +4,8 @@ var attr = DS.attr;
 App.Photo = DS.Model.extend({
     title: attr(),
     caption: attr(),
-    width: attr(),
-    height: attr(),
+    width: attr('number',{transient: true}),
+    height: attr('number',{transient: true}),
     uploaded: attr('isodatetime'),
     serving_url: attr('string',{transient: true}),
     orientation: attr('number'),
@@ -31,29 +31,32 @@ App.Photo = DS.Model.extend({
         Em.run.debounce(this,'save_me',5000);
 
     }.observes('title'),
-    img_src: function(){
-        return this.get('serving_url') + '=s300';
-    }.property('serving_url')
 });
 
 App.PhotoGridPhotoComponent = Em.Component.extend({
     tagName: 'div',
     classNameBindings: [':photo', 'context.photo.saving:'],
-    background_img: function(){
-        var img_src = 'url(' + this.get('photo.img_src'),
+    get_img_url: function(long_edge_width) {
+        var url = this.get('photo.serving_url') + '=s' + long_edge_width,
             or = this.get('photo.orientation');
 
+        return url.replace('http:','');
+
         if (or == 6) {
-            img_src += '-r90)';
+            url += '-r90';
         } else if (or == 8) {
-            img_src += '-r270)';
-        } else {
-            img_src += ')'
+            url += '-r270';
         }
 
-        console.log(img_src);
-        this.$().css({'background-image':img_src});
-    }.observes('photo.img_src').on('didInsertElement'),
+        return url;
+
+    },
+    background_img: function(){
+
+        var img_src = this.get_img_url(300);
+        this.$().css({'background-image':'url(' + img_src + ')'});
+
+    }.on('didInsertElement'),
     setup: function() {
         var sz = this.get('photo.display_sz'),
             w = sz[0],

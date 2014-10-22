@@ -28,41 +28,61 @@ App.AlbumView = Em.View.extend({
             return;
         }
 
-
         var w = this.$('.edge-to-edge').width(),
-            p = this.get('controller.model.photos.content'),
-            this_row = [],
-            aspect = 16/ 9,
-            _basis = Math.floor(w/320),HTML
-            basis = (w - 2*_basis)/_basis,
-            height = basis/aspect;
+            cw = 0,
+            cr = [],
+            p = this.get('controller.model.photos.arrangedContent'),
+            min_height = 200; //Minimum height of each row in pixels
 
-//        console.log(w,aspect,_basis,basis,height)
+        //Sizing algorithm is choose a minimum row height, add images until
+        // adding an additional image would be wider than the width of the element
+        // then scale the images so they take up the full width
 
-        //Try and get each photo as close to 320px wide and 180px high
+        var calc_width = function(_photo) {
+            var _aspect = _photo.get('width') / _photo.get('height'), // 600w / 400h = 1.5
+                _width = min_height * _aspect; // 200 * 1.5 = 300
 
-        var row_portraits = function(row){
-            var rp = 0;
+            return _width;
+        }
+
+        var scale_row = function(row) {
+
+            var row_width = 0;
+
+            row.forEach(function(__) {
+                row_width += calc_width(__);
+            });
+
+            var scale = w / row_width;
+
             row.forEach(function(__){
-                if (__.height > __.width){
-                    rp += 1;
-                }
+                var _width = calc_width(__) * scale,
+                    _height = __.get('width') / __.get('height') * _width;
+
+                __.set('display_sz',[_width,_height]);
             })
-            return rp;
+
         }
 
         p.forEach(function(_) {
+            console.log(_)
+            var _width = calc_width(_);
 
-            if (this_row.length == _basis){
-
+            if (_width + cw <= w) {
+                //adding this image would not overflow the row, so add it
+                cr.pushObject(_);
+                cw += _width;
+            } else {
+                scale_row(cr);
+                cr = [_];
+                cw = _width;
             }
 
-
-
-            _.set('display_sz',[basis,height]);
         });
 
-
+        if (cr.length > 0) {
+            scale_row(cr);
+        }
 
 //        console.log(this.$().width(), p.length);
     }.on('didInsertElement').observes('controller.model.photos.[]')
