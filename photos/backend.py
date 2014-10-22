@@ -62,10 +62,6 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         name = blob_info.filename
         album = ndb.Key(urlsafe=self.request.get('album'))
 
-        img = images.Image(blob_key=blob_info.key())
-        img.rotate(0)
-        img.execute_transforms(parse_source_metadata=True)
-
         #{
         # u'YResolution': 350,
         # u'LightSource': 0,
@@ -107,14 +103,24 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # u'DigitalZoomRatio': 1
         # }
 
-        orientation = int(img.get_original_metadata()['Orientation'])
 
-        if orientation == 8:
-            img.rotate(-90)
-            blob_info.key.delete()
+        img = images.Image(blob_key=blob_info.key())
+        img.rotate(0)
+        img.execute_transforms(parse_source_metadata=True)
 
-            blob_info = blobstore.blobstore.cre
+        try:
+            orientation = int(img.get_original_metadata()['Orientation'])
+        except KeyError:
+            orientation = None
 
+        # orient_map = {
+        #     3: lambda i: i.rotate(180),
+        #     6: lambda i: i.rotate(90),
+        #     8: lambda i: i.rotate(-90)
+        # }
+
+        # if orientation in orient_map:
+        #     orient_map[orientation](img)
 
         photo = Photo(
             blob=blob_info.key(),
@@ -123,14 +129,20 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             album=album,
             width=img.width,
             height= img.height,
-            original_metadata=img.get_original_metadata()
+            orientation = orientation,
+            original_metadata=img.get_original_metadata(),
         )
+
+        if orientation in [6,8]:
+            photo.width = img.height
+            photo.height = img.width
+
         photo.put()
 
-        logging.info(img.get_original_metadata())
-        logging.info(orientation)
-        logging.info(img.width)
-        logging.info(img.height)
+        # logging.info(img.get_original_metadata())
+        # logging.info(orientation)
+        # logging.info(img.width)
+        # logging.info(img.height)
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(photo,cls=NDBEncoder))

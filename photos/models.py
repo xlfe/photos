@@ -35,6 +35,7 @@ class Photo(ndb.Model):
     original_metadata = ndb.JsonProperty()
     width = ndb.IntegerProperty()
     height = ndb.IntegerProperty()
+    orientation = ndb.IntegerProperty()
 
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)
@@ -49,7 +50,16 @@ class Photo(ndb.Model):
 
     @property
     def _serving_url(self):
-        return images.get_serving_url(blob_key=self.blob)
+
+        url = images.get_serving_url(blob_key=self.blob)
+        # if self.orientation == 6:
+        #     url += '-r90'
+        # elif self.orientation == 8:
+        #     url += '-r270'
+
+        return url
+
+
 
 
 

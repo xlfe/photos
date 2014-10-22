@@ -8,6 +8,7 @@ App.Photo = DS.Model.extend({
     height: attr(),
     uploaded: attr('isodatetime'),
     serving_url: attr('string',{transient: true}),
+    orientation: attr('number'),
 
 
     saving: true,
@@ -39,7 +40,18 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
     tagName: 'div',
     classNameBindings: [':photo', 'context.photo.saving:'],
     background_img: function(){
-        var img_src = 'url(' + this.get('photo.img_src') + ')';
+        var img_src = 'url(' + this.get('photo.img_src'),
+            or = this.get('photo.orientation');
+
+        if (or == 6) {
+            img_src += '-r90)';
+        } else if (or == 8) {
+            img_src += '-r270)';
+        } else {
+            img_src += ')'
+        }
+
+        console.log(img_src);
         this.$().css({'background-image':img_src});
     }.observes('photo.img_src').on('didInsertElement'),
     setup: function() {
@@ -51,6 +63,8 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
             height: h + 'px',
             width:  w + 'px'
         });
+
+        console.log(w,h);
 
     }.observes('photo.display_sz').on('didInsertElement'),
     click: function() {
