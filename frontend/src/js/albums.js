@@ -32,7 +32,7 @@ App.AlbumView = Em.View.extend({
             cw = 0,
             cr = [],
             p = this.get('controller.model.photos.arrangedContent'),
-            min_height = 200; //Minimum height of each row in pixels
+            min_height = 220; //Minimum height of each row in pixels
 
         //Sizing algorithm is choose a minimum row height, add images until
         // adding an additional image would be wider than the width of the element
@@ -42,6 +42,7 @@ App.AlbumView = Em.View.extend({
             var _aspect = _photo.get('width') / _photo.get('height'), // 600w / 400h = 1.5
                 _width = min_height * _aspect; // 200 * 1.5 = 300
 
+//            console.log(_photo.get('height'),_photo.get('width'),min_height,_width);
             return _width;
         }
 
@@ -53,11 +54,11 @@ App.AlbumView = Em.View.extend({
                 row_width += calc_width(__);
             });
 
-            var scale = w / row_width;
+            var scale = (w - row.length * 2)/row_width;
 
             row.forEach(function(__){
                 var _width = calc_width(__) * scale,
-                    _height = __.get('width') / __.get('height') * _width;
+                    _height = __.get('height') / __.get('width') * _width;
 
                 __.set('display_sz',[_width,_height]);
             })
@@ -65,7 +66,6 @@ App.AlbumView = Em.View.extend({
         }
 
         p.forEach(function(_) {
-            console.log(_)
             var _width = calc_width(_);
 
             if (_width + cw <= w) {
@@ -84,8 +84,13 @@ App.AlbumView = Em.View.extend({
             scale_row(cr);
         }
 
-//        console.log(this.$().width(), p.length);
-    }.on('didInsertElement').observes('controller.model.photos.[]')
+    }.on('didInsertElement').observes('controller.model.photos.[]','controller.model.sortProperties'),
+    actions: {
+        do_size: function() {
+            console.log('doing size')
+            this.size_photos();
+        }
+    }
 });
 
 App.PhotosController = Em.ArrayController.extend({
@@ -94,17 +99,13 @@ App.PhotosController = Em.ArrayController.extend({
     sp_observer: function() {
 
         if (Em.none(this.get('album'))){
-//            console.log('No album')
-//            this.set('sortProperties', ['title']);
-//            this.set('sortProperties', true);
             return;
         }
-
-//        console.log(this.get('album.sortProperties'));
 
         this.set('sortProperties', [this.get('album.sortProperties')]);
         this.set('sortAscending', [this.get('album.sortAscending')]);
         console.log('sp_observer')
+        this.send('do_size');
     }.observes('album','album.sortProperties','album.sortAscending')
 })
 
@@ -130,7 +131,7 @@ App.AlbumRoute = Em.Route.extend({
 
     setupController: function (controller, model) {
         controller.set('model', model);
-        console.log(model);
+//        console.log(model);
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
                 var p = App.PhotosController.create({
                 content:photos,

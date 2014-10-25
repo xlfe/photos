@@ -30,7 +30,7 @@ App.Photo = DS.Model.extend({
 
         Em.run.debounce(this,'save_me',5000);
 
-    }.observes('title'),
+    }.observes('title')
 });
 
 App.PhotoGridPhotoComponent = Em.Component.extend({
@@ -67,10 +67,8 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
             width:  w + 'px'
         });
 
-        console.log(w,h);
-
     }.observes('photo.display_sz').on('didInsertElement'),
     click: function() {
         console.log('clicked')
-    },
+    }
 })
