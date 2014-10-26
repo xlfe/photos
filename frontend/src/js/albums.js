@@ -83,6 +83,7 @@ App.AlbumView = Em.View.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
+//        console.log(w,'sized',this.get('controller.model'))
 
     }.on('didInsertElement').observes('controller.model.photos.[]','controller.model.sortProperties'),
     actions: {

@@ -6,10 +6,12 @@ App.ModalBaseComponent = Ember.Component.extend({
             this.sendAction('ok');
         }
     },
+
     show: function () {
         this.$('.modal').modal().on('hidden.bs.modal', function () {
             this.sendAction('close');
         }.bind(this));
+
     }.on('didInsertElement')
 });
 
@@ -97,7 +99,7 @@ App.UploadModalView = Ember.View.extend({
                 });
             },
             success: function(file,success){
-                console.log(_this.get('context.model'))
+//                console.log(_this.get('context.model'))
                 var store = _this.get('context.model.store');
                 var photo = store.push('photo',success);
                 _this.get('context.model.photos.content').pushObject(photo);
@@ -106,13 +108,23 @@ App.UploadModalView = Ember.View.extend({
                 }
             },
             totaluploadprogress: function(progress,total,sent){
-                _this.set('progress',progress);
+                _this.set('progress',progress.toFixed(0));
+                console.log(progress,total,sent);
+            },
+            queuecomplete: function() {
+                console.log('done');
             }
         });
 
         this.set('dz',dz);
+        this.set('progress',0);
         this.set('files',[]);
-    }.on('didInsertElement')
+    }.on('didInsertElement'),
+    progress_obs: function() {
+        this.$('.progress-bar').css({
+            width: this.get('progress') +'%'
+        });
+    }.observes('progress')
 });
 
 

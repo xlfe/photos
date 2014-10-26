@@ -20,7 +20,7 @@ exports.versions = {
     moment_timezone_with_data: '0.1.0',
 //    tagit: '2.0',
     handlebars_runtime: '1.3.0',
-    bootstrap: '3.1.1'
+    bootstrap: '3.2.0'
 }
 
 exports.override_for_release = false;
