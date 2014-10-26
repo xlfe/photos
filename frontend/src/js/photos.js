@@ -10,7 +10,6 @@ App.Photo = DS.Model.extend({
     serving_url: attr('string',{transient: true}),
     orientation: attr('number'),
 
-
     saving: true,
     am_loaded: function() {
         this.set('saving',false);

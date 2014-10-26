@@ -3,7 +3,11 @@
 App.Album = DS.Model.extend({
     name: DS.attr('string'),
     sortProperties: DS.attr('string'),
-    sortAscending: DS.attr('boolean')
+    sortAscending: DS.attr('boolean'),
+    sortOptions:[
+        { name: 'Uploaded date/time', val: 'uploaded'},
+        { name: 'Photo title', val: 'title'}
+    ]
 });
 
 App.AlbumController = Em.Controller.extend({
@@ -18,9 +22,10 @@ App.AlbumView = Em.View.extend({
     templateName: 'albums/album',
     didInsertElement: function() {
         var _this = this;
-        window.onresize = function(){
+        $(window).resize(function(){
             Em.run.debounce(_this,_this.size_photos,100);
-        }
+        });
+        this.size_photos();
     },
     size_photos: function() {
 
@@ -44,7 +49,7 @@ App.AlbumView = Em.View.extend({
 
 //            console.log(_photo.get('height'),_photo.get('width'),min_height,_width);
             return _width;
-        }
+        };
 
         var scale_row = function(row) {
 
@@ -62,8 +67,7 @@ App.AlbumView = Em.View.extend({
 
                 __.set('display_sz',[_width,_height]);
             })
-
-        }
+        };
 
         p.forEach(function(_) {
             var _width = calc_width(_);
@@ -83,9 +87,7 @@ App.AlbumView = Em.View.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-//        console.log(w,'sized',this.get('controller.model'))
-
-    }.on('didInsertElement').observes('controller.model.photos.[]','controller.model.sortProperties'),
+    }.observes('controller.model.photos.[]','controller.model.sortProperties'),
     actions: {
         do_size: function() {
             console.log('doing size')

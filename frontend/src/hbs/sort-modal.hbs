@@ -1,6 +1,7 @@
-{{#modal-base model=model title='Select sort options' ok='save' close='closeModal'}}
+{{#modal-base model=model title='Select sort options' ok='ok' close='closeModal'}}
 
-    {{model.sortProperties}}
+    {{view Ember.Select content=model.sortOptions optionValuePath="content.val" optionLabelPath="content.name" value=model.sortProperties}}
+
 
     {{input type="checkbox" checked=model.sortAscending}}
 
