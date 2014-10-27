@@ -4,6 +4,7 @@ App.Album = DS.Model.extend({
     name: DS.attr('string'),
     sortProperties: DS.attr('string'),
     sortAscending: DS.attr('boolean'),
+    manualSorting:[],
     sortOptions:[
         { name: 'Uploaded date/time', val: 'uploaded'},
         { name: 'Photo title', val: 'title'}
@@ -112,7 +113,12 @@ App.PhotosController = Em.ArrayController.extend({
 
         this.set('sortProperties', [this.get('album.sortProperties')]);
         this.set('sortAscending', this.get('album.sortAscending'));
-        console.log('sort update')
+        console.log('sort update');
+
+        var content = this.get('arrangedContent');
+        for (var i = 0; i < content.length; i++) {
+            content[i].set('album_position',i * (content.length+1));
+        }
 //        this.send('do_size');
 //    }.observes('album','album._sortProperties','album._sortAscending')
     }

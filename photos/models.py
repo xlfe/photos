@@ -34,6 +34,8 @@ class Photo(ndb.Model):
     height = ndb.IntegerProperty()
     orientation = ndb.IntegerProperty()
 
+    album_position = ndb.IntegerProperty()
+
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)
     tags = ndb.StringProperty(repeated=True)

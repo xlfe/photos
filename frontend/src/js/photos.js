@@ -4,6 +4,7 @@ var attr = DS.attr;
 App.Photo = DS.Model.extend({
     title: attr(),
     caption: attr(),
+    album_position: attr('number'),
     width: attr('number',{transient: true}),
     height: attr('number',{transient: true}),
     uploaded: attr('isodatetime',{transient: true}),
@@ -80,11 +81,8 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
     },
     dragOver: function(evt,hmm) {
         var left = evt.target.offsetLeft,
-            top = evt.target.offsetTop,
-            height = evt.target.offsetBottom - evt.target.offsetTop,
             width = evt.target.offsetWidth,
-            mouseX = evt.originalEvent.clientX,
-            mouseY = evt.originalEvent.clientY;
+            mouseX = evt.originalEvent.clientX;
 
         if (mouseX > left + width / 2) {
             this.set('highlight-left',false);
