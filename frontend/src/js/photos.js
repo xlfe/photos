@@ -6,9 +6,9 @@ App.Photo = DS.Model.extend({
     caption: attr(),
     width: attr('number',{transient: true}),
     height: attr('number',{transient: true}),
-    uploaded: attr('isodatetime'),
+    uploaded: attr('isodatetime',{transient: true}),
     serving_url: attr('string',{transient: true}),
-    orientation: attr('number'),
+    orientation: attr('number',{transient:true}),
 
     saving: true,
     am_loaded: function() {

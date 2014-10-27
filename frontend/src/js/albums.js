@@ -97,8 +97,8 @@ App.AlbumView = Em.View.extend({
 });
 
 App.PhotosController = Em.ArrayController.extend({
-    sortProperties: ['title'],
-    sortAscending: true,
+    sortProperties: ['uploaded'],
+    sortAscending: false,
     sp_observer: function() {
 
         if (Em.none(this.get('album'))){

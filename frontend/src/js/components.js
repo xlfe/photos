@@ -100,7 +100,6 @@ App.UploadModalView = Ember.View.extend({
             },
             processing: function(file){
                 this.options.url = file.postUrl;
-//                console.log(this.options.url);
             },
             sending: function(file, xhr, formData) {
                 $.each(file.postData, function(k, v){
@@ -108,10 +107,10 @@ App.UploadModalView = Ember.View.extend({
                 });
             },
             success: function(file,success){
-//                console.log(_this.get('context.model'))
                 var store = _this.get('context.model.store');
-                var photo = store.push('photo',success);
-                _this.get('context.model.photos.content').pushObject(photo);
+                var photo = store.find('photo',success.id).then(function(_o){
+                    _this.get('context.model.photos.content').pushObject(_o);
+                });
                 if (file.previewElement) {
                     file.previewElement.classList.add("dz-success");
                 }
