@@ -34,7 +34,9 @@ App.Photo = DS.Model.extend({
 
 App.PhotoGridPhotoComponent = Em.Component.extend({
     tagName: 'div',
-    classNameBindings: [':photo', 'context.photo.saving:'],
+    attributeBindings: ['draggable'],
+    draggable: "true",
+    classNameBindings: [':photo', 'context.photo.saving:','highlight-right:','highlight-left:'],
     get_img_url: function(long_edge_width) {
         var url = this.get('photo.serving_url') + '=s' + long_edge_width,
             or = this.get('photo.orientation');
@@ -69,5 +71,45 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
     }.observes('photo.display_sz').on('didInsertElement'),
     click: function() {
         console.log('clicked')
+    },
+    dragStart: function() {
+        console.log('dragstart')
+        this.$().bind('drop',function(){
+            console.log('dropped')
+        })
+    },
+    dragOver: function(evt,hmm) {
+        var left = evt.target.offsetLeft,
+            top = evt.target.offsetTop,
+            height = evt.target.offsetBottom - evt.target.offsetTop,
+            width = evt.target.offsetWidth,
+            mouseX = evt.originalEvent.clientX,
+            mouseY = evt.originalEvent.clientY;
+
+        if (mouseX > left + width / 2) {
+            this.set('highlight-left',false);
+            this.set('highlight-right',true);
+        } else {
+            this.set('highlight-left',true);
+            this.set('highlight-right',false);
+        }
+
+//        console.log('dragOver',this.get('photo.title'),lorr);
+//        this.set('highlight',lorr);
+    },
+    dragEnter: function() {
+//        this.set('highlight',true)
+        console.log('dragEnter',this.get('photo.title'))
+    },
+    dragLeave: function() {
+        this.set('highlight-left',false)
+        this.set('highlight-right',false)
+        console.log('dragExit',this.get('photo.title'))
+    },
+    dragEnd: function() {
+        console.log('dragEnd',this.get('photo.title'))
+    },
+    drop: function() {
+        console.log('dragDrop',this.get('photo.title'))
     }
 })

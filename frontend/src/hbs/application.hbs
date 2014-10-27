@@ -13,21 +13,14 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="#"> <i class="fa fa-lg fa-picture-o"></i> Slidenight
-            </a>
+            {{#link-to "albums" class="navbar-brand"}}
+                <i class="fa fa-lg fa-picture-o"></i> Slidenight
+            {{/link-to}}
+
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-            <ul class="nav navbar-nav navbar-left">
-                    {{#link-to "albums" tagName="li" class="menu-link"}}
-                        <a {{bind-attr href="view.href"}}>
-                        <i class="fa fa-lg fa-folder-o"></i>
-                        Your albums
-                        </a>
-                    {{/link-to}}
-
-            </ul>
             {{outlet menu}}
 
             <ul class="nav navbar-nav navbar-right">
@@ -52,7 +45,7 @@
 
 <div class="navbar navbar-fixed-bottom app-footer">
     <div class="container-fluid">
-        <p class="footer-item"> &copy; Slidenight - Slideshows happen, slidenights are forever!
+        <p class="footer-item"> Slideshows happen, slidenights are forever!
         </p>
     </div>
 </div>

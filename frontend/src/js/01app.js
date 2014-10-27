@@ -22,6 +22,13 @@ App.IndexRoute = Em.Route.extend({
 });
 
 App.ApplicationRoute = Em.Route.extend({
+//    setupController: function(controller) {
+//        this.get('store').find('album').then(function(albums){
+//            controller.set('model',albums);
+//        })
+//        this.transitionTo('albums');
+//        return controller;
+//    },
     actions: {
         loading: function (transition, originRoute) {
             var view = this.container.lookup('view:loading').append();
@@ -35,6 +42,7 @@ App.ApplicationRoute = Em.Route.extend({
             });
         },
         closeModal: function () {
+            console.log('closeModal')
             return this.disconnectOutlet({
                 outlet: 'modal',
                 parentView: 'application'

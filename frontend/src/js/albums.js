@@ -97,19 +97,25 @@ App.AlbumView = Em.View.extend({
 });
 
 App.PhotosController = Em.ArrayController.extend({
+//    setupController: function(controller,model){
+//        console.log(controller,model,'photos setup');
+//        controller.set('model',model);
+//        return controller;
+//    },
     sortProperties: ['uploaded'],
     sortAscending: false,
-    sp_observer: function() {
+    update_sort: function() {
 
-        if (Em.none(this.get('album'))){
+        if (Em.none(this.get('album'))) {
             return;
         }
 
         this.set('sortProperties', [this.get('album.sortProperties')]);
-        this.set('sortAscending', [this.get('album.sortAscending')]);
-        console.log('sp_observer')
-        this.send('do_size');
-    }.observes('album','album.sortProperties','album.sortAscending')
+        this.set('sortAscending', this.get('album.sortAscending'));
+        console.log('sort update')
+//        this.send('do_size');
+//    }.observes('album','album._sortProperties','album._sortAscending')
+    }
 })
 
 App.AlbumRoute = Em.Route.extend({
@@ -123,28 +129,18 @@ App.AlbumRoute = Em.Route.extend({
         });
 
         this.render();
-
     },
-//    willDestroyElement: function () {
-//        return this.disconnectOutlet({
-//            outlet: 'modal',
-//            parentView: 'application'
-//        });
-//    }
-
     setupController: function (controller, model) {
         controller.set('model', model);
-//        console.log(model);
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
                 var p = App.PhotosController.create({
                 content:photos,
                 album: model
             });
-            p.sp_observer();
+            p.update_sort();
             model.set('photos', p);
         });
         return controller;
-
     },
     model: function (params) {
         return this.get('store').find('album', params.album_id);

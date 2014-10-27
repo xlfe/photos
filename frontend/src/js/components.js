@@ -1,34 +1,45 @@
 
 App.ModalBaseComponent = Ember.Component.extend({
     actions: {
-        ok: function () {
+        save: function () {
             this.$('.modal').modal('hide');
             console.log('modal-ok')
-            this.sendAction('ok');
+            this.sendAction('save');
+        },
+        close: function() {
+            console.log('modal-close');
+            this.sendAction('close');
         }
     },
     show: function () {
         this.$('.modal').modal().on('hidden.bs.modal', function () {
-            this.sendAction('close');
-        }.bind(this));
 
+            //Disconnect view once modal is removed...
+            this.sendAction('closeModal');
+
+        }.bind(this));
     }.on('didInsertElement')
 });
 
-App.SortModalView = Ember.View.extend({
-//    actions: {
-        ok: function() {
-            console.log('sort-ok')
-            return true;
+App.SortModalController = Ember.Controller.extend({
+    actions: {
+        save: function() {
+//            console.log('sort-save');
+            var c = this.get('model.photos');
+            c.update_sort();
+            this.get('model').save();
+        },
+        close: function() {
+//            console.log('sort-close');
         }
-//    }
-})
+    }
+});
 
 Dropzone.autoDiscover = false;
 
 App.UploadModalView = Ember.View.extend({
     title: function() {
-        return 'Upload to ' + this.get('context.model.name');
+        return 'Upload photos to album "' + this.get('context.model.name') + '"';
     }.property('context.model.name'),
     files:[],
     files_observer: function(){
@@ -124,7 +135,6 @@ App.UploadModalView = Ember.View.extend({
             },
             totaluploadprogress: function(progress,total,sent){
                 _this.set('progress',progress.toFixed(0));
-                console.log(progress,total,sent);
             },
             queuecomplete: function() {
                 console.log('done');
@@ -132,7 +142,7 @@ App.UploadModalView = Ember.View.extend({
         });
 
         this.set('dz',dz);
-        this.set('progress',0);
+        this.set('progress',0.0);
         this.set('files',[]);
     }.on('didInsertElement'),
     progress_obs: function() {

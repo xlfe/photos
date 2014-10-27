@@ -1,4 +1,4 @@
-{{#modal-base model=model ok='save' close='closeModal'}}
+{{#modal-base model=model closeModal='closeModal'}}
     <div class="progress">
         <div class="progress-bar" role="progressbar" {{bind-attr aria-valuenow="progress"}} aria-valuemin="0" aria-valuemax="100">
             <span class="">{{view.progress}}% complete</span>
@@ -7,5 +7,4 @@
     <form class="dropzone" id="upload-box">
         <div class="dz-default dz-message"><span>Drop files here to upload</span></div>
     </form>
-    <!--<button {{action 'ok' on='submit' target=view}}>Ok</button>-->
 {{/modal-base}}

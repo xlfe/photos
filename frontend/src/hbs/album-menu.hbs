@@ -1,7 +1,9 @@
 
 {{#link-to "album" this tagName="li" class="menu-link"}}
     <a {{bind-attr href="view.href"}}>
-        &raquo; {{controller.model.name}}
+        <strong>
+            {{controller.model.name}}
+        </strong>
     </a>
 {{/link-to}}
 
@@ -9,7 +11,7 @@
 <li class="menu-link">
     <a href="#" {{action 'openModalModel' 'sort-modal' model}}>
         <i class="fa fa-lg fa-sort"></i>
-        Sort
+        Sort options
     </a>
 </li>
 
