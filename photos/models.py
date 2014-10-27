@@ -4,10 +4,7 @@ from google.appengine.api import users
 from google.appengine.ext.deferred import defer
 from google.appengine.api import images
 import logging
-# from webapp2_extras.security import generate_random_string
 import datetime
-
-
 
 class User(ndb.Model):
 
@@ -50,13 +47,7 @@ class Photo(ndb.Model):
 
     @property
     def _serving_url(self):
-
         url = images.get_serving_url(blob_key=self.blob)
-        # if self.orientation == 6:
-        #     url += '-r90'
-        # elif self.orientation == 8:
-        #     url += '-r270'
-
         return url
 
 

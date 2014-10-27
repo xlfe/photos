@@ -105,14 +105,21 @@ App.UploadModalView = Ember.View.extend({
                 $.each(file.postData, function(k, v){
                     formData.append(k, v);
                 });
+
+                if (file.previewElement) {
+                    file.previewElement.classList.add("dz-transferring");
+                    $(file.previewElement).append('<div class="dz-progress dz-uploading"><i class="fa fa-lg fa-refresh"></i></div>');
+                }
             },
             success: function(file,success){
                 var store = _this.get('context.model.store');
-                var photo = store.find('photo',success.id).then(function(_o){
+                var photo = store.find('photo',success).then(function(_o){
                     _this.get('context.model.photos.content').pushObject(_o);
                 });
+
                 if (file.previewElement) {
                     file.previewElement.classList.add("dz-success");
+                    file.previewElement.classList.remove("dz-transferring");
                 }
             },
             totaluploadprogress: function(progress,total,sent){

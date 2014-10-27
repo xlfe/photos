@@ -147,7 +147,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # logging.info(img.height)
 
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(photo,cls=NDBEncoder))
+        # self.response.out.write(json.dumps(photo,cls=NDBEncoder))
+        self.response.out.write(json.dumps(photo.key.urlsafe()))
 
 
 
