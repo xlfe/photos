@@ -54,13 +54,6 @@ class PrepareUpload(webapp2.RequestHandler):
         self.response.out.write(json.dumps(urls))
         return
 
-class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-    def post(self):
-        upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
-        blob_info = upload_files[0]
-
-        name = blob_info.filename
-        album = ndb.Key(urlsafe=self.request.get('album'))
 
         #{
         # u'YResolution': 350,
@@ -103,10 +96,23 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # u'DigitalZoomRatio': 1
         # }
 
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+
+    def post(self):
+        upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
+        blob_info = upload_files[0]
+
+        name = blob_info.filename
+        album = ndb.Key(urlsafe=self.request.get('album'))
+        _album = album.get()
+
 
         img = images.Image(blob_key=blob_info.key())
         img.rotate(0)
         img.execute_transforms(parse_source_metadata=True)
+
+        if 'DateTime' not in img.get_original_metadata():
+            logging.info(img.get_original_metadata())
 
         try:
             orientation = int(img.get_original_metadata()['Orientation'])
@@ -122,11 +128,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # if orientation in orient_map:
         #     orient_map[orientation](img)
 
-        logging.info('Loaded {} WxH {}x{} and orientation {}'.format(name,img.width,img.height,orientation))
+        img_count = _album.inc_imgCount()
 
         photo = Photo(
             blob=blob_info.key(),
             title=name,
+            album_pos_id = img_count,
             filename=name,
             album=album,
             width=img.width,

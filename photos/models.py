@@ -5,6 +5,8 @@ from google.appengine.ext.deferred import defer
 from google.appengine.api import images
 import logging
 import datetime
+import general_counter
+
 
 class User(ndb.Model):
 
@@ -19,6 +21,14 @@ class Album(ndb.Model):
     name = ndb.StringProperty()
     sortProperties = ndb.StringProperty()
     sortAscending = ndb.BooleanProperty()
+    manualSort = ndb.IntegerProperty(repeated=True)
+    imgCount = ndb.IntegerProperty(default=0)
+
+    @ndb.transactional
+    def inc_imgCount(self):
+        self.imgCount +=1
+        self.put()
+        return self.imgCount
 
 class Photo(ndb.Model):
 
@@ -34,7 +44,7 @@ class Photo(ndb.Model):
     height = ndb.IntegerProperty()
     orientation = ndb.IntegerProperty()
 
-    album_position = ndb.IntegerProperty()
+    album_pos_id = ndb.IntegerProperty()
 
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)

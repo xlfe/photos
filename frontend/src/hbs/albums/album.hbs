@@ -1,7 +1,7 @@
 <div class="container-fluid edge-to-edge">
     <div class="your-photos">
         {{#each controller.model.photos.arrangedContent}}
-            {{photo-grid-photo photo=this save="save"}}
+            {{photo-grid-photo photo=this album=controller.model save="save"}}
         {{else}}
             <div class="box-middle-center">
                 <span>

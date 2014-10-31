@@ -4,11 +4,16 @@ App.Album = DS.Model.extend({
     name: DS.attr('string'),
     sortProperties: DS.attr('string'),
     sortAscending: DS.attr('boolean'),
-    manualSorting:[],
+    manualSort: DS.attr('list'),
     sortOptions:[
         { name: 'Uploaded date/time', val: 'uploaded'},
-        { name: 'Photo title', val: 'title'}
-    ]
+        { name: 'Photo title', val: 'title'},
+        { name: 'Digitized', val: 'original_metadata.DateTime'},
+        { name: 'Manual', val:'position'}
+    ],
+    photos_count: function() {
+        return
+    }
 });
 
 App.AlbumController = Em.Controller.extend({
@@ -17,7 +22,15 @@ App.AlbumController = Em.Controller.extend({
 App.AlbumMenuView = Em.View.extend({
     tagName: 'ul',
     classNames: ['nav','navbar-nav','navbar-left']
-})
+});
+
+function calc_width(_photo) {
+    var _aspect = _photo.get('width') / _photo.get('height'), // 600w / 400h = 1.5
+        min_height = 320, //Minimum height of each row in pixels
+        _width = min_height * _aspect; // 200 * 1.5 = 300
+
+    return _width;
+};
 
 App.AlbumView = Em.View.extend({
     templateName: 'albums/album',
@@ -37,20 +50,12 @@ App.AlbumView = Em.View.extend({
         var w = this.$('.edge-to-edge').width(),
             cw = 0,
             cr = [],
-            p = this.get('controller.model.photos.arrangedContent'),
-            min_height = 220; //Minimum height of each row in pixels
+            p = this.get('controller.model.photos.arrangedContent');
 
         //Sizing algorithm is choose a minimum row height, add images until
         // adding an additional image would be wider than the width of the element
         // then scale the images so they take up the full width
 
-        var calc_width = function(_photo) {
-            var _aspect = _photo.get('width') / _photo.get('height'), // 600w / 400h = 1.5
-                _width = min_height * _aspect; // 200 * 1.5 = 300
-
-//            console.log(_photo.get('height'),_photo.get('width'),min_height,_width);
-            return _width;
-        };
 
         var scale_row = function(row) {
 
@@ -110,15 +115,41 @@ App.PhotosController = Em.ArrayController.extend({
         if (Em.none(this.get('album'))) {
             return;
         }
+        if (this.get('album.sortProperties') == 'position') {
+            var album_sort = this.get('album.manualSort');
+
+            console.log("manual sort enabled",album_sort);
+
+            if (album_sort.length == 0) {
+                console.log('resort')
+                this.get('content').forEach(function(s){
+
+                    while (album_sort.indexOf(s.get('album_pos_id')) != -1) {
+                        s.set('album_pos_id', s.get('album_pos_id') + 1);
+                    }
+                    album_sort.pushObject(s.get('album_pos_id'));
+                    s.save();
+                })
+            }
+
+            this.get('content').forEach(function(s) {
+                s.set('position',album_sort.indexOf(s.get('album_pos_id')));
+//                console.log(s.position,s.get('album_pos_id'));
+            });
+
+            this.get('album').save()
+
+        } else {
+            this.set('album.manualSort',[]);
+            this.get('album').save()
+        }
+
 
         this.set('sortProperties', [this.get('album.sortProperties')]);
         this.set('sortAscending', this.get('album.sortAscending'));
         console.log('sort update');
 
-        var content = this.get('arrangedContent');
-        for (var i = 0; i < content.length; i++) {
-            content[i].set('album_position',i * (content.length+1));
-        }
+
 //        this.send('do_size');
 //    }.observes('album','album._sortProperties','album._sortAscending')
     }
