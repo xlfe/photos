@@ -109,8 +109,14 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
 //    },
     drop: function(evt) {
 
-        var ms = this.get('album.manualSort');
+        var ms = this.get('album.manualSort'),
+            offset = 0,
+            asc = this.get('album.sortAscending');
 
+        if (this.get('album.sortProperties') !== 'position') {
+            this.set('album.sortProperties','position');
+            this.get('album.photos').update_sort();
+        }
 
         //Remove the item we just dragged
         console.log('Drag',drag['dragging'])
@@ -118,11 +124,22 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
         ms.splice(ms.indexOf(drag['dragging']),1);
         console.log('Post',ms)
         console.log('Tgt ',ms.indexOf(this.get('photo.album_pos_id')))
+        offset = ms.indexOf(this.get('photo.album_pos_id'));
+
         if (drag['position'] =='after'){
-            ms.splice(ms.indexOf(this.get('photo.album_pos_id'))+1,0,drag['dragging'])
-        } else {
-            ms.splice(ms.indexOf(this.get('photo.album_pos_id')),0,drag['dragging'])
+            offset +=1;
         }
+
+        if (asc == false){
+            offset += 1;
+        }
+
+        if (asc == false && drag['position'] == 'after') {
+
+            offset -= 2;
+        }
+
+        ms.splice(offset,0,drag['dragging'])
 
         console.log('Post',ms)
         this.set('album.manualSort',ms);
