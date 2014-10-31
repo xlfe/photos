@@ -123,12 +123,16 @@ App.PhotosController = Em.ArrayController.extend({
             if (album_sort.length == 0) {
                 console.log('resort')
                 this.get('content').forEach(function(s){
+                    var modified = false;
 
                     while (album_sort.indexOf(s.get('album_pos_id')) != -1) {
                         s.set('album_pos_id', s.get('album_pos_id') + 1);
+                        modified = true;
                     }
                     album_sort.pushObject(s.get('album_pos_id'));
-                    s.save();
+                    if (modified){
+                        s.save();
+                    }
                 })
             }
 
