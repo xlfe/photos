@@ -12,6 +12,7 @@ exports.paths = {
 exports.versions = {
     ember: '1.7.0',
     ember_data: '1.0.0b9',
+    hammer: '2.0.4',
 //    jserrorlog: '1.4.2',
 //    typeahead: '10.2',
     moment: '2.7.0',

@@ -4,7 +4,9 @@ App = Ember.Application.create();
 
 App.Router.map(function () {
     this.resource('albums',function() {
-        this.resource('album', {path:':album_id'},function(){})
+        this.resource('album', {path:':album_id'},function(){
+            this.route('show', {path: ':photo_id'})
+        })
     }),
     this.resource('user', {path: ':user_id'})
 });
@@ -50,4 +52,3 @@ App.ApplicationRoute = Em.Route.extend({
         }
     }
 });
-

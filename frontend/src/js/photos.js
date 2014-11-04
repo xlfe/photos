@@ -62,6 +62,7 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
 
         var long_edge = Math.min(1600,Math.max(width,height)),
             img_src = this.get_img_url(long_edge);
+
         this.$().css({'background-image':'url(' + img_src + ')'});
     },
     setup: function() {
@@ -76,9 +77,10 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
 
         this.background_img(w,h);
 
+
     }.observes('photo.display_sz').on('didInsertElement'),
-    click: function() {
-        console.log('clicked')
+    didInsertElement: function() {
+        console.log(this.get('album._lightbox'))
     },
     dragStart: function() {
         drag['dragging']= this.get('photo.album_pos_id');
@@ -119,11 +121,9 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
         }
 
         //Remove the item we just dragged
-        console.log('Drag',drag['dragging'])
-        console.log('Pre ',ms)
-        ms.splice(ms.indexOf(drag['dragging']),1);
-        console.log('Post',ms)
-        console.log('Tgt ',ms.indexOf(this.get('photo.album_pos_id')))
+        ms.removeObject(drag['dragging']);
+//        ms.splice(ms.indexOf(drag['dragging']),1);
+
         offset = ms.indexOf(this.get('photo.album_pos_id'));
 
         if (drag['position'] =='after'){
@@ -138,13 +138,11 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
 
             offset -= 2;
         }
+        console.log(offset);
+        ms.insertAt(offset,drag['dragging']);
+//        ms.splice(offset,0,drag['dragging'])
 
-        ms.splice(offset,0,drag['dragging'])
-
-        console.log('Post',ms)
-        this.set('album.manualSort',ms);
-
-        console.log('dragDrop',drag,this.get('photo.album_pos_id'));
+//        this.set('album.manualSort',ms);
 
         this.set('highlight-left',false);
         this.set('highlight-right',false);
