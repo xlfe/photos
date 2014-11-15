@@ -1,10 +1,38 @@
 {{#modal-base model=model closeModal='closeModal'}}
-    <div class="progress">
-        <div class="progress-bar" role="progressbar" {{bind-attr aria-valuenow="progress"}} aria-valuemin="0" aria-valuemax="100">
-            <span class="">{{view.progress}}% complete</span>
+
+    {{#if uploading}}
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" {{bind-attr aria-valuenow="progress"}} aria-valuemin="0"
+                 aria-valuemax="100">
+                <span class="">{{view.progress}}% complete</span>
+            </div>
         </div>
+    {{/if}}
+
+
+    <div class="upload">
+
+        {{#unless view.files}}
+
+            <label class="hint">Drop
+                {{#if view.accept_files}}
+                    files
+                {{else}}
+                    folders
+                {{/if}}
+                here (or click to browse)
+
+
+            </label>
+
+            {{#if view.accept_files}}
+                <input type="file" id="file_input" accept="image/*" multiple/>
+            {{else}}
+                <input type="file" id="file_input" directory webkitdirectory/>
+            {{/if}}
+
+
+        {{/unless}}
     </div>
-    <form class="dropzone" id="upload-box">
-        <div class="dz-default dz-message"><span>Drop files here to upload</span></div>
-    </form>
+
 {{/modal-base}}

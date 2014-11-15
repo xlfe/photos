@@ -128,12 +128,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # if orientation in orient_map:
         #     orient_map[orientation](img)
 
-        img_count = _album.inc_imgCount()
+        first,last = Photo.allocate_ids(1,parent=album)
 
-        photo = Photo(
+        photo = Photo(parent=album, id=first,
             blob=blob_info.key(),
             title=name,
-            album_pos_id = img_count,
+            album_pos_id = first,
             filename=name,
             album=album,
             width=img.width,

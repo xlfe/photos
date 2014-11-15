@@ -56,12 +56,15 @@ App.AlbumShowView = Em.View.extend({
         return serving_url;
 
     }.property('controller.model.serving_url'),
+    photo: function() {
+        return this.get('controller.model');
+    }.property('controller.model'),
     setPhoto: function() {
 
         if (this.$() === undefined) return;
 
-        var screenWidth	 = $( window ).width() * 0.95,
-            screenHeight = $( window ).height() * 0.95,
+        var screenWidth	 = $( window ).width() * 0.99,
+            screenHeight = ($( window ).height() -25 )* 0.99,
             photo        = this.get('controller.model'),
             image        = this.$('img'),
             tmpImage 	 = new Image();
@@ -85,7 +88,7 @@ App.AlbumShowView = Em.View.extend({
             image.css({
                 'width':  imageWidth + 'px',
                 'height': imageHeight + 'px',
-                'top':    ( $( window ).height() - imageHeight ) / 2 + 'px',
+                'top':    ( $( window ).height() - imageHeight -25 ) / 2 + 'px',
                 'left':   ( $( window ).width() - imageWidth ) / 2 + 'px'
             });
         };
@@ -268,6 +271,7 @@ App.PhotosController = Em.ArrayController.extend({
                         s.save();
                     }
                 })
+//                this.get('album').save()
             }
 
             this.get('content').forEach(function(s) {
@@ -275,11 +279,9 @@ App.PhotosController = Em.ArrayController.extend({
 //                console.log(s.position,s.get('album_pos_id'));
             });
 
-            this.get('album').save()
-
         } else {
             this.set('album.manualSort',[]);
-            this.get('album').save()
+//            this.get('album').save()
         }
 
 

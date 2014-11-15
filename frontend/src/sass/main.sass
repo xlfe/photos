@@ -95,11 +95,36 @@ li.header-img-link, li.menu-link, .action-pointer
     font-weight: bold
     padding-bottom: 1em
 
-form.dropzone
+.upload
   height: 360px !important
   overflow-y: scroll !important
-.dz-preview
-  margin: 3px !important
+  position: relative
+  overflow: hidden
+  width: 100%
+  border: 1px solid lightgrey
+  border-radius: 8px
+  text-align: center
+  vertical-align: middle
+
+  .hint
+    font-weight: bold
+    font-size: larger
+    padding-top: 150px
+
+.upload input[type=file]
+  position: absolute
+  top: 0
+  right: 0
+  left: 0
+  bottom: 0
+  min-width: 100%
+  min-height: 100%
+  filter: alpha(opacity=0)
+  opacity: 0
+  outline: none
+  background: white
+  cursor: inherit
+  display: block
 
 .highlight-right
   border-right: 5px solid yellow !important
@@ -121,6 +146,17 @@ form.dropzone
   right: 0
   bottom: 0
   left: 0
+
+  .details
+    position: absolute
+    bottom: 0
+    left: 0
+    right: 0
+    height: 20px
+    background-color: white
+    text-align: center
+
+    margin-bottom: 5px
 
 #lightbox
   position: fixed

@@ -22,13 +22,7 @@ class Album(ndb.Model):
     sortProperties = ndb.StringProperty()
     sortAscending = ndb.BooleanProperty()
     manualSort = ndb.IntegerProperty(repeated=True)
-    imgCount = ndb.IntegerProperty(default=0)
 
-    @ndb.transactional
-    def inc_imgCount(self):
-        self.imgCount +=1
-        self.put()
-        return self.imgCount
 
 class Photo(ndb.Model):
 
