@@ -1,4 +1,4 @@
-{{#modal-base model=model closeModal='closeModal'}}
+{{#modal-base model=model save='save' custom_save="Upload" save_disabled=view.nofiles custom_close="Cancel" closeModal='closeModal'}}
 
     {{#if uploading}}
         <div class="progress">
@@ -12,10 +12,10 @@
 
     <div class="upload">
 
-        {{#each view.files}}
+        {{#each controller.files}}
 
             <label class="file">
-                <label class="progress"></label>
+                <label class="progress" {{bind-attr style=progress}}></label>
 
                 <label class="name">
                     {{name}}

@@ -1,6 +1,6 @@
 DS.RESTAdapter.reopen({namespace: 'api'});
 
-App = Ember.Application.create();
+var App = Ember.Application.create();
 
 App.Router.map(function () {
     this.resource('albums',function() {

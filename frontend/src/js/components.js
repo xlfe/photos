@@ -1,8 +1,6 @@
 App.ModalBaseComponent = Ember.Component.extend({
     actions: {
         save: function () {
-            this.$('.modal').modal('hide');
-            console.log('modal-ok')
             this.sendAction('save');
         },
         close: function () {
@@ -27,6 +25,7 @@ App.SortModalController = Ember.Controller.extend({
             var c = this.get('model.photos');
             c.update_sort();
             this.get('model').save();
+            this.$('.modal').modal('hide');
         },
         close: function () {
 //            console.log('sort-close');
@@ -34,16 +33,108 @@ App.SortModalController = Ember.Controller.extend({
     }
 });
 
-function fileSizeSI(a,b,c,d,e){
- return (b=Math,c=b.log,d=1e3,e=c(a)/c(d)|0,a/b.pow(d,e)).toFixed(2)
- +' '+(e?'kMGTPEZY'[--e]+'B':'Bytes')
+
+App.UploadModalController = Ember.Controller.extend({
+    files: [],
+    prepare_uploads: function (files) {
+        var self = this,
+            album = this.get('model.id');
+
+        $.ajax({
+            url: '/api/prepare-upload',
+            data: {count: files.length},
+            type: 'GET',
+            success: function (response) {
+
+                for (var i = 0; i < response.length; i++) {
+                    files[i].set('postUrl', response[i]);
+                    files[i].set('status','Starting...');
+                    files[i].set('album',album);
+                    self.start_upload(files[i]);
+                }
+            },
+            error: function (response) {
+                console.log('error', response);
+            }
+        });
+    },
+    concurrent_uploads: 3,
+    start_upload: function (file) {
+
+        var xhr = new XMLHttpRequest(),
+            formData = new FormData(),
+            _this = this;
+
+//        xhr.addEventListener('progress', function (e) {
+//            var done = e.position || e.loaded, total = e.totalSize || e.total;
+//            console.log('xhr progress: ' + (Math.floor(done / total * 1000) / 10) + '%');
+//        }, false);
+
+        if (xhr.upload) {
+            xhr.upload.onprogress = function (e) {
+                var done = e.position || e.loaded, total = e.totalSize || e.total,
+                    progress = 'width: ' + (Math.floor(done / total * 1000) / 10) + '%';
+
+                if (done == total) {
+                    file.set('progress','width: 100%');
+                    file.set('status','Processing...');
+                } else {
+                    file.set('progress',progress);
+                }
+
+            };
+        }
+        xhr.onreadystatechange = function (e) {
+            if (4 == this.readyState) {
+                file.set('status','Complete');
+
+                var store = _this.get('store');
+                var photo = store.find('photo', e.target.response).then(function (_o) {
+                    _this.get('model.photos.content').pushObject(_o);
+                });
+
+            }
+        };
+        xhr.open("POST", file.postUrl, true);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+        formData.append("album", file.get('album'));
+        formData.append("file", file.get('file'));
+        file.set('status','Uploading...');
+        file.set('progress',0);
+
+        xhr.send(formData);
+
+    },
+    actions: {
+
+        save: function () {
+            this.prepare_uploads(this.get('files'));
+
+//            this.$('.modal').modal('hide');
+        },
+        close: function () {
+            console.log('closing?')
+        }
+    }
+})
+
+function fileSizeSI(a, b, c, d, e) {
+    return (b = Math, c = b.log, d = 1e3, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
+        + ' ' + (e ? 'kMGTPEZY'[--e] + 'B' : 'Bytes')
 }
+
 App.UploadModalView = Ember.View.extend({
     accept_files: true, //false - only for chrome - accept a folder
-    files: [],
-    setup: function () {
-
-    }.on('didInsertElement'),
+    nofiles: function () {
+        console.log(this.get('controller'))
+        return this.get('controller.files').length == 0;
+    }.property('controller.files.[]'),
+    didInsertElement: function () {
+//        this.get('controller').set('files',[]);
+    },
     change: function (e) {
 
         e.stopPropagation();
@@ -52,25 +143,19 @@ App.UploadModalView = Ember.View.extend({
 
         var files = e.target.files || e.dataTransfer.files;
 
-        for (var i=0; i< files.length; i++) {
+        for (var i = 0; i < files.length; i++) {
 
-            var file = files[i];
+            if (files[i].type.match('image/*')) {
 
+                var file = Em.Object.create({
+                    file: files[i],
+                    name: files[i].name,
+                    hSize: fileSizeSI(files[i].size),
+                    status: 'Waiting...'
+                });
 
-            file.hSize = fileSizeSI(file.size);
-            file.status = 'Waiting...';
-
-            if (file.type.match('image/*')) {
-                this.get('files').pushObject(file);
+                this.get('controller.files').pushObject(file);
             }
-
-            console.log(file.name);
-
-//            var xhr = new XMLHttpRequest();
-//            xhr.open("POST", "receivefile.php", true);
-//            xhr.setRequestHeader("X_FILENAME", file.name);
-//            xhr.send(file);
-
         }
 
 
@@ -81,59 +166,15 @@ App.UploadModalView = Ember.View.extend({
 
     title: function () {
 
-        var files = this.get('files'),
-            count ='';
-        if (files.length> 0) {
+        var files = this.get('controller.files'),
+            count = '';
+        if (files.length > 0) {
             count = files.length + ' ';
         }
 
         return 'Upload ' + count + 'photos to album "' + this.get('context.model.name') + '"';
-    }.property('context.model.name','files.[]'),
-//    files: [],
-//    files_observer: function () {
-//        Em.run.debounce(this, this.files_runner, 500);
-//    }
-//
-//        .
-//        observes('files.[]'),
-//    files_runner: function () {
-//        var needs_upload = this.get('files').filter(function (f) {
-//            return f.status == 'added' && f.accepted == true;
-//        }).map(function (f) {
-//            f.status = 'blob_queue';
-//            return f;
-//        });
-//
-//        if (needs_upload.length > 0) {
-//            this.upload_helper(needs_upload);
-//        }
-//    },
-//    upload_helper: function (files) {
-//
-//        var dz = this.get('dz'),
-//            album = this.get('context.model.id');
-//
-//        $.ajax({
-//            url: '/api/prepare-upload',
-//            data: {count: files.length},
-//            type: 'GET',
-//            success: function (response) {
-//
-//                for (var i = 0; i < response.length; i++) {
-//                    files[i].postUrl = response[i];
-//                    files[i].status = 'added';
-//                    files[i].postData = {
-//                        album: album
-//                    };
-//                    console.log(response[i])
-//                    dz.enqueueFile(files[i]);
-//                }
-//            },
-//            error: function (response) {
-//                console.log('error', response);
-//            }
-//        });
-//    },
+    }.property('context.model.name', 'files.[]'),
+
 //    setupFileupload: function () {
 //        var _this = this,
 //            dz = new Dropzone('#upload-box', {
@@ -174,6 +215,7 @@ App.UploadModalView = Ember.View.extend({
 //                    }
 //                },
 //                success: function (file, success) {
+
 //                    var store = _this.get('context.model.store');
 //                    var photo = store.find('photo', success).then(function (_o) {
 //                        _this.get('context.model.photos.content').pushObject(_o);
