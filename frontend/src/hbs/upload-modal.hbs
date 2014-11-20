@@ -12,7 +12,26 @@
 
     <div class="upload">
 
-        {{#unless view.files}}
+        {{#each view.files}}
+
+            <label class="file">
+                <label class="progress"></label>
+
+                <label class="name">
+                    {{name}}
+                </label>
+
+                <label class="size">
+                    {{hSize}}
+                </label>
+
+                <label class="status">
+                    {{status}}
+                </label>
+            </label>
+
+
+        {{else}}
 
             <label class="hint">Drop
                 {{#if view.accept_files}}
@@ -21,18 +40,17 @@
                     folders
                 {{/if}}
                 here (or click to browse)
-
-
             </label>
 
-            {{#if view.accept_files}}
-                <input type="file" id="file_input" accept="image/*" multiple/>
-            {{else}}
-                <input type="file" id="file_input" directory webkitdirectory/>
-            {{/if}}
+        {{/each}}
+
+        {{#if view.accept_files}}
+            <input type="file" id="file_input" accept="image/*" multiple/>
+        {{else}}
+            <input type="file" id="file_input" directory webkitdirectory/>
+        {{/if}}
 
 
-        {{/unless}}
     </div>
 
 {{/modal-base}}

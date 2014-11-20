@@ -172,6 +172,7 @@ App.AlbumView = Em.View.extend({
     didInsertElement: function() {
         var _this = this;
 
+
         $(window).resize(function () {
             Em.run.debounce(_this, _this.size_photos, 100);
         });
@@ -310,12 +311,18 @@ App.AlbumRoute = Em.Route.extend({
     setupController: function (controller, model) {
         controller.set('model', model);
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
-                var p = App.PhotosController.create({
+
+            var p = App.PhotosController.create({
                 content:photos,
                 album: model
             });
             p.update_sort();
             model.set('photos', p);
+
+            if (photos.get('content.length')==0 ){
+                controller.send('openModalModel','upload-modal',model);
+            }
+
         });
         return controller;
     },
