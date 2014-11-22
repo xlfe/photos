@@ -1,4 +1,12 @@
-{{#modal-base model=model save='save' custom_save="Upload" save_disabled=view.nofiles custom_close="Cancel" closeModal='closeModal'}}
+{{#modal-base
+    model=model
+    save='save'
+    close='close'
+    custom_save=controller.save_caption
+    save_disabled=controller.save_disabled
+    custom_close=controller.close_caption
+    closeModal='closeModal'
+}}
 
     {{#if uploading}}
         <div class="progress">
@@ -49,8 +57,6 @@
         {{else}}
             <input type="file" id="file_input" directory webkitdirectory/>
         {{/if}}
-
-
     </div>
 
 {{/modal-base}}

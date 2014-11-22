@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CorsConfig>
+  <Cors>
+        <Origins>
+		<Origin>https://slide-night.appspot.com</Origin>
+        </Origins>
+        <Methods>
+            <Method>GET</Method>
+            <Method>PUT</Method>
+            <Method>POST</Method>
+            <Method>HEAD</Method>
+        </Methods>
+        <ResponseHeaders>
+            <ResponseHeader>*</ResponseHeader>
+        </ResponseHeaders>
+        <MaxAgeSec>86400</MaxAgeSec>
+    </Cors>
+</CorsConfig>

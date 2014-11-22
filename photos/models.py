@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 from google.appengine.ext.deferred import defer
 from google.appengine.api import images
+from google.appengine.ext import blobstore
 import logging
 import datetime
 import general_counter
@@ -46,6 +47,7 @@ class Photo(ndb.Model):
 
     taken = ndb.DateTimeProperty()
     blob = ndb.BlobKeyProperty()
+    gs = ndb.StringProperty()
     filename = ndb.StringProperty()
     album = ndb.KeyProperty(Album)
 
@@ -53,8 +55,11 @@ class Photo(ndb.Model):
 
     @property
     def _serving_url(self):
-        url = images.get_serving_url(blob_key=self.blob)
-        return url
+        if self.blob:
+            _key = self.blob
+        else:
+            _key = blobstore.create_gs_key(self.gs)
+        return images.get_serving_url(blob_key=_key,secure_url=True)
 
 
 

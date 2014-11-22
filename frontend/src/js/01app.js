@@ -44,7 +44,6 @@ App.ApplicationRoute = Em.Route.extend({
             });
         },
         closeModal: function () {
-            console.log('closeModal')
             return this.disconnectOutlet({
                 outlet: 'modal',
                 parentView: 'application'

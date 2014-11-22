@@ -79,9 +79,6 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
 
 
     }.observes('photo.display_sz').on('didInsertElement'),
-    didInsertElement: function() {
-        console.log(this.get('album._lightbox'))
-    },
     dragStart: function() {
         drag['dragging']= this.get('photo.album_pos_id');
         console.log('Drag starting with ' + drag['dragging']);

@@ -285,14 +285,8 @@ App.PhotosController = Em.ArrayController.extend({
 //            this.get('album').save()
         }
 
-
         this.set('sortProperties', [this.get('album.sortProperties')]);
         this.set('sortAscending', this.get('album.sortAscending'));
-        console.log('sort update');
-
-
-//        this.send('do_size');
-//    }.observes('album','album._sortProperties','album._sortAscending')
     }
 })
 
