@@ -29,7 +29,7 @@ class Photo(ndb.Model):
 
     class RESTMeta:
 
-        excluded_properties = ['blob']
+        excluded_properties = ['blob','gs','owner']
 
     owner = ndb.KeyProperty(kind=User, required=False)
     uploaded = ndb.DateTimeProperty(auto_now_add=True)
@@ -44,6 +44,8 @@ class Photo(ndb.Model):
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)
     tags = ndb.StringProperty(repeated=True)
+    path = ndb.StringProperty()
+    last_modified = ndb.DateTimeProperty()
 
     taken = ndb.DateTimeProperty()
     blob = ndb.BlobKeyProperty()

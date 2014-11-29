@@ -127,6 +127,8 @@ App.UploadModalController = Ember.Controller.extend({
         if (prod == false) {
             var form = new FormData;
             form.append('album', file.get('album'));
+            form.append('path', file.get('path'));
+            form.append('lastModifiedDate', file.get('file').lastModifiedDate);
             form.append('file', data, file.get('name'));
             data = form;
         }
@@ -175,6 +177,8 @@ App.UploadModalController = Ember.Controller.extend({
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify({
                             id: response['bucket'] + '/' + response['name'],
+                            path: file.get('path'),
+                            lastModifiedDate: file.get('file').lastModifiedDate,
                             album: file.get('album'),
                             name: file.get('name')
                         }),
@@ -330,7 +334,7 @@ function fileSizeSI(a, b, c, d, e) {
 }
 
 App.UploadModalView = Ember.View.extend({
-    accept_files: true, //false - only for chrome - accept a folder
+    accept_files: window.chrome === undefined,//true, //false - only for chrome - accept a folder
     didInsertElement: function(){
         this.set('controller.modal',this.$('.modal'));
     },
@@ -339,7 +343,8 @@ App.UploadModalView = Ember.View.extend({
         e.stopPropagation();
         e.preventDefault();
 
-        var files = e.target.files || e.dataTransfer.files;
+        var files = e.target.files || e.dataTransfer.files,
+            folders = !this.get('accept_files');
 
         for (var i = 0; i < files.length; i++) {
 
@@ -348,12 +353,19 @@ App.UploadModalView = Ember.View.extend({
                 var file = Em.Object.create({
                     file: files[i],
                     name: files[i].name,
+                    path: '/',
                     bytes: files[i].size,
                     type: files[i].type,
                     hSize: fileSizeSI(files[i].size),
                     status: 'Added',
                     _status: 0
                 });
+
+                if (folders){
+                    var wrp = files[i].webkitRelativePath;
+                    file.set('path',wrp.substr(0,wrp.length - files[i].name.length - 1));
+                }
+
                 this.get('controller.files').pushObject(file);
                 this.set('controller.save_disabled',false);
             }

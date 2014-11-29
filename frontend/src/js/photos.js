@@ -7,6 +7,7 @@ App.Photo = DS.Model.extend({
     album_pos_id: attr('number'),
     width: attr('number',{transient: true}),
     height: attr('number',{transient: true}),
+    path: attr('string'),
     uploaded: attr('isodatetime',{transient: true}),
     serving_url: attr('string',{transient: true}),
     orientation: attr('number',{transient:true}),
@@ -146,4 +147,31 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
         this.get('album.photos').update_sort();
         this.get('album').save();
     }
-})
+});
+
+
+
+App.PhotoGridFolderComponent = App.PhotoGridPhotoComponent.extend({
+    classNameBindings: [':folder'],
+    setup: function() {
+        var sz = this.get('folder.display_sz'),
+            w = sz[0],
+            h = sz[1];
+
+        this.$().css({
+            height: h + 'px',
+            width:  w + 'px'
+        });
+
+
+    }.observes('photo.display_sz').on('didInsertElement'),
+    actions: {
+        click: function(){
+            var album = this.get('album'),
+                photos = album.get('photos'),
+                cp = photos.get('current_path') || '',
+                fn = this.get('folder.name');
+            photos.set('current_path',fn );
+        }
+    }
+});

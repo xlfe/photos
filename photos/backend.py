@@ -121,16 +121,20 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
 
         first,last = Photo.allocate_ids(1,parent=album)
 
+        meta = img.get_original_metadata()
+        meta['__original_file_modified']=params['lastModifiedDate']
+
         photo = Photo(parent=album, id=first,
                       gs = blobstore_filename,
                       title=params['name'],
+                      path=params['path'],
                       album_pos_id = first,
                       filename=params['name'],
                       album=album,
                       width=img.width,
                       height= img.height,
                       orientation = orientation,
-                      original_metadata=img.get_original_metadata(),
+                      original_metadata=meta
                       )
 
         # if orientation in [6,8]:
@@ -178,16 +182,20 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
         first,last = Photo.allocate_ids(1,parent=album)
 
+        meta = img.get_original_metadata()
+        meta['__original_file_modified']=self.request.get('lastModifiedDate')
+
         photo = Photo(parent=album, id=first,
             blob=blob_info.key(),
             title=name,
             album_pos_id = first,
+            path=self.request.get('path'),
             filename=name,
             album=album,
             width=img.width,
             height= img.height,
             orientation = orientation,
-            original_metadata=img.get_original_metadata(),
+            original_metadata=meta
         )
 
         # if orientation in [6,8]:

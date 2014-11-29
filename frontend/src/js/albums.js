@@ -5,23 +5,22 @@ App.Album = DS.Model.extend({
     sortProperties: DS.attr('string'),
     sortAscending: DS.attr('boolean'),
     manualSort: DS.attr('list'),
-    sortOptions:[
-        { name: 'Uploaded date/time', val: 'uploaded'},
-        { name: 'Photo title', val: 'title'},
-        { name: 'Digitized', val: 'original_metadata.DateTime'},
-        { name: 'Manual', val:'position'}
+    sortOptions: [
+        {name: 'Uploaded date/time', val: 'uploaded'},
+        {name: 'Photo title', val: 'title'},
+        {name: 'Digitized', val: 'original_metadata.DateTime'},
+        {name: 'Manual', val: 'position'}
     ],
-    photos_count: function() {
+    photos_count: function () {
         return
     }
 });
 
-App.AlbumController = Em.Controller.extend({
-});
+App.AlbumController = Em.Controller.extend({});
 
 App.AlbumMenuView = Em.View.extend({
     tagName: 'ul',
-    classNames: ['nav','navbar-nav','navbar-left']
+    classNames: ['nav', 'navbar-nav', 'navbar-left']
 });
 
 function calc_width(_photo) {
@@ -35,61 +34,59 @@ function calc_width(_photo) {
 
 App.AlbumShowView = Em.View.extend({
 //    needs: ['album'],
-    templateName:'albums/show',
-    willDestroyElement: function(){
+    templateName: 'albums/show',
+    willDestroyElement: function () {
         $(document).off('keyup', this.keyUp);
-        this.$('#lightbox-overlay').off('click',this.overlay_click);
+        this.$('#lightbox-overlay').off('click', this.overlay_click);
     },
     didInsertElement: function () {
         $(document).on('keyup', {_this: this}, this.keyUp);
-        this.$('#lightbox-overlay').on('click',{_this:this},this.overlay_click);
+        this.$('#lightbox-overlay').on('click', {_this: this}, this.overlay_click);
     },
-    overlay_click: function(event) {
+    overlay_click: function (event) {
         event.data._this.get('controller').transitionToRoute('album');
     },
-    displayUrl: function() {
+    displayUrl: function () {
 
-        var photo        = this.get('controller.model'),
-            long_edge = Math.min(1600,Math.max(photo.get('width'),photo.get('height'))),
+        var photo = this.get('controller.model'),
+            long_edge = Math.min(1600, Math.max(photo.get('width'), photo.get('height'))),
             serving_url = photo.get('serving_url') + '=s' + long_edge;
 
         return serving_url;
 
     }.property('controller.model.serving_url'),
-    photo: function() {
+    photo: function () {
         return this.get('controller.model');
     }.property('controller.model'),
-    setPhoto: function() {
+    setPhoto: function () {
 
         if (this.$() === undefined) return;
 
-        var screenWidth	 = $( window ).width() * 0.99,
-            screenHeight = ($( window ).height() -25 )* 0.99,
-            photo        = this.get('controller.model'),
-            image        = this.$('img'),
-            tmpImage 	 = new Image();
+        var screenWidth = $(window).width() * 0.99,
+            screenHeight = ($(window).height() - 25 ) * 0.99,
+            photo = this.get('controller.model'),
+            image = this.$('img'),
+            tmpImage = new Image();
 
         image.hide();
 
-        tmpImage.src	= this.get('displayUrl');
-        tmpImage.onload = function()
-        {
+        tmpImage.src = this.get('displayUrl');
+        tmpImage.onload = function () {
             image.show();
-            imageWidth	 = photo.get('width');
-            imageHeight	 = photo.get('height');
+            imageWidth = photo.get('width');
+            imageHeight = photo.get('height');
 
-            if( imageWidth > screenWidth || imageHeight > screenHeight )
-            {
-                var ratio	 = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
-                imageWidth	/= ratio;
-                imageHeight	/= ratio;
+            if (imageWidth > screenWidth || imageHeight > screenHeight) {
+                var ratio = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
+                imageWidth /= ratio;
+                imageHeight /= ratio;
             }
 
             image.css({
-                'width':  imageWidth + 'px',
+                'width': imageWidth + 'px',
                 'height': imageHeight + 'px',
-                'top':    ( $( window ).height() - imageHeight -25 ) / 2 + 'px',
-                'left':   ( $( window ).width() - imageWidth ) / 2 + 'px'
+                'top': ( $(window).height() - imageHeight - 25 ) / 2 + 'px',
+                'left': ( $(window).width() - imageWidth ) / 2 + 'px'
             });
         };
 
@@ -103,31 +100,31 @@ App.AlbumShowView = Em.View.extend({
         swipeRight: function (event) {
             this.get('controller').go_photo(1);
         },
-        tap: function(event){
-            if (event.tapCount == 2){
+        tap: function (event) {
+            if (event.tapCount == 2) {
                 this.get('controller').transitionToRoute('album');
                 event.preventDefault();
             }
         }
     },
-    click: function() {
-
-        console.log('controllerFor',this.get('controller.controllers.album').get('model.photos.arrangedContent'))
-    },
-    keyUp: function(evt) {
+    //click: function() {
+    //
+    //    console.log('controllerFor',this.get('controller.controllers.album').get('model.photos.arrangedContent'))
+    //},
+    keyUp: function (evt) {
 
         var _this = evt.data._this,
             controller = _this.get('controller'),
             photo = controller.get('model');
 
-        if(evt.which == 27){
+        if (evt.which == 27) {
             //Escape - close
             controller.transitionToRoute('album')
             return;
         } else if (evt.which == 39) {
             //Right
             controller.go_photo(1);
-            return ;
+            return;
         } else if (evt.which == 37) {
             //Left
             controller.go_photo(-1);
@@ -140,7 +137,7 @@ App.AlbumShowView = Em.View.extend({
 
 App.AlbumShowController = Em.ObjectController.extend({
     needs: ['album'],
-    go_photo: function(idx) {
+    go_photo: function (idx) {
         var photo = this.get('model'),
             album = this.get('controllers.album').get('model.photos.arrangedContent'),
             current_idx = album.indexOf(photo),
@@ -149,12 +146,12 @@ App.AlbumShowController = Em.ObjectController.extend({
         if (new_idx >= album.length) {
             new_idx = 0;
         } else if (new_idx < 0) {
-            new_idx = album.length -1;
+            new_idx = album.length - 1;
         }
 
-        this.transitionToRoute('album.show',album.objectAt(new_idx));
+        this.transitionToRoute('album.show', album.objectAt(new_idx));
     }
-})
+});
 
 //App.AlbumShowRoute = Em.Route.extend({
 //    setupController: function(controller,model){
@@ -164,12 +161,9 @@ App.AlbumShowController = Em.ObjectController.extend({
 //});
 
 App.AlbumView = Em.View.extend({
-
     images: 'photos.arrangedContent',
-
-
     templateName: 'albums/album',
-    didInsertElement: function() {
+    didInsertElement: function () {
         var _this = this;
 
 
@@ -179,41 +173,41 @@ App.AlbumView = Em.View.extend({
 
         this.size_photos();
     },
-    size_photos: function() {
+    size_photos: function () {
 
-        if (this.$('edge-to-edge') === undefined || this.get('controller.model.photos') === undefined){
+        if (this.$('edge-to-edge') === undefined || this.get('controller.model.photos') === undefined) {
             return;
         }
 
         var w = this.$('.edge-to-edge').width(),
             cw = 0,
             cr = [],
-            p = this.get('controller.model.photos.arrangedContent');
+            p = this.get('controller.model.photos.folders').concat(this.get('controller.model.photos.filtered_arrangedContent'));
 
         //Sizing algorithm is choose a minimum row height, add images until
         // adding an additional image would be wider than the width of the element
         // then scale the images so they take up the full width
 
 
-        var scale_row = function(row) {
+        var scale_row = function (row) {
 
             var row_width = 0;
 
-            row.forEach(function(__) {
+            row.forEach(function (__) {
                 row_width += calc_width(__);
             });
 
-            var scale = (w - row.length * 2)/row_width;
+            var scale = (w - row.length * 2) / row_width;
 
-            row.forEach(function(__){
+            row.forEach(function (__) {
                 var _width = calc_width(__) * scale,
                     _height = __.get('height') / __.get('width') * _width;
 
-                __.set('display_sz',[_width,_height]);
+                __.set('display_sz', [_width, _height]);
             })
         };
 
-        p.forEach(function(_) {
+        p.forEach(function (_) {
             var _width = calc_width(_);
 
             if (_width + cw <= w) {
@@ -231,24 +225,26 @@ App.AlbumView = Em.View.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-    }.observes('controller.model.photos.[]','controller.model.sortProperties'),
+    }.observes('controller.model.photos.[]', 'controller.model.sortProperties','controller.model.photos.current_path'),
     actions: {
-        do_size: function() {
+        do_size: function () {
             console.log('doing size')
             this.size_photos();
         }
     }
 });
 
+App.Folder = Em.Object.extend({
+    height: 200,
+    width: 200,
+    display_sz: [200,200],
+    is_folder: true
+});
+
 App.PhotosController = Em.ArrayController.extend({
-//    setupController: function(controller,model){
-//        console.log(controller,model,'photos setup');
-//        controller.set('model',model);
-//        return controller;
-//    },
     sortProperties: ['uploaded'],
     sortAscending: false,
-    update_sort: function() {
+    update_sort: function () {
 
         if (Em.none(this.get('album'))) {
             return;
@@ -256,11 +252,11 @@ App.PhotosController = Em.ArrayController.extend({
         if (this.get('album.sortProperties') == 'position') {
             var album_sort = this.get('album.manualSort');
 
-            console.log("manual sort enabled",album_sort);
+            console.log("manual sort enabled", album_sort);
 
             if (album_sort.length == 0) {
                 console.log('resort')
-                this.get('arrangedContent').forEach(function(s){
+                this.get('arrangedContent').forEach(function (s) {
                     var modified = false;
 
                     while (album_sort.indexOf(s.get('album_pos_id')) != -1) {
@@ -268,27 +264,76 @@ App.PhotosController = Em.ArrayController.extend({
                         modified = true;
                     }
                     album_sort.pushObject(s.get('album_pos_id'));
-                    if (modified){
+                    if (modified) {
                         s.save();
                     }
-                })
+                });
 //                this.get('album').save()
             }
 
-            this.get('content').forEach(function(s) {
-                s.set('position',album_sort.indexOf(s.get('album_pos_id')));
+            this.get('content').forEach(function (s) {
+                s.set('position', album_sort.indexOf(s.get('album_pos_id')));
 //                console.log(s.position,s.get('album_pos_id'));
             });
 
         } else {
-            this.set('album.manualSort',[]);
+            this.set('album.manualSort', []);
 //            this.get('album').save()
         }
 
         this.set('sortProperties', [this.get('album.sortProperties')]);
         this.set('sortAscending', this.get('album.sortAscending'));
-    }
-})
+    },
+    current_path: null,
+    filtered_arrangedContent: function () {
+        var cp = this.get('current_path') || '';
+
+        return this.get('arrangedContent').filter(function (_) {
+            var path = _.get('path') || '',
+                m = path.match('^'+cp+'$') != null;
+
+            //console.log('# ',path,' - ',cp,m);
+            return m;
+        });
+
+    }.property('arrangedContent', 'current_path'),
+    folders: function () {
+        var folder_list = {},
+            folders = [],
+            cp = this.get('current_path') || '',
+            re = '^' + cp + '[/]?[^/]+$';
+
+        //folder
+        //folder/1 great
+        //folder/1 great/another
+
+
+        this.get('content').forEach(function (_) {
+            if (_.get('path') !== null) {
+
+                console.log('F ',_.get('path').match(re) !=null, _.get('path'),' ',re);
+
+                if (_.get('path').match(re) != null){
+
+                    //console.log('folders',re,cp)
+
+                    folder_list[_.get('path')] = null;
+
+                }
+
+            }
+        });
+
+        for (k in folder_list) {
+            folders.pushObject(App.Folder.create({
+                name: k
+            }))
+        }
+
+        console.log(folder_list, folders);
+        return folders;
+    }.property('current_path')
+});
 
 App.AlbumRoute = Em.Route.extend({
     renderTemplate: function () {
@@ -307,14 +352,14 @@ App.AlbumRoute = Em.Route.extend({
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
 
             var p = App.PhotosController.create({
-                content:photos,
+                content: photos,
                 album: model
             });
             p.update_sort();
             model.set('photos', p);
 
-            if (photos.get('content.length')==0 ){
-                controller.send('openModalModel','upload-modal',model);
+            if (photos.get('content.length') == 0) {
+                controller.send('openModalModel', 'upload-modal', model);
             }
 
         });
@@ -339,7 +384,7 @@ App.AlbumsIndexRoute = Em.Route.extend({
             var name = prompt('New album name?'),
                 _this = this;
 
-            if ($.trim(name).length==0){
+            if ($.trim(name).length == 0) {
                 return;
             }
 
@@ -355,7 +400,6 @@ App.AlbumsIndexRoute = Em.Route.extend({
 });
 
 
-App.AlbumCoverComponent = Em.Component.extend({
-});
+App.AlbumCoverComponent = Em.Component.extend({});
 
 

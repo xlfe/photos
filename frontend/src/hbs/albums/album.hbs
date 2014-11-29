@@ -1,7 +1,10 @@
 {{outlet}}
 <div class="container-fluid edge-to-edge">
     <div class="your-photos">
-        {{#each controller.model.photos.arrangedContent}}
+        {{#each controller.model.photos.folders}}
+            {{photo-grid-folder folder=this album=controller.model}}
+        {{/each}}
+        {{#each controller.model.photos.filtered_arrangedContent}}
             {{photo-grid-photo photo=this album=controller.model save="save"}}
         {{else}}
             <div class="box-middle-center">
