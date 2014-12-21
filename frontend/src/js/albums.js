@@ -11,12 +11,30 @@ App.Album = DS.Model.extend({
         {name: 'Digitized', val: 'original_metadata.DateTime'},
         {name: 'Manual', val: 'position'}
     ],
-    photos_count: function () {
-        return
-    }
+    //photos_count: function () {
+    //    return
+    //}
 });
 
-App.AlbumController = Em.Controller.extend({});
+App.AlbumController = Em.Controller.extend({
+    queryParams: ['path'],
+    p_obs: function() {
+        var cp = this.get('path'),
+            model = this.get('model.photos');
+        if (Em.none(model)){
+            return
+        }
+        this.set('model.photos.current_path',cp);
+    }.observes('path'),
+    pp_obs: function() {
+        var mpcp = this.get('model.photos.current_path');
+        if (Em.none(mpcp)){
+            return
+        }
+        this.set('path',this.get('model.photos.current_path'));
+        console.log(this.get('path'))
+    }.observes('model.photos.current_path')
+});
 
 App.AlbumMenuView = Em.View.extend({
     tagName: 'ul',
@@ -252,10 +270,10 @@ App.PhotosController = Em.ArrayController.extend({
         if (this.get('album.sortProperties') == 'position') {
             var album_sort = this.get('album.manualSort');
 
-            console.log("manual sort enabled", album_sort);
+            //console.log("manual sort enabled", album_sort);
 
             if (album_sort.length == 0) {
-                console.log('resort')
+                //console.log('resort')
                 this.get('arrangedContent').forEach(function (s) {
                     var modified = false;
 
@@ -314,11 +332,8 @@ App.PhotosController = Em.ArrayController.extend({
                 console.log('F ',_.get('path').match(re) !=null, _.get('path'),' ',re);
 
                 if (_.get('path').match(re) != null){
-
                     //console.log('folders',re,cp)
-
                     folder_list[_.get('path')] = null;
-
                 }
 
             }
@@ -326,11 +341,14 @@ App.PhotosController = Em.ArrayController.extend({
 
         for (k in folder_list) {
             folders.pushObject(App.Folder.create({
-                name: k
+                name: k,
+                images: this.get('content').filter(function(_){
+                    return _.get('path').match(k) != null;
+                }).length
             }))
         }
 
-        console.log(folder_list, folders);
+        //console.log(folder_list, folders);
         return folders;
     }.property('current_path')
 });
@@ -353,6 +371,7 @@ App.AlbumRoute = Em.Route.extend({
 
             var p = App.PhotosController.create({
                 content: photos,
+                current_path: controller.get('path'),
                 album: model
             });
             p.update_sort();

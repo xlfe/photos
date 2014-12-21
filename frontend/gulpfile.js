@@ -1,9 +1,3 @@
-function assert(condition, message) {
-    if (!condition) {
-        throw message || "Assertion failed";
-    }
-}
-
 var     gulp            = require('gulp'),
         gutil           = require('gulp-util'),
         uglify          = require('gulp-uglify'),
@@ -36,6 +30,14 @@ gulp.task('clean-siteroot', function() {
         .pipe(rimraf({force: true}));
 });
 
+
+function assert(condition, message) {
+    if (!condition) {
+        throw message || "Assertion failed";
+    }
+}
+
+
 function copy_vendor_files(t,cb) {
 
     var js_root = paths.vendor,
@@ -49,6 +51,7 @@ function copy_vendor_files(t,cb) {
     static_js.forEach(function(s) {
         files.push(s);
     });
+
 
     needs = files.slice(0);
 
@@ -203,9 +206,7 @@ gulp.task('compile-useref',function(){
 gulp.task('watch', ['debug'], function() {
     gulp.watch(paths.handlebars + '/**',['compile-hbs-debug']);
     gulp.watch(paths.scripts + '/**/*.js',['compile-app-debug']);
-    if ('sass' in paths) {
-        gulp.watch(paths.sass + '/**',['compile-sass-debug']);
-    }
+    gulp.watch(paths.sass + '/**',['compile-sass-debug']);
     gulp.watch(paths.static + '/**',['copy-static']);
 });
 
@@ -213,9 +214,7 @@ gulp.task('watch-useref',['compile-useref'],function(){
     gulp.watch(userefs + '/**',['compile-useref']);
     gulp.watch(paths.handlebars + '/**',['compile-useref']);
     gulp.watch(paths.scripts + '/**/*.js',['compile-useref']);
-    if ('sass' in paths) {
-        gulp.watch(paths.sass + '/**', ['compile-useref']);
-    }
+    gulp.watch(paths.sass + '/**',['compile-useref']);
 })
 
 
@@ -223,9 +222,7 @@ var build = function(level) {
     gulp.start('copy-static');
     gulp.start('copy-vendor-' + level);
     gulp.start('compile-hbs-' + level);
-    if ('sass' in paths) {
-        gulp.start('compile-sass-' + level);
-    }
+    gulp.start('compile-sass-'+ level);
     gulp.start('compile-app-' + level);
 
 }

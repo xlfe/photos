@@ -1,4 +1,3 @@
-
 {{#link-to "album" this tagName="li" class="menu-link"}}
     <a {{bind-attr href="view.href"}}>
         <strong>
@@ -18,17 +17,14 @@
 <li class="menu-link">
     <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
         <i class="fa fa-lg fa-upload"></i>
-            Upload
+        Upload
     </a>
 </li>
 
 
 <li class="menu-link pull-right">
     <a>
-
-    {{model.photos.length}} Photos
+        {{model.photos.length}} Photos
     </a>
 </li>
-
-
 

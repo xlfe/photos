@@ -82,7 +82,7 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function() {
         drag['dragging']= this.get('photo.album_pos_id');
-        console.log('Drag starting with ' + drag['dragging']);
+        //console.log('Drag starting with ' + drag['dragging']);
     },
     dragOver: function(evt) {
         var left = evt.target.offsetLeft,
@@ -136,7 +136,7 @@ App.PhotoGridPhotoComponent = Em.Component.extend({
 
             offset -= 2;
         }
-        console.log(offset);
+        //console.log(offset);
         ms.insertAt(offset,drag['dragging']);
 //        ms.splice(offset,0,drag['dragging'])
 

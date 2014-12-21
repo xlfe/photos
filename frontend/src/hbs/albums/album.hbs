@@ -6,15 +6,20 @@
         {{/each}}
         {{#each controller.model.photos.filtered_arrangedContent}}
             {{photo-grid-photo photo=this album=controller.model save="save"}}
-        {{else}}
-            <div class="box-middle-center">
+        {{/each}}
+
+        {{#unless controller.model.photos.folders}}
+            {{#unless controller.model.photos.filtered_arrangedContent}}
+
+                <div class="box-middle-center">
                 <span>
                     No photos found - would you like to
                     <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
                         upload some photos</a>?
                 </span>
-            </div>
-        {{/each}}
+                </div>
+            {{/unless}}
+        {{/unless}}
     </div>
 </div>
 
