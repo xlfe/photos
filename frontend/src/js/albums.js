@@ -350,6 +350,21 @@ App.PhotosController = Em.ArrayController.extend({
 
         //console.log(folder_list, folders);
         return folders;
+    }.property('current_path'),
+    breadcrumbs: function() {
+        var cp = this.get('current_path'),
+            paths = [];
+
+        if (Em.none(cp)){
+            return [];
+        }
+        return cp.split('/').map(function(_){
+            paths.pushObject(_);
+            return Em.Object.create({
+                name: _,
+                path: paths.join('/')
+            })
+        })
     }.property('current_path')
 });
 

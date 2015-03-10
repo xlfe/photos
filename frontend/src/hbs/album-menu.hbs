@@ -1,10 +1,19 @@
-{{#link-to "album" this tagName="li" class="menu-link"}}
+{{#link-to "album" this (query-params path=null) tagName="li" class="menu-link"}}
     <a {{bind-attr href="view.href"}}>
         <strong>
             {{controller.model.name}}
         </strong>
     </a>
 {{/link-to}}
+
+{{#each p in model.photos.breadcrumbs}}
+    {{#link-to "album" this (query-params path=p.path) tagName="li" class="menu-link"}}
+        <a>
+        > {{p.name}}
+        </a>
+    {{/link-to}}
+{{/each}}
+
 
 
 <li class="menu-link">
