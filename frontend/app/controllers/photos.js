@@ -1,6 +1,13 @@
 import Em from 'ember';
 
-App.PhotosController = Em.ArrayController.extend({
+var Folder = Em.Object.extend({
+    height: 200,
+    width: 200,
+    display_sz: [200,200],
+    is_folder: true
+});
+
+export default Em.ArrayController.extend({
     sortProperties: ['uploaded'],
     sortAscending: false,
     update_sort: function () {
@@ -8,17 +15,17 @@ App.PhotosController = Em.ArrayController.extend({
         if (Em.none(this.get('album'))) {
             return;
         }
-        if (this.get('album.sortProperties') == 'position') {
+        if (this.get('album.sortProperties') === 'position') {
             var album_sort = this.get('album.manualSort');
 
             //console.log("manual sort enabled", album_sort);
 
-            if (album_sort.length == 0) {
+            if (album_sort.length === 0) {
                 //console.log('resort')
                 this.get('arrangedContent').forEach(function (s) {
                     var modified = false;
 
-                    while (album_sort.indexOf(s.get('album_pos_id')) != -1) {
+                    while (album_sort.indexOf(s.get('album_pos_id')) !== -1) {
                         s.set('album_pos_id', s.get('album_pos_id') + 1);
                         modified = true;
                     }
@@ -58,7 +65,7 @@ App.PhotosController = Em.ArrayController.extend({
     }.property('arrangedContent', 'current_path'),
     folders: function () {
         var folder_list = {},
-            folders = [],
+            content = this.get('content'),
             cp = this.get('current_path') || '',
             re = '^' + cp + '[/]?[^/]+$';
 
@@ -80,17 +87,14 @@ App.PhotosController = Em.ArrayController.extend({
             }
         });
 
-        for (k in folder_list) {
-            folders.pushObject(App.Folder.create({
-                name: k,
-                images: this.get('content').filter(function(_){
-                    return _.get('path').match(k) != null;
-                }).length
-            }))
-        }
-
-        //console.log(folder_list, folders);
-        return folders;
+        return folder_list.map(function(k){
+             return Folder.create({
+                 name: k,
+                 images: content.filter(function (_) {
+                     return _.get('path').match(k) != null;
+                 })
+             });
+        });
     }.property('current_path'),
     breadcrumbs: function() {
         var cp = this.get('current_path'),
@@ -104,8 +108,8 @@ App.PhotosController = Em.ArrayController.extend({
             return Em.Object.create({
                 name: _,
                 path: paths.join('/')
-            })
-        })
+            });
+        });
     }.property('current_path')
 });
 

@@ -4,11 +4,11 @@ export default Em.View.extend({
 //    needs: ['album'],
     templateName: 'albums/show',
     willDestroyElement: function () {
-        $(document).off('keyup', this.keyUp);
+        Em.$(document).off('keyup', this.keyUp);
         this.$('#lightbox-overlay').off('click', this.overlay_click);
     },
     didInsertElement: function () {
-        $(document).on('keyup', {_this: this}, this.keyUp);
+        Em.$(document).on('keyup', {_this: this}, this.keyUp);
         this.$('#lightbox-overlay').on('click', {_this: this}, this.overlay_click);
     },
     overlay_click: function (event) {
@@ -28,10 +28,12 @@ export default Em.View.extend({
     }.property('controller.model'),
     setPhoto: function () {
 
-        if (this.$() === undefined) return;
+        if (this.$() === undefined) {
+            return;
+        }
 
-        var screenWidth = $(window).width() * 0.99,
-            screenHeight = ($(window).height() - 25 ) * 0.99,
+        var screenWidth = Em.$(window).width() * 0.99,
+            screenHeight = (Em.$(window).height() - 25 ) * 0.99,
             photo = this.get('controller.model'),
             image = this.$('img'),
             tmpImage = new Image();
@@ -41,8 +43,8 @@ export default Em.View.extend({
         tmpImage.src = this.get('displayUrl');
         tmpImage.onload = function () {
             image.show();
-            imageWidth = photo.get('width');
-            imageHeight = photo.get('height');
+            var imageWidth = photo.get('width'),
+                imageHeight = photo.get('height');
 
             if (imageWidth > screenWidth || imageHeight > screenHeight) {
                 var ratio = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
@@ -53,8 +55,8 @@ export default Em.View.extend({
             image.css({
                 'width': imageWidth + 'px',
                 'height': imageHeight + 'px',
-                'top': ( $(window).height() - imageHeight - 25 ) / 2 + 'px',
-                'left': ( $(window).width() - imageWidth ) / 2 + 'px'
+                'top': ( Em.$(window).height() - imageHeight - 25 ) / 2 + 'px',
+                'left': ( Em.$(window).width() - imageWidth ) / 2 + 'px'
             });
         };
 
@@ -62,14 +64,14 @@ export default Em.View.extend({
     }.observes('controller.model').on('didInsertElement'),
 
     gestures: {
-        swipeLeft: function (event) {
+        swipeLeft: function () {
             this.get('controller').go_photo(-1);
         },
-        swipeRight: function (event) {
+        swipeRight: function () {
             this.get('controller').go_photo(1);
         },
         tap: function (event) {
-            if (event.tapCount == 2) {
+            if (event.tapCount === 2) {
                 this.get('controller').transitionToRoute('album');
                 event.preventDefault();
             }
@@ -82,18 +84,17 @@ export default Em.View.extend({
     keyUp: function (evt) {
 
         var _this = evt.data._this,
-            controller = _this.get('controller'),
-            photo = controller.get('model');
+            controller = _this.get('controller');
 
-        if (evt.which == 27) {
+        if (evt.which === 27) {
             //Escape - close
-            controller.transitionToRoute('album')
+            controller.transitionToRoute('album');
             return;
-        } else if (evt.which == 39) {
+        } else if (evt.which === 39) {
             //Right
             controller.go_photo(1);
             return;
-        } else if (evt.which == 37) {
+        } else if (evt.which === 37) {
             //Left
             controller.go_photo(-1);
             return;

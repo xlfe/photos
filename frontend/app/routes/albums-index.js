@@ -9,7 +9,7 @@ export default Em.Route.extend({
             var name = prompt('New album name?'),
                 _this = this;
 
-            if ($.trim(name).length == 0) {
+            if (Em.$.trim(name).length === 0) {
                 return;
             }
 

@@ -1,4 +1,5 @@
 import Em from 'ember';
+import PhotosController from 'controllers/photos';
 
 export default Em.Route.extend({
     renderTemplate: function () {
@@ -16,7 +17,7 @@ export default Em.Route.extend({
         controller.set('model', model);
         this.get('store').find('photo', {'album[]': model.get('id')}).then(function (photos) {
 
-            var p = App.PhotosController.create({
+            var p = PhotosController.create({
                 content: photos,
                 current_path: controller.get('path'),
                 album: model
@@ -24,7 +25,7 @@ export default Em.Route.extend({
             p.update_sort();
             model.set('photos', p);
 
-            if (photos.get('content.length') == 0) {
+            if (photos.get('content.length') === 0) {
                 controller.send('openModalModel', 'upload-modal', model);
             }
 

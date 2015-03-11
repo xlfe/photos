@@ -1,5 +1,13 @@
 import Em from 'ember';
 
+function calc_width(_photo) {
+    var _aspect = _photo.get('width') / _photo.get('height'), // 600w / 400h = 1.5
+        min_height = 320, //Minimum height of each row in pixels
+        _width = min_height * _aspect; // 200 * 1.5 = 300
+
+    return _width;
+}
+
 export default Em.View.extend({
     images: 'photos.arrangedContent',
     templateName: 'albums/album',
@@ -7,7 +15,7 @@ export default Em.View.extend({
         var _this = this;
 
 
-        $(window).resize(function () {
+        Em.$(window).resize(function () {
             Em.run.debounce(_this, _this.size_photos, 100);
         });
 
@@ -44,7 +52,7 @@ export default Em.View.extend({
                     _height = __.get('height') / __.get('width') * _width;
 
                 __.set('display_sz', [_width, _height]);
-            })
+            });
         };
 
         p.forEach(function (_) {
@@ -68,7 +76,7 @@ export default Em.View.extend({
     }.observes('controller.model.photos.[]', 'controller.model.sortProperties','controller.model.photos.current_path'),
     actions: {
         do_size: function () {
-            console.log('doing size')
+            console.log('doing size');
             this.size_photos();
         }
     }

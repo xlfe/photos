@@ -6,17 +6,17 @@ export default Em.Controller.extend({
         var cp = this.get('path'),
             model = this.get('model.photos');
         if (Em.none(model)){
-            return
+            return;
         }
         this.set('model.photos.current_path',cp);
     }.observes('path'),
     pp_obs: function() {
         var mpcp = this.get('model.photos.current_path');
         if (Em.none(mpcp)){
-            return
+            return;
         }
         this.set('path',this.get('model.photos.current_path'));
-        console.log(this.get('path'))
+        console.log(this.get('path'));
     }.observes('model.photos.current_path')
 });
 
