@@ -3,8 +3,8 @@
 <h3> Your albums
 </h3>
 
-{{#each}}
-    {{album-cover album=this}}
+{{#each album in controller.model}}
+    {{album-cover album=album}}
 {{/each}}
 
 <a href="" {{action 'new_album'}}>

@@ -20,21 +20,21 @@
 
     <div class="upload">
 
-        {{#each controller.files}}
+        {{#each file in controller.files}}
 
             <label class="file">
-                <label class="progress" {{bind-attr style=progress}}></label>
+                <label class="progress" {{bind-attr style=file.progress}}></label>
 
                 <label class="name">
-                    {{name}}
+                    {{file.name}}
                 </label>
 
                 <label class="size">
-                    {{hSize}}
+                    {{file.hSize}}
                 </label>
 
                 <label class="status">
-                    {{status}}
+                    {{file.status}}
                 </label>
             </label>
 
