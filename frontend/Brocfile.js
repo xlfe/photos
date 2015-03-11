@@ -30,5 +30,7 @@ app.import('bower_components/bootstrap/dist/js/bootstrap.js');
 app.import('bower_components/moment/moment.js');
 app.import('bower_components/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js');
 
+app.import('bower_components/hammerjs/hammer.js');
+app.import('bower_components/ember-hammer/ember-hammer.js');
 
 module.exports = app.toTree();
