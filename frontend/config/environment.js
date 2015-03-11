@@ -31,6 +31,8 @@ module.exports = function (environment) {
         ENV.contentSecurityPolicy = {
             'connect-src': "'self' http://iolggr.appspot.com"
         }
+
+        ENV.host = 'localhost';
     }
 
     if (environment === 'test') {
