@@ -253,6 +253,8 @@ class BaseRESTHandler(webapp2.RequestHandler):
 
         response.headers['Content-Type'] = 'application/json'
         response.headers['Access-Control-Allow-Methods'] = ', '.join(self.permissions.keys())
+        response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept'
+
 
         if getattr(self, 'allowed_origin', None):
             response.headers['Access-Control-Allow-Origin'] = self.allowed_origin

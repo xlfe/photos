@@ -207,6 +207,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(photo.key.urlsafe()))
 
+ALLOWED_ORIGIN = '*'
 
 
 app = webapp2.WSGIApplication([
@@ -214,9 +215,9 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/finalize-upload',GCSFinalizeHandler),
         webapp2.Route('/api/upload',UploadHandler),
 
-        RESTHandler('/api/users',User,permissions=OWNER_PERMISSIONS,user_object=User),
-        RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User),
-        RESTHandler('/api/albums',Album,permissions=OWNER_PERMISSIONS,user_object=User),
+        RESTHandler('/api/users',User,permissions=OWNER_PERMISSIONS,user_object=User,  allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/albums',Album,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN),
       ],
     debug=True,
     config=config
