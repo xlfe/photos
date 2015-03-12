@@ -1,5 +1,5 @@
 import Em from 'ember';
-import PhotosController from 'controllers/photos';
+import PhotosController from '../controllers/photos';
 
 export default Em.Route.extend({
     renderTemplate: function () {

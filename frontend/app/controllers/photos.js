@@ -12,7 +12,7 @@ export default Em.ArrayController.extend({
     sortAscending: false,
     update_sort: function () {
 
-        if (Em.none(this.get('album'))) {
+        if (Em.isNone(this.get('album'))) {
             return;
         }
         if (this.get('album.sortProperties') === 'position') {
@@ -87,7 +87,7 @@ export default Em.ArrayController.extend({
             }
         });
 
-        return folder_list.map(function(k){
+        return Object.keys(folder_list).map(function(k){
              return Folder.create({
                  name: k,
                  images: content.filter(function (_) {
@@ -100,7 +100,7 @@ export default Em.ArrayController.extend({
         var cp = this.get('current_path'),
             paths = [];
 
-        if (Em.none(cp)){
+        if (Em.isNone(cp)){
             return [];
         }
         return cp.split('/').map(function(_){

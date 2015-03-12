@@ -29,10 +29,10 @@ module.exports = function (environment) {
         // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
         ENV.contentSecurityPolicy = {
-            'connect-src': "'self' http://iolggr.appspot.com"
+            'connect-src': "'self' http://iolggr.appspot.com http://localhost:8080"
         }
 
-        ENV.host = 'localhost';
+        ENV.api_host = 'http://localhost:8080';
     }
 
     if (environment === 'test') {
