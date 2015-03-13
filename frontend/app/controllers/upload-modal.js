@@ -70,8 +70,7 @@ export default Em.Controller.extend({
     add_file: function(file,_id) {
         var _this = this;
         this.store.find('photo',_id).then(function(photo){
-            console.log(_this.get('model.photos'))
-            _this.get('model.photos').pushObject(photo);
+            _this.get('model.photos.content').pushObject(photo);
             file.set('status','Complete');
             file.set('_status',6);
         });
@@ -216,6 +215,7 @@ export default Em.Controller.extend({
         });
 
         uploading.forEach(function(_){
+            _.set('status',-1);
             _.get('xhr').abort();
         });
 

@@ -22,6 +22,7 @@ class Album(ndb.Model):
     name = ndb.StringProperty()
     sortProperties = ndb.StringProperty()
     sortAscending = ndb.BooleanProperty()
+    minHeight = ndb.IntegerProperty(default=200,required=True)
     manualSort = ndb.IntegerProperty(repeated=True)
 
 

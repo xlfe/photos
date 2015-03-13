@@ -3,9 +3,11 @@
 <h3> Your albums
 </h3>
 
-{{#each album in controller.model}}
-    {{album-cover album=album}}
-{{/each}}
+<div class="albums">
+    {{#each album in controller.model}}
+        {{album-cover album=album}}
+    {{/each}}
+</div>
 
 <a href="" {{action 'new_album'}}>
     <i class="fa fa-lg fa-plus"></i>

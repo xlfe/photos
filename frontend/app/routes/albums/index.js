@@ -1,4 +1,5 @@
 import Em from 'ember';
+import PhotosController from '../../controllers/photos';
 
 export default Em.Route.extend({
     model: function () {
@@ -15,9 +16,18 @@ export default Em.Route.extend({
 
             this.get('store').createRecord('album', {
                 name: name,
+                minHeight: 320,
                 sortProperties: 'uploaded',
                 sortAscending: true
             }).save().then(function (_) {
+
+                var p = PhotosController.create({
+                    content: [],
+                    current_path: null,
+                    album: _
+                });
+                p.update_sort();
+                _.set('photos', p);
                 _this.transitionTo('album', _);
             });
         }

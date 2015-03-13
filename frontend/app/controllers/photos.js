@@ -15,9 +15,9 @@ function below_folder(path, folder) {
     return path.match('^' + folder + '(/.*)?$') !== null;
 }
 
-if (typeof String.prototype.startsWith != 'function') {
+if (typeof String.prototype.startsWith !== 'function') {
   String.prototype.startsWith = function (str){
-    return this.slice(0, str.length) == str;
+    return this.slice(0, str.length) === str;
   };
 }
 
@@ -77,7 +77,7 @@ export default Em.ArrayController.extend({
         //console.log('filtered_arrangedContent',content);
         return content;
 
-    }.property('arrangedContent', 'current_path'),
+    }.property('arrangedContent.[]', 'current_path'),
 
     folders: function () {
         // Show all folders that have this path or below
@@ -110,7 +110,7 @@ export default Em.ArrayController.extend({
                  })
              });
         });
-    }.property('current_path','content'),
+    }.property('current_path','content.[]'),
     breadcrumbs: function() {
         var cp = this.get('current_path'),
             paths = [];

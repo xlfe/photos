@@ -22,7 +22,7 @@ export default Em.Route.extend({
         var store = this.get('store');
 
 
-        return new Ember.RSVP.Promise(function(resolve,reject){
+        return new Em.RSVP.Promise(function(resolve,reject){
 
             store.find('album', params.album_id).then(function (album) {
 
@@ -35,11 +35,9 @@ export default Em.Route.extend({
                     });
                     p.update_sort();
                     album.set('photos', p);
-
                     resolve(album);
-
                 });
-            })
-        })
+            });
+        });
     }
 });
