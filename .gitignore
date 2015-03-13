@@ -1,10 +1,9 @@
-slidenight/static/
+slidenight/static
 frontend/node_modules
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 .idea/
-frontend/.sass-cache/
 
 .DS_Store
 

@@ -14,7 +14,6 @@ export default Em.View.extend({
     didInsertElement: function () {
         var _this = this;
 
-
         Em.$(window).resize(function () {
             Em.run.debounce(_this, _this.size_photos, 100);
         });
@@ -73,7 +72,7 @@ export default Em.View.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-    }.observes('controller.model.photos.[]', 'controller.model.sortProperties','controller.model.photos.current_path'),
+    }.observes('controller.model.photos', 'controller.model.sortProperties','controller.model.photos.current_path'),
     actions: {
         do_size: function () {
             console.log('doing size');

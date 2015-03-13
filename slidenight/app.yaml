@@ -26,6 +26,14 @@ handlers:
   login: admin
   secure: always
 
+- url: /(albums)
+  static_files: static/index.html
+  upload: static/index.html
+
+- url: /(albums)/(.*)
+  static_files: static/index.html
+  upload: static/index.html
+
 - url: /
   static_dir: static
   login: admin

@@ -1,4 +1,5 @@
 import Em from 'ember';
+import config from '../config/environment';
 
 var select = function (f, i) {
     return f.filter(function (_) {
@@ -28,7 +29,7 @@ export default Em.Controller.extend({
         file.set('_status', 2);
 
         Em.$.ajax({
-            url: '/api/prepare-upload',
+            url: [config.api_host, config.api_endpoint, 'prepare-upload'].join('/'),
             type: 'POST',
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
@@ -69,7 +70,8 @@ export default Em.Controller.extend({
     add_file: function(file,_id) {
         var _this = this;
         this.store.find('photo',_id).then(function(photo){
-            _this.get('model.photos.content').pushObject(photo);
+            console.log(_this.get('model.photos'))
+            _this.get('model.photos').pushObject(photo);
             file.set('status','Complete');
             file.set('_status',6);
         });
@@ -111,7 +113,7 @@ export default Em.Controller.extend({
                 var xhr = new window.XMLHttpRequest();
                 if (xhr.upload) {
                     xhr.upload.onprogress = function (e) {
-                        var done = start + e.position || e.loaded, total = file.get('bytes'),
+                        var done = start + e.loaded, total = file.get('bytes'),
                             progress = 'width: ' + (Math.floor(done / total * 1000) / 10) + '%';
                         file.set('progress',progress);
                     };
@@ -138,7 +140,7 @@ export default Em.Controller.extend({
                 if (prod) {
 
                     Em.$.ajax({
-                        url: '/api/finalize-upload',
+                        url: [config.api_host, config.api_endpoint, 'finalize-upload'].join('/'),
                         method: 'POST',
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify({
@@ -192,6 +194,8 @@ export default Em.Controller.extend({
     },
     cancel_queue: function() {
 
+        this.set('cancelling',true);
+
         var _f = this.get('files'),
             self = this,
             queued = select(_f, 1),
@@ -201,8 +205,15 @@ export default Em.Controller.extend({
 
         if (queued.length + preparing.length + ready.length + uploading.length === 0) {
             self.set('close_caption','Cancelled');
+            self.set('save_caption','Cancelled');
+            self.set('save_disabled',false);
             return true;
         }
+
+        queued.forEach(function(_){
+            _.set('_status',-1);
+            _.set('status','Cancelled');
+        });
 
         uploading.forEach(function(_){
             _.get('xhr').abort();
@@ -210,7 +221,7 @@ export default Em.Controller.extend({
 
         setTimeout(function(){
             self.cancel_queue();
-        },500);
+        },50);
     },
     process_queue: function () {
 
@@ -249,7 +260,7 @@ export default Em.Controller.extend({
 
         setTimeout(function () {
             self.process_queue();
-        }, 500);
+        }, 50);
 
         return false;
 
@@ -281,6 +292,7 @@ export default Em.Controller.extend({
     },
     reset: function() {
         this.get('modal').modal('hide');
+        this.set('cancelling',false);
         this.set('files',[]);
         this.set('done',false);
         this.set('save_disabled',true);

@@ -36,8 +36,19 @@ from google.appengine.api import images
 import httplib2
 from oauth2client.appengine import AppAssertionCredentials
 
+def allow_crosssite(response,origin='*'):
+    response.headers['access-control-allow-origin'] = origin
+    return response
 
-class PrepareUpload(webapp2.RequestHandler):
+class CrosssiteAllowed(webapp2.RequestHandler):
+    def options(self):
+        self.response.headers['access-control-allow-headers'] = 'X-Requested-With, Content-Type, Accept'
+        self.response.headers['access-control-allow-methods'] = 'POST, PUT, GET, DELETE, OPTIONS'
+        allow_crosssite(self.response,self.request.host)
+        return self.response
+
+class PrepareUpload(CrosssiteAllowed):
+
     def post(self):
 
         params = json.loads(self.request.body)
@@ -76,6 +87,7 @@ class PrepareUpload(webapp2.RequestHandler):
             url = blobstore.create_upload_url('/api/upload')
 
             self.response.headers['Content-Type'] = 'application/json'
+            allow_crosssite(self.response)
 
             upload = {
                 'location': url,
@@ -205,6 +217,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         photo.put()
 
         self.response.headers['Content-Type'] = 'application/json'
+        allow_crosssite(self.response)
         self.response.out.write(json.dumps(photo.key.urlsafe()))
 
 ALLOWED_ORIGIN = '*'

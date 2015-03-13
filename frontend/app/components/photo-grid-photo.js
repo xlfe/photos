@@ -33,7 +33,12 @@ export default Em.Component.extend({
         this.$().css({'background-image': 'url(' + img_src + ')'});
     },
     setup: function () {
-        var sz = this.get('photo.display_sz'),
+        var sz = this.get('photo.display_sz');
+
+        if (Em.isNone(sz)){
+            return;
+        }
+        var
             w = sz[0],
             h = sz[1];
 

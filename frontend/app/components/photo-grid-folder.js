@@ -1,4 +1,4 @@
-import PGPC from 'photo-grid-photo';
+import PGPC from '../components/photo-grid-photo';
 
 export default PGPC.extend({
     classNameBindings: [':folder'],
@@ -19,7 +19,7 @@ export default PGPC.extend({
             var album = this.get('album'),
                 photos = album.get('photos'),
                 //cp = photos.get('current_path') || '',
-                fn = this.get('folder.name');
+                fn = this.get('folder.path');
             photos.set('current_path',fn );
         }
     }

@@ -1,15 +1,17 @@
 {{outlet}}
 <div class="container-fluid edge-to-edge">
     <div class="your-photos">
-        {{#each folder in controller.model.photos.folders}}
+
+        {{#each folder in model.photos.folders}}
             {{photo-grid-folder folder=folder album=controller.model}}
         {{/each}}
-        {{#each photo in controller.model.photos.filtered_arrangedContent}}
+
+        {{#each photo in model.photos.filtered_arrangedContent}}
             {{photo-grid-photo photo=photo album=controller.model save="save"}}
         {{/each}}
 
-        {{#unless controller.model.photos.folders}}
-            {{#unless controller.model.photos.filtered_arrangedContent}}
+        {{#unless model.photos.folders}}
+            {{#unless model.photos.filtered_arrangedContent}}
 
                 <div class="box-middle-center">
                 <span>
@@ -20,6 +22,7 @@
                 </div>
             {{/unless}}
         {{/unless}}
+
     </div>
 </div>
 

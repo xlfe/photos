@@ -7,6 +7,20 @@ var Folder = Em.Object.extend({
     is_folder: true
 });
 
+
+function below_folder(path, folder) {
+    if (folder.length === 0){
+        return true;
+    }
+    return path.match('^' + folder + '(/.*)?$') !== null;
+}
+
+if (typeof String.prototype.startsWith != 'function') {
+  String.prototype.startsWith = function (str){
+    return this.slice(0, str.length) == str;
+  };
+}
+
 export default Em.ArrayController.extend({
     sortProperties: ['uploaded'],
     sortAscending: false,
@@ -50,11 +64,9 @@ export default Em.ArrayController.extend({
         this.set('sortProperties', [this.get('album.sortProperties')]);
         this.set('sortAscending', this.get('album.sortAscending'));
     },
-    current_path: null,
     filtered_arrangedContent: function () {
-        var cp = this.get('current_path') || '';
-
-        return this.get('arrangedContent').filter(function (_) {
+        var cp = this.get('current_path') || '',
+            content = this.get('arrangedContent').filter(function (_) {
             var path = _.get('path') || '',
                 m = path.match('^'+cp+'$') != null;
 
@@ -62,40 +74,43 @@ export default Em.ArrayController.extend({
             return m;
         });
 
+        //console.log('filtered_arrangedContent',content);
+        return content;
+
     }.property('arrangedContent', 'current_path'),
+
     folders: function () {
+        // Show all folders that have this path or below
+
         var folder_list = {},
             content = this.get('content'),
             cp = this.get('current_path') || '',
-            re = '^' + cp + '[/]?[^/]+$';
+            l = cp.length > 0 ? cp.length + 1 : 0;
 
-        //folder
-        //folder/1 great
-        //folder/1 great/another
-
+        //   folder
+        //   folder/1 great
+        //   folder/1 great/another
 
         this.get('content').forEach(function (_) {
-            if (_.get('path') !== null) {
+            var p = _.get('path');
 
-                console.log('F ',_.get('path').match(re) !=null, _.get('path'),' ',re);
-
-                if (_.get('path').match(re) != null){
-                    //console.log('folders',re,cp)
-                    folder_list[_.get('path')] = null;
+            if (Em.isPresent(p)){
+                if (below_folder(p,cp) && (p.length > cp.length)) {
+                    folder_list[p.slice(l).split('/')[0]] = null;
                 }
-
             }
         });
 
         return Object.keys(folder_list).map(function(k){
              return Folder.create({
                  name: k,
+                 path: cp.length > 0 ? cp + '/' + k : k,
                  images: content.filter(function (_) {
-                     return _.get('path').match(k) != null;
+                     return below_folder(_.get('path'),k);
                  })
              });
         });
-    }.property('current_path'),
+    }.property('current_path','content'),
     breadcrumbs: function() {
         var cp = this.get('current_path'),
             paths = [];

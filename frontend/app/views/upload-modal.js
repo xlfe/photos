@@ -46,12 +46,12 @@ export default Em.View.extend({
     title: function () {
         var files = this.get('controller.files'),
             count = '';
-        if (files.length > 0) {
+        if (Em.isEmpty(files) === false) {
             count = files.length + ' ';
         }
 
         return 'Upload ' + count + 'photos to album "' + this.get('context.model.name') + '"';
-    }.property('context.model.name', 'files.[]')
+    }.property('context.model.name', 'controller.files.[]')
 });
 
 
