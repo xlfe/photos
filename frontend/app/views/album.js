@@ -1,8 +1,6 @@
 import Em from 'ember';
 
 export default Em.View.extend({
-    images: 'photos.arrangedContent',
-    templateName: 'albums/album',
     didInsertElement: function () {
         var _this = this;
 

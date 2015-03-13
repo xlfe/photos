@@ -70,7 +70,7 @@ export default Em.Controller.extend({
     add_file: function(file,_id) {
         var _this = this;
         this.store.find('photo',_id).then(function(photo){
-            _this.get('model.photos.content').pushObject(photo);
+            _this.get('model.photos').pushObject(photo);
             file.set('status','Complete');
             file.set('_status',6);
         });

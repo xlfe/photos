@@ -11,16 +11,5 @@ export default PGPC.extend({
             height: h + 'px',
             width:  w + 'px'
         });
-
-
-    }.observes('photo.display_sz').on('didInsertElement'),
-    actions: {
-        click: function(){
-            var album = this.get('album'),
-                photos = album.get('photos'),
-                //cp = photos.get('current_path') || '',
-                fn = this.get('folder.path');
-            photos.set('current_path',fn );
-        }
-    }
+    }.on('didInsertElement')
 });

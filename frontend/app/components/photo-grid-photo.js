@@ -49,7 +49,6 @@ export default Em.Component.extend({
 
         this.background_img(w, h);
 
-
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function () {
         drag['dragging'] = this.get('photo.album_pos_id');

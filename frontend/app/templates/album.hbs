@@ -1,16 +1,16 @@
 <div class="container-fluid edge-to-edge">
     <div class="your-photos">
 
-        {{#each folder in model.photos.folders}}
-            {{photo-grid-folder folder=folder album=controller.model}}
+        {{#each folder in folders}}
+            {{photo-grid-folder folder=folder album=model}}
         {{/each}}
 
-        {{#each photo in model.photos.filtered_arrangedContent}}
+        {{#each photo in arrangedContent}}
             {{photo-grid-photo photo=photo album=controller.model save="save"}}
         {{/each}}
 
-        {{#unless model.photos.folders}}
-            {{#unless model.photos.filtered_arrangedContent}}
+        {{#unless folders}}
+            {{#unless arrangedContent}}
 
                 <div class="box-middle-center">
                 <span>

@@ -32,6 +32,7 @@ export default DS.Model.extend({
 
         Em.run.debounce(this, 'save_me', 5000);
 
-    }.observes('minHeight')
+    }.observes('minHeight'),
+    photos: []
 });
 
