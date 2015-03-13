@@ -1,7 +1,7 @@
 import Em from 'ember';
 
 export default Em.View.extend({
-//    needs: ['album'],
+    needs: ['album'],
     templateName: 'albums/show',
     willDestroyElement: function () {
         Em.$(document).off('keyup', this.keyUp);
