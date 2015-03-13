@@ -11,19 +11,7 @@ export default Em.Component.extend({
     draggable: "true",
     classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:', 'highlight-left:'],
     get_img_url: function (long_edge_width) {
-        var url = this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
-            //or = this.get('photo.orientation');
-
-        return url.replace('http:', '');
-
-        //if (or === 6) {
-        //    url += '-r90';
-        //} else if (or === 8) {
-        //    url += '-r270';
-        //}
-        //
-        //return url;
-
+        return this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
     },
     background_img: function (width, height) {
 
@@ -51,8 +39,7 @@ export default Em.Component.extend({
 
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function () {
-        drag['dragging'] = this.get('photo.album_pos_id');
-        //console.log('Drag starting with ' + drag['dragging']);
+        drag['dragging'] = this.get('photo.pos');
     },
     dragOver: function (evt) {
         var left = evt.target.offsetLeft,
@@ -74,48 +61,33 @@ export default Em.Component.extend({
         this.set('highlight-left', false);
         this.set('highlight-right', false);
     },
-//    dragEnd: function() {
-//        console.log('dragEnd',this.get('photo.title'))
-//    },
     drop: function () {
 
-        var ms = this.get('album.manualSort'),
-            offset = 0,
-            asc = this.get('album.sortAscending');
+        var ms = this.get('album.manualSort');
 
-        if (this.get('album.sortProperties') !== 'position') {
-            this.set('album.sortProperties', 'position');
-            this.get('album.photos').update_sort();
+        if (Em.isEmpty(ms)){
+            console.log("Its empty")
+            this.sendAction('new_sort');
         }
 
-        //Remove the item we just dragged
-        ms.removeObject(drag['dragging']);
-//        ms.splice(ms.indexOf(drag['dragging']),1);
+        if (this.get('photo.pos') !== drag['dragging']){
 
-        offset = ms.indexOf(this.get('photo.album_pos_id'));
+            //Remove the item we just dragged
+            ms.removeObject(drag['dragging']);
 
-        if (drag['position'] === 'after') {
-            offset += 1;
+            //New offset
+            var offset = ms.indexOf(this.get('photo.pos'));
+
+            if (drag['position'] === 'after') {
+                offset += 1;
+            }
+
+            ms.insertAt(offset, drag['dragging']);
+            this.get('album').save();
         }
-
-        if (asc === false) {
-            offset += 1;
-        }
-
-        if (asc === false && drag['position'] === 'after') {
-
-            offset -= 2;
-        }
-        //console.log(offset);
-        ms.insertAt(offset, drag['dragging']);
-//        ms.splice(offset,0,drag['dragging'])
-
-//        this.set('album.manualSort',ms);
 
         this.set('highlight-left', false);
         this.set('highlight-right', false);
-        this.get('album.photos').update_sort();
-        this.get('album').save();
     }
 });
 

@@ -6,7 +6,7 @@ var attr = DS.attr;
 export default DS.Model.extend({
     title: attr(),
     caption: attr(),
-    album_pos_id: attr('number'),
+    pos: attr('number'),
     width: attr('number', {transient: true}),
     height: attr('number', {transient: true}),
     path: attr('string'),

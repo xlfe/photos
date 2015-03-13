@@ -11,5 +11,5 @@ export default PGPC.extend({
             height: h + 'px',
             width:  w + 'px'
         });
-    }.on('didInsertElement')
+    }.observes('folder.display_sz').on('didInsertElement')
 });

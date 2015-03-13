@@ -20,8 +20,6 @@ class User(ndb.Model):
 
 class Album(ndb.Model):
     name = ndb.StringProperty()
-    sortProperties = ndb.StringProperty()
-    sortAscending = ndb.BooleanProperty()
     minHeight = ndb.IntegerProperty(default=200,required=True)
     manualSort = ndb.IntegerProperty(repeated=True)
 
@@ -40,7 +38,7 @@ class Photo(ndb.Model):
     height = ndb.IntegerProperty()
     orientation = ndb.IntegerProperty()
 
-    album_pos_id = ndb.IntegerProperty()
+    pos = ndb.IntegerProperty()
 
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)

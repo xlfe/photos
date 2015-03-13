@@ -4,7 +4,7 @@ export default Em.ObjectController.extend({
     needs: ['album'],
     go_photo: function (idx) {
         var photo = this.get('model'),
-            album = this.get('controllers.album').get('model.photos.arrangedContent'),
+            album = this.get('controllers.album.arrangedContent'),
             current_idx = album.indexOf(photo),
             new_idx = current_idx + idx;
 

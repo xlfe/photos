@@ -23,7 +23,6 @@ handlers:
 - url: /
   static_files: static/index.html
   upload: static/index.html
-  login: admin
   secure: always
 
 - url: /(albums)
@@ -36,7 +35,6 @@ handlers:
 
 - url: /
   static_dir: static
-  login: admin
   secure: always
 
 #skip_files:

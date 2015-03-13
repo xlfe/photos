@@ -42,20 +42,20 @@
         {{else}}
 
             <label class="hint">Drop
-                {{#if view.accept_files}}
-                    files
-                {{else}}
+                {{#if view.accept_folders}}
                     folders
+                {{else}}
+                    files
                 {{/if}}
                 here (or click to browse)
             </label>
 
         {{/each}}
 
-        {{#if view.accept_files}}
-            <input type="file" id="file_input" accept="image/*" multiple/>
-        {{else}}
+        {{#if view.accept_folders}}
             <input type="file" id="file_input" directory webkitdirectory/>
+        {{else}}
+            <input type="file" id="file_input" accept="image/*" multiple/>
         {{/if}}
     </div>
 

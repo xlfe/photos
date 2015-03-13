@@ -3,8 +3,6 @@ import DS from 'ember-data';
 
 export default DS.Model.extend({
     name: DS.attr('string'),
-    sortProperties: DS.attr('string'),
-    sortAscending: DS.attr('boolean'),
     manualSort: DS.attr('list'),
     minHeight: DS.attr('number'),
     sortOptions: [

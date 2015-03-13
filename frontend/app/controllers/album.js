@@ -20,64 +20,65 @@ if (typeof String.prototype.startsWith !== 'function') {
   };
 }
 
+function default_sort(manualSort) {
+    return function (_a, _b) {
+        _a = _a.get('pos');
+        _b = _b.get('pos');
+
+        var __a = manualSort.indexOf(_a),
+            __b = manualSort.indexOf(_b);
+
+        if (__a === -1) {
+            manualSort.pushObject(_a);
+            __a = manualSort.indexOf(_a);
+        }
+        if (__b === -1) {
+            manualSort.pushObject(_b);
+            __b = manualSort.indexOf(_b);
+        }
+
+        if (__a  < __b) {
+            return -1;
+        }
+        return 1;
+    };
+}
+
 
 export default Em.Controller.extend({
     queryParams: ['path'],
 
     sort_by: function (by, direction) {
 
-        if (Em.isNone(this.get('album'))) {
-            return;
-        }
-        if (this.get('album.sortProperties') === 'position') {
-            var album_sort = this.get('album.manualSort');
+        var manualSort = this.get('model.manualSort'),
+            ds = default_sort(manualSort),
+            photos = this.get('model.photos.content');
 
-            //console.log("manual sort enabled", album_sort);
+        if (Em.isNone(by)){
 
-            if (album_sort.length === 0) {
-                //console.log('resort')
-                this.get('arrangedContent').forEach(function (s) {
-                    var modified = false;
-
-                    while (album_sort.indexOf(s.get('album_pos_id')) !== -1) {
-                        s.set('album_pos_id', s.get('album_pos_id') + 1);
-                        modified = true;
-                    }
-                    album_sort.pushObject(s.get('album_pos_id'));
-                    if (modified) {
-                        s.save();
-                    }
-                });
-//                this.get('album').save()
-            }
-
-            this.get('content').forEach(function (s) {
-                s.set('position', album_sort.indexOf(s.get('album_pos_id')));
-//                console.log(s.position,s.get('album_pos_id'));
+            photos.sort(ds).forEach(function(_){
+                manualSort.pushObject(_.get('pos'));
             });
 
-        } else {
-            this.set('album.manualSort', []);
-//            this.get('album').save()
+            return;
+
         }
-
-        this.set('sortProperties', [this.get('album.sortProperties')]);
-        this.set('sortAscending', this.get('album.sortAscending'));
     },
-
     arrangedContent: function () {
 
-        var path = this.get('path'),
+        var path = this.get('path') || '',
+            manualSort = this.get('model.manualSort'),
+            ds = default_sort(manualSort),
             photos = this.get('model.photos').filter(function(_){
                 var photo_path = _.get('path') || '';
 
                 return photo_path.match('^' + path + '$') !== null;
 
-            });
+            }).sort(ds);
 
         return photos;
 
-    }.property('model.photos.length','path'),
+    }.property('model.photos.length','path','model.manualSort.@each'),
     folders: function () {
         // Show all folders that have this path or below
 
@@ -193,6 +194,11 @@ export default Em.Controller.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-    }.observes('model.photos.length', 'model.minHeight', 'path')
+    }.observes('arrangedContent.@each', 'model.minHeight', 'path'),
+    actions: {
+        new_sort: function(){
+            this.sort_by();
+        }
+    }
 });
 

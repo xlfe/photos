@@ -1,12 +1,15 @@
 import Em from 'ember';
 
 function fileSizeSI(a,b,c,d,e){
-        return (b=Math,c=b.log,d=1e3,e=c(a)/c(d)|0,a/b.pow(d,e)).toFixed(2) +
-            ' '+(e?'kMGTPEZY'[--e]+'B':'Bytes');
+    b=Math;
+    c=b.log;
+    d=1e3;
+    e=c(a)/c(d)|0;
+    return a/b.pow(d,e).toFixed(2) + ' '+(e?'kMGTPEZY'[--e]+'B':'Bytes');
 }
 
 export default Em.View.extend({
-    accept_files: window.chrome === undefined,//true, //false - only for chrome - accept a folder
+    accept_folders: window.chrome !== undefined,//true, //false - only for chrome - accept a folder
     didInsertElement: function(){
         this.set('controller.modal',this.$('.modal'));
     },

@@ -7,7 +7,7 @@
         {{/each}}
 
         {{#each photo in arrangedContent}}
-            {{photo-grid-photo photo=photo album=controller.model save="save"}}
+            {{photo-grid-photo photo=photo album=controller.model new_sort="new_sort" save="save"}}
         {{/each}}
 
         {{#unless folders}}
