@@ -6,12 +6,17 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 import logging
 import datetime
-import general_counter
 
 
 class User(ndb.Model):
 
+    first_name = ndb.StringProperty()
+    last_name = ndb.StringProperty()
     email = ndb.StringProperty()
+
+    @property
+    def full_name(self):
+        return '{} {}'.format(self.first_name, self.last_name)
 
     @classmethod
     def current_user(self):
@@ -19,9 +24,23 @@ class User(ndb.Model):
 
 
 class Album(ndb.Model):
+    class RESTMeta:
+        sideload_properties = ['photos']
+
     name = ndb.StringProperty()
     minHeight = ndb.IntegerProperty(default=200,required=True)
     manualSort = ndb.IntegerProperty(repeated=True)
+
+    def photos(self,sideloads):
+
+        keys = Photo.query(Photo.album == self.key).fetch(keys_only=True)
+        (results, cursor, more_available) = Photo.query(Photo.album == self.key).fetch_page(5)
+
+        sideloads['photos'] = results
+
+        # return [r.key.urlsafe() for r in results]
+
+        return keys
 
 
 class Photo(ndb.Model):

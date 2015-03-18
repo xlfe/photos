@@ -1,45 +1,25 @@
-
-import importlib
-import logging
 import json
-import re
-
-from urlparse import urlparse
 from datetime import datetime, time, date
 from urllib import urlencode
-
 import webapp2
 from google.appengine.ext import ndb
-
 from google.appengine.ext.ndb import Cursor
 from google.appengine.ext.db import BadValueError, BadRequestError
-
-from webapp2_extras import auth
 from webapp2_extras import sessions
 from webapp2_extras.routes import NamePrefixRoute
-
-from google.appengine.ext import blobstore
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.api import app_identity
-from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 from permissions import *
-from json.encoder import INFINITY,encode_basestring,encode_basestring_ascii,c_make_encoder,_make_iterencode
 
 try:
     import dateutil.parser
 except ImportError as e:
     dateutil = None
 
-def model_ember_key(model):
-    return model._get_kind().lower()[0] + model._get_kind()[1:]
+import logging
+
+model_ember_key = lambda (model):model._get_kind().lower()[0] + model._get_kind()[1:]
 
 class NDBEncoder(json.JSONEncoder):
     """JSON encoding for NDB models and properties"""
-
-    #Override floattr repr
-    def _decode_key(self, key):
-            # model_class = ndb.Model._kind_map.get(key.kind())
-            return key.urlsafe()
 
     def default(self, obj):
         if isinstance(obj, ndb.Model):
@@ -47,16 +27,14 @@ class NDBEncoder(json.JSONEncoder):
 
             # Filter the properties that will be returned to user
             included_properties = get_included_properties(obj, 'output')
+
             obj_dict = dict((k,v) for k,v in obj_dict.iteritems() if k in included_properties)
+            obj_dict['id'] = obj.key.urlsafe()
 
-            # Each BlobKeyProperty is represented as a dict of upload_url/download_url
-            # for (name, prop) in obj._properties.iteritems():
-            #     if isinstance(prop, ndb.FloatProperty):
-            #         obj_dict[name] = '{:.2f}'.format(obj_dict[name])
-
-            # Translate the property names
-            obj_dict = translate_property_names(obj_dict, obj, 'output')
-            obj_dict['id'] = self._decode_key(obj.key)
+            rest_meta = getattr(obj,'RESTMeta',None)
+            if rest_meta:
+                for prop in getattr(rest_meta,'sideload_properties',[]):
+                    obj_dict[prop] = getattr(obj,prop)
 
             return obj_dict
 
@@ -64,13 +42,8 @@ class NDBEncoder(json.JSONEncoder):
             return obj.isoformat()
 
         elif isinstance(obj, ndb.Key) or isinstance(obj,ndb.KeyProperty):
-            return self._decode_key(obj)
+            return obj.urlsafe()
 
-        elif isinstance(obj, ndb.GeoPt):
-            return str(obj)
-
-        elif isinstance(obj,ndb.BlobKey):
-            return str(obj)
         else:
             return super(NDBEncoder,self).default(obj)
 
@@ -83,48 +56,17 @@ class RESTException(Exception):
 # Utility functions
 #
 
+def add_sideload(model,sideloads):
 
-def get_translation_table(model, input_type):
-    """Returns the translation table for a given `model` with a given `input_type`"""
     meta_class = getattr(model, 'RESTMeta', None)
-    if not meta_class:
-        return {}
 
-    translation_table = getattr(model.RESTMeta, 'translate_property_names', {})
-    translation_table.update(getattr(model.RESTMeta, 'translate_%s_property_names' % input_type, {}))
+    if meta_class:
+        for sideload in getattr(meta_class, 'sideload_properties',[]):
 
-    return translation_table
-
+            ids = getattr(model,sideload)(sideloads)
+            setattr(model,sideload,ids)
 
 
-def translate_property_names(data, model, input_type):
-    """Translates property names in `data` dict from one name to another, according to what is stated in `input_type` and the model's
-    RESTMeta.translate_property_names/translate_input_property_names/translate_output_property_name - note that the change of `data` is in-place."""
-
-    translation_table = get_translation_table(model, input_type)
-
-    if not translation_table:
-        return data
-
-
-    # Translate from one property name to another - for output, we turn the original property names
-    # into the new property names. For input, we convert back from the new property names to the original
-    # property names.
-    for old_name, new_name in translation_table.iteritems():
-        if input_type == 'output' and old_name not in data: continue
-        if input_type == 'input' and new_name not in data: continue
-
-        if input_type == 'output':
-            original_value = data[old_name]
-            del data[old_name]
-            data[new_name] = original_value
-
-        elif input_type == 'input':
-            original_value = data[new_name]
-            del data[new_name]
-            data[old_name] = original_value
-
-    return data
 
 def get_included_properties(model, input_type):
     """Gets the properties of a `model` class to use for input/output (`input_type`). Uses the
@@ -157,9 +99,12 @@ def get_included_properties(model, input_type):
         excluded_properties.update(set(BaseRESTHandler.DEFAULT_EXCLUDED_INPUT_PROPERTIES))
         # if meta_class and getattr(meta_class, 'use_input_id', False):
         #     included_properties.update(['id'])
+
     if input_type == 'output':
         excluded_properties.update(set(BaseRESTHandler.DEFAULT_EXCLUDED_OUTPUT_PROPERTIES))
 
+    if meta_class:
+        included_properties.update(set(getattr(meta_class, 'sideload_properties', [])))
     # Calculate the properties to include
     properties = included_properties - excluded_properties
 
@@ -292,74 +237,26 @@ class BaseRESTHandler(webapp2.RequestHandler):
         if not model_id:
             return None
 
-        # if getattr(self.model,'RESTMeta',None) and getattr(self.model.RESTMeta,'custom_getter',False):
-        #     custom_getter = getattr(self.model.RESTMeta,'custom_getter')
-        #     model_getter = getattr(self.model,custom_getter)
-        #     return model_getter(model_id)
-
         try:
-            # if getattr(self.model, 'RESTMeta', None) and getattr(self.model.RESTMeta, 'use_input_id', False):
-            #     model = ndb.Key(self.model, int(model_id)).get()
-            #     if not model: raise Exception(self.model._get_kind(),model_id)
-            # else:
             model = ndb.Key(urlsafe=model_id).get()
-            if not model: raise Exception()
+            if not model:
+                raise Exception()
         except Exception, exc:
             # Invalid key name
             raise RESTException('Invalid model id - %s' % model_id)
 
         return model
 
-
-    def _build_next_query_url(self, cursor):
-        """Returns the next URL to fetch results for - used when paging. Returns none if no more results"""
-        if not cursor:
-            return None
-
-        # Use all of the original query arguments - just override the cursor argument
-        params = self.request.GET
-        params['cursor'] = cursor.urlsafe()
-        return self.request.path_url + '?' + urlencode(params)
-
     def _filter_query(self):
         """Filters the query results for given property filters (if provided by user)."""
 
-        get_params = self.request.GET
-        params = []
+        query = self.request.GET.get('q')
 
-        if len(get_params) == 0:
+        if not query:
             # No query given - return as-is
             return self.model.query()
 
-        try:
-            for param,value in get_params.iteritems():
-
-                if param.endswith('[]'):
-                    if param == 'ids[]':
-                        column = getattr(self.model,'key')
-                    else:
-                        column = getattr(self.model,param[:-2],None)
-                        assert column is not None,param[:-2]
-
-
-                    params.extend([ndb.OR(column == ndb.Key(urlsafe=v)) for v in value.split(',')])
-                    logging.info(params)
-
-                else:
-                    column = getattr(self.model,param,None)
-
-                    assert column is not None,"Unable to find column {0}".format(param)
-
-                    if type(column.property.columns[0]) == ndb.Key:
-                        k = ndb.Key(kind=self.model._get_kind(),urlsafe=value)
-                        value = k._id
-
-                    params.append(column == value)
-
-
-                return self.model.query().filter(*params)
-        except Exception, exc:
-            raise
+        return self.model.gql('WHERE ' + query)
 
     def _fetch_query(self, query):
         """Fetches the query results for a given limit (if provided by user) and for a specific results page (if given by user).
@@ -403,40 +300,27 @@ class BaseRESTHandler(webapp2.RequestHandler):
 
         if not self.request.GET.get('order'):
             # No order given
-            return query
+            orders = []
 
         else:
-            try:
-                # The order parameter is formatted as 'col1, -col2, col3'
-                orders = [o.strip() for o in self.request.GET.get('order').split(',')]
-                orders = ['+'+o if not o.startswith('-') and not o.startswith('+') else o for o in orders]
 
-                # Translate property names (if it's defined for the current model) - e.g. input 'col1' is actually 'my_col1' in MyModel
-                translated_orders = dict([order.lstrip('-+'), order[0]] for order in orders)
-                translated_orders = translate_property_names(translated_orders, self.model, 'input')
+            orders = [o.strip() for o in self.request.GET.get('order').split(',')]
+            orders = ['+'+o if not o.startswith('-') and not o.startswith('+') else o for o in orders]
+            translated_orders = dict([order.lstrip('-+'), order[0]] for order in orders)
+            orders = [-getattr(self.model, order) if direction == '-' else getattr(self.model, order) for order,direction in translated_orders.iteritems()]
 
-                orders = [-getattr(self.model, order) if direction == '-' else getattr(self.model, order) for order,direction in translated_orders.iteritems()]
-
-            except AttributeError, exc:
-                # Invalid column name
-                raise RESTException('Invalid "order" parameter - %s' % self.request.GET.get('order'))
 
         # Always use a sort-by-key order at the end - this solves the case where the query uses IN or != operators - since we're using a cursor
         # to fetch results - there is a requirement for this solution in order for the fetch_page to work. See "Query cursors" at
         # https://developers.google.com/appengine/docs/python/ndb/queries
-
         orders.append(self.model.key)
 
         # Return the ordered query
         return query.order(*orders)
 
-
     def _build_model_from_data(self, data, cls, model=None,check_permissions=None):
         """Builds a model instance (according to `cls`) from user input and returns it. Updates an existing model instance if given.
         Raises exceptions if input data is invalid."""
-
-        # Translate the property names (this is done before the filtering in order to get the original property names by which the filtering is done)
-        data = translate_property_names(data, cls, 'input')
 
         # Transform any raw input data into appropriate NDB properties - write all transformed properties
         # into another dict (so any other unauthorized properties will be ignored).
@@ -671,33 +555,31 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 query = self._order_query(query) # Order the results
                 (results, cursor) = self._fetch_query(query) # Fetch them (with a limit / specific page, if provided)
 
-                if self.after_get_callback:
-                    # Additional processing required
-                    results = self.after_get_callback(results,webapp=self)
+                sideloads = {}
+                for result in results:
+                    add_sideload(result,sideloads)
 
-                if isinstance(results, webapp2.Response):
-                    return results
-                else:
-                    return {
-                        self.model._get_kind(): results,
-                        # 'next_results_url': self._build_next_query_url(cursor)
-                        }
+
+                response = {
+                    self.model._get_kind(): results,
+                    'meta': {
+                        'next_results_url': cursor.urlsafe() if cursor else None
+                    }
+                }
+
 
             else:
 
-                if self.after_get_callback:
-                    result = self.after_get_callback(model,webapp=self)
-                    if isinstance(result,webapp2.Response):
-                        return result
-                    else:
-                        return {
-                            self.model._get_kind(): result
-                        }
-                else:
 
-                    return {
-                        self.model._get_kind(): model
-                    }
+                sideloads = {}
+                add_sideload(model,sideloads)
+
+                response = {
+                    self.model._get_kind(): model
+                }
+
+            response.update(sideloads)
+            return response
 
 
         @rest_method_wrapper
@@ -815,9 +697,17 @@ def get_rest_class(ndb_model, base_url, **kwd):
             if self.after_put_callback:
                 model = self.after_put_callback(updated_keys, model)
 
-            return {
-                model._get_kind(): model
+
+
+            sideloads = {}
+            add_sideload(model,sideloads)
+
+            response = {
+                self.model._get_kind(): model
             }
+
+            response.update(sideloads)
+            return response
 
         @rest_method_wrapper
         def delete(self, model):
@@ -908,7 +798,6 @@ class RESTHandler(NamePrefixRoute): # We inherit from NamePrefixRoute so the sam
 
 
         included_properties = get_included_properties(model, 'input')
-        translation_table = get_translation_table(model, 'input')
 
         super(RESTHandler, self).__init__('rest-handler-', routes)
 
