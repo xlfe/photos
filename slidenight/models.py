@@ -57,7 +57,8 @@ class Photo(ndb.Model):
     filename = ndb.StringProperty()
     album = ndb.KeyProperty(Album)
 
-    serving_url = ndb.ComputedProperty(lambda k: k._serving_url)
+    # serving_url = ndb.ComputedProperty(lambda k: k._serving_url)
+    serving_url = ndb.StringProperty()
 
     @property
     def _serving_url(self):

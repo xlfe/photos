@@ -153,6 +153,7 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         #     photo.width = img.height
         #     photo.height = img.width
 
+        photo.serving_url = photo._serving_url
         photo.put()
 
         self.response.headers['Content-Type'] = 'application/json'
@@ -214,6 +215,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         #     photo.width = img.height
         #     photo.height = img.width
 
+        photo.serving_url = photo._serving_url
         photo.put()
 
         self.response.headers['Content-Type'] = 'application/json'
