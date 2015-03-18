@@ -70,10 +70,19 @@ li.header-img-link, li.menu-link, .action-pointer
 .albums
   @extend .your-photos
 
-.slider
-  input
-    width: 80%
-    display: inline
+li.slider
+  //display: inline-block
+  //width: 175px
+  a
+    div.spacer
+      display: inline-block
+      width: 10px
+    span
+      vertical-align: middle
+    input
+      vertical-align: middle
+      display: inline-block
+      width: 90px
 
 span.title
   display: block

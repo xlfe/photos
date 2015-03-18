@@ -66,7 +66,7 @@ export default Em.Component.extend({
         var ms = this.get('album.manualSort');
 
         if (Em.isEmpty(ms)){
-            console.log("Its empty")
+            console.log("Its empty");
             this.sendAction('new_sort');
         }
 

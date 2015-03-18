@@ -149,7 +149,7 @@ export default Em.Controller.extend({
 
         var calc_width = function(_photo) {
             return min_height * (_photo.get('width') / _photo.get('height'));
-        }
+        };
 
         var scale_row = function (row) {
 
