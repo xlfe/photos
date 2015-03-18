@@ -11,6 +11,9 @@ function below_folder(path, folder) {
     if (folder.length === 0){
         return true;
     }
+    if (Em.isNone(path)){
+        return false;
+    }
     return path.match('^' + folder + '(/.*)?$') !== null;
 }
 
@@ -70,15 +73,17 @@ export default Em.Controller.extend({
             manualSort = this.get('model.manualSort'),
             ds = default_sort(manualSort),
             photos = this.get('model.photos').filter(function(_){
+                if (_.get('currentState.isLoading') == true){
+                    return false;
+                }
                 var photo_path = _.get('path') || '';
-
                 return photo_path.match('^' + path + '$') !== null;
 
             }).sort(ds);
 
         return photos;
 
-    }.property('model.photos.length','path','model.manualSort.@each'),
+    }.property('model.photos.@each.path','path','model.manualSort.@each'),
     folders: function () {
         // Show all folders that have this path or below
 
@@ -115,7 +120,7 @@ export default Em.Controller.extend({
                 })
             });
         });
-    }.property('path', 'model.photos.length'),
+    }.property('path', 'model.photos.@each.path'),
     breadcrumbs: function () {
         var cp = this.get('path'),
             paths = [];
@@ -133,7 +138,7 @@ export default Em.Controller.extend({
     }.property('path'),
     size_photos: function () {
 
-        if (Em.$('.edge-to-edge').width() === null || Em.isEmpty(this.get('model.photos'))) {
+        if (Em.$('.edge-to-edge').width() === null || Em.isEmpty(this.get('arrangedContent'))) {
             return;
         }
 

@@ -18,7 +18,7 @@ export default Em.Component.extend({
         var long_edge = Math.min(1600, Math.max(width, height)),
             img_src = this.get_img_url(long_edge);
 
-        this.$().css({'background-image': 'url(' + img_src + ')'});
+            this.$().css({'background-image': 'url(' + img_src + ')'});
     },
     setup: function () {
         var sz = this.get('photo.display_sz');
@@ -26,6 +26,7 @@ export default Em.Component.extend({
         if (Em.isNone(sz)){
             return;
         }
+
         var
             w = sz[0],
             h = sz[1];

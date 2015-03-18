@@ -23,6 +23,7 @@ export default DS.Model.extend({
             _this.set('saving', false);
         });
     },
+    saving: true,
     watch_keeper: function () {
 
         if (this.get('saving') === true) {
@@ -32,6 +33,7 @@ export default DS.Model.extend({
         Em.run.debounce(this, 'save_me', 5000);
 
     }.observes('minHeight'),
-    photos: []
+    photos: [],
+    more_results: true
 });
 

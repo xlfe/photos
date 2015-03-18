@@ -36,6 +36,9 @@
 
     <li class="menu-link pull-right slider">
         <a>
+            {{#if model.more_results}}
+                <i class="fa fa-spin fa-spinner"></i>
+            {{/if}}
             <span>
                 {{model.photos.length}} Photos
             </span>
