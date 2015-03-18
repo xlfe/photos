@@ -31,11 +31,6 @@ class NDBEncoder(json.JSONEncoder):
             obj_dict = dict((k,v) for k,v in obj_dict.iteritems() if k in included_properties)
             obj_dict['id'] = obj.key.urlsafe()
 
-            rest_meta = getattr(obj,'RESTMeta',None)
-            if rest_meta:
-                for prop in getattr(rest_meta,'sideload_properties',[]):
-                    obj_dict[prop] = getattr(obj,prop)
-
             return obj_dict
 
         elif isinstance(obj, datetime) or isinstance(obj, date) or isinstance(obj, time):
@@ -55,18 +50,6 @@ class RESTException(Exception):
 #
 # Utility functions
 #
-
-def add_sideload(model,sideloads):
-
-    meta_class = getattr(model, 'RESTMeta', None)
-
-    if meta_class:
-        for sideload in getattr(meta_class, 'sideload_properties',[]):
-
-            ids = getattr(model,sideload)(sideloads)
-            setattr(model,sideload,ids)
-
-
 
 def get_included_properties(model, input_type):
     """Gets the properties of a `model` class to use for input/output (`input_type`). Uses the
@@ -103,8 +86,6 @@ def get_included_properties(model, input_type):
     if input_type == 'output':
         excluded_properties.update(set(BaseRESTHandler.DEFAULT_EXCLUDED_OUTPUT_PROPERTIES))
 
-    if meta_class:
-        included_properties.update(set(getattr(meta_class, 'sideload_properties', [])))
     # Calculate the properties to include
     properties = included_properties - excluded_properties
 
@@ -555,11 +536,6 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 query = self._order_query(query) # Order the results
                 (results, cursor) = self._fetch_query(query) # Fetch them (with a limit / specific page, if provided)
 
-                sideloads = {}
-                for result in results:
-                    add_sideload(result,sideloads)
-
-
                 response = {
                     self.model._get_kind(): results,
                     'meta': {
@@ -570,15 +546,10 @@ def get_rest_class(ndb_model, base_url, **kwd):
 
             else:
 
-
-                sideloads = {}
-                add_sideload(model,sideloads)
-
                 response = {
                     self.model._get_kind(): model
                 }
 
-            response.update(sideloads)
             return response
 
 
@@ -697,16 +668,10 @@ def get_rest_class(ndb_model, base_url, **kwd):
             if self.after_put_callback:
                 model = self.after_put_callback(updated_keys, model)
 
-
-
-            sideloads = {}
-            add_sideload(model,sideloads)
-
             response = {
                 self.model._get_kind(): model
             }
 
-            response.update(sideloads)
             return response
 
         @rest_method_wrapper
