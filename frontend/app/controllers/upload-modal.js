@@ -288,6 +288,10 @@ export default Em.Controller.extend({
             if (this.cancel_queue() === true){
                 this.reset();
             }
+        },
+        toggleVal: function() {
+            console.log('Hmm')
+            this.toggleProperty('toggleValue');
         }
     },
     reset: function() {
@@ -303,6 +307,27 @@ export default Em.Controller.extend({
     save_disabled: true,
     save_caption: 'Upload',
     close_caption: 'Cancel',
-    cancel: false
+    cancel: false,
+    can_accept_folders: window.chrome !== undefined,//true, //false - only for chrome - accept a folder
+    accept_folders: false,
+    toggleValue: false,
+    toggle: function() {
+
+        var af = this.get('can_accept_folders'),
+            tv = this.get('toggleValue');
+
+        if (af === true) {
+            if (tv === false) {
+                this.set('accept_folders',false);
+                return new Em.Handlebars.SafeString('<i class="fa fa-folder-open-o"></i>');
+            }
+            if (tv === true) {
+                this.set('accept_folders',true);
+                return new Em.Handlebars.SafeString('<i class="fa fa-file-o"></i>');
+            }
+        }
+        return undefined;
+
+    }.property('can_accept_folders','toggleValue'),
 });
 

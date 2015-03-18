@@ -12,6 +12,12 @@
             </div>
             <div class="modal-footer">
 
+                {{#if toggle}}
+                    <button type="button" class="btn btn-default" {{action 'toggleVal'}}>
+                        {{toggle}}
+                    </button>
+                {{/if}}
+
                 <button type="button" class="btn btn-default" {{action 'close'}}>
                     {{#unless custom_close}}
                         Close

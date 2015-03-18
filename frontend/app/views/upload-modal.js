@@ -9,7 +9,7 @@ function fileSizeSI(a,b,c,d,e){
 }
 
 export default Em.View.extend({
-    accept_folders: window.chrome !== undefined,//true, //false - only for chrome - accept a folder
+
     didInsertElement: function(){
         this.set('controller.modal',this.$('.modal'));
     },

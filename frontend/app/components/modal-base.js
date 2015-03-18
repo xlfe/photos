@@ -7,6 +7,9 @@ export default Em.Component.extend({
         },
         close: function () {
             this.sendAction('close');
+        },
+        toggleVal: function() {
+            this.sendAction('toggleVal');
         }
     },
     show: function () {

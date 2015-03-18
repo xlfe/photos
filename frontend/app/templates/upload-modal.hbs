@@ -5,6 +5,8 @@
     custom_save=controller.save_caption
     save_disabled=controller.save_disabled
     custom_close=controller.close_caption
+    toggle=toggle
+    toggleVal='toggleVal'
     closeModal='closeModal'
 }}
 
@@ -42,7 +44,7 @@
         {{else}}
 
             <label class="hint">Drop
-                {{#if view.accept_folders}}
+                {{#if accept_folders}}
                     folders
                 {{else}}
                     files
@@ -52,7 +54,7 @@
 
         {{/each}}
 
-        {{#if view.accept_folders}}
+        {{#if accept_folders}}
             <input type="file" id="file_input" directory webkitdirectory/>
         {{else}}
             <input type="file" id="file_input" accept="image/*" multiple/>

@@ -1,7 +1,5 @@
 import Em from 'ember';
 
-var
-
 export default Em.Route.extend({
     renderTemplate: function () {
         var c = this.get('controller');
@@ -30,6 +28,7 @@ export default Em.Route.extend({
                 album.set('more_results',true);
 
                 query_params['cursor'] = more_results;
+                query_params['limit'] = query_params['limit'] * 2;
 
                 store.find('photo',query_params).then(function(more){
 
