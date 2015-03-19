@@ -40,6 +40,11 @@
                 <i class="fa fa-spin fa-spinner"></i>
             {{/if}}
             <span>
+
+                {{#if controller.selected}}
+                    {{controller.selected.length}} selected
+                    <span class="fa fa-close" {{action 'cancel_selection'}}></span> -
+                {{/if}}
                 {{model.photos.length}} Photos
             </span>
             <div class="spacer"></div>

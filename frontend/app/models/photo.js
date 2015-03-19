@@ -16,6 +16,7 @@ export default DS.Model.extend({
     orientation: attr('number', {transient: true}),
     original_metadata: attr('object'),
 
+    selected: false,
     saving: true,
     am_loaded: function () {
         this.set('saving', false);

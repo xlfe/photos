@@ -7,12 +7,36 @@ var drag = {
 
 export default Em.Component.extend({
     tagName: 'div',
-    attributeBindings: ['draggable'],
-    draggable: "true",
-    classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:', 'highlight-left:'],
-    selection: 'fa fa-check-circle fa-2x',
+    attributeBindings: ['draggable','photo_id:data-photo'],
+    draggable: function() {
+
+        if (this.get('photo.selected') === true || this.get('selection_mode') === 0){
+            return true;
+        }
+
+        return false;
+
+    }.property('photo.selected','selection_mode'),
+    photo_id: function() {
+        return this.get('photo.id');
+    }.property('photo.id'),
+    classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:', 'highlight-left:','photo.selected:selected'],
     get_img_url: function (long_edge_width) {
         return this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
+    },
+    click: function(e){
+        var selection = this.get('selection_mode') > 0;
+        if (Em.$(e.target).hasClass('photo') === true) {
+
+            if (selection === true) {
+                this.toggleProperty('photo.selected');
+            } else {
+                this.sendAction('transition',this.get('photo'));
+            }
+
+        }
+        return false;
+
     },
     background_img: function (width, height) {
 
@@ -91,6 +115,11 @@ export default Em.Component.extend({
 
         this.set('highlight-left', false);
         this.set('highlight-right', false);
+    },
+    actions: {
+        selection: function() {
+            this.toggleProperty('photo.selected');
+        }
     }
 });
 

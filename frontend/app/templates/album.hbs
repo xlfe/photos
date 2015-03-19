@@ -1,13 +1,20 @@
 {{outlet}}
 <div class="container-fluid edge-to-edge">
-    <div class="your-photos">
+    <div {{bind-attr class=controller.album_class}}>
+        <div class="photo-select"><span></span></div>
 
         {{#each folder in folders}}
             {{photo-grid-folder folder=folder album=model}}
         {{/each}}
 
         {{#each photo in arrangedContent}}
-            {{photo-grid-photo photo=photo album=controller.model new_sort="new_sort" save="save"}}
+            {{photo-grid-photo
+            photo=photo
+            selection_mode=controller.selected.length
+            album=controller.model
+            new_sort="new_sort"
+            transition="transition"
+            save="save"}}
         {{/each}}
 
         {{#unless folders}}

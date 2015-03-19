@@ -34,6 +34,11 @@ export default DS.Model.extend({
 
     }.observes('minHeight'),
     photos: [],
-    more_results: true
+    more_results: true,
+    selected: function() {
+
+
+
+    }.property
 });
 

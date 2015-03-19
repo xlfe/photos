@@ -73,7 +73,7 @@ export default Em.Controller.extend({
             manualSort = this.get('model.manualSort'),
             ds = default_sort(manualSort),
             photos = this.get('model.photos').filter(function(_){
-                if (_.get('currentState.isLoading') == true){
+                if (_.get('currentState.isLoading') === true){
                     return false;
                 }
                 var photo_path = _.get('path') || '';
@@ -84,6 +84,19 @@ export default Em.Controller.extend({
         return photos;
 
     }.property('model.photos.@each.path','path','model.manualSort.@each'),
+    selected: function() {
+        return this.get('arrangedContent').filter(function(_){
+            return _.get('selected') === true;
+        });
+    }.property('arrangedContent.@each.selected'),
+    album_class: function() {
+        var base_class='your-photos';
+
+        if (this.get('selected').length > 0){
+            return base_class + ' selection';
+        }
+        return base_class;
+    }.property('selected.length'),
     folders: function () {
         // Show all folders that have this path or below
 
@@ -142,7 +155,7 @@ export default Em.Controller.extend({
             return;
         }
 
-        var w = Em.$('.edge-to-edge').width(),
+        var w = Em.$('.your-photos').width(),
             cw = 0,
             cr = [],
             min_height = +this.get('model.minHeight') || 320, //Minimum height of each row in pixels
@@ -203,6 +216,14 @@ export default Em.Controller.extend({
     actions: {
         new_sort: function(){
             this.sort_by();
+        },
+        transition: function(photo){
+            this.transitionToRoute('album.show',photo);
+        },
+        cancel_selection: function() {
+            this.get('selected').forEach(function(_){
+                _.set('selected',false);
+            });
         }
     }
 });

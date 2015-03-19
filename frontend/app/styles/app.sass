@@ -43,8 +43,52 @@ li.header-img-link, li.menu-link, .action-pointer
 
 @import flex
 
+
+$o-hover-photo: 0.25
+$o-active: 0.5
+$o-hover-item: 0.5
+
+.your-photos.selection
+  @include transition(padding-top, 0.2s, ease-in-out)
+  padding-top: 20px
+  border-bottom: 2px solid gainsboro
+
+  .photo
+    border: 8px solid white
+
+    &:hover
+      @include transition(border, 0.15s, ease-in-out)
+      border: 4px solid white
+
+  .photo.selected
+    border: 5px solid #427fed
+
 .your-photos
   width: 100%
+  padding-left: 1%
+  padding-right: 1%
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  margin: auto
+  padding-bottom: 40px
+  padding-top: 10px
+
+  .photo-select
+    display: none
+    z-index: 9000
+    position: absolute !important
+    cursor: default !important
+
+    span
+      background-color: rgba(66, 140, 250, 0.41)
+      border: 1px solid rgba(66,140,250,0.8)
+      width: 100%
+      height: 100%
+      float: left
+
+  .photo-select.active
+    display: block !important
 
   @extend %flexbox
   @include flex-direction(row)
@@ -60,40 +104,54 @@ li.header-img-link, li.menu-link, .action-pointer
     background-position: center
     background-repeat: no-repeat
 
-    .fa,.ember-text-field
-      //@include transition(opacity, 0.2s, ease-in)
-      opacity: 0
-
-    .fa
+    i, input
       display: block
+      opacity: 0
+      border: none
+
+    .fa-check-circle
       color: #1dd200
       float: left
       margin: 3px
       margin-left: 10px
 
-
     .ember-text-field
-      display: block
       background: rgba(255,255,255,0.80)
-      border: none
       width: 100%
       padding-left: 5px
       color: black
 
     &:hover
-
       *
         @include transition(opacity, 0.25s, ease-in-out)
 
-      .fa
-        opacity: 0.25
+      .fa-check-circle
+        margin-top: 0
+        opacity: $o-hover-photo
         &:hover
-          opacity: 1
+          opacity: $o-hover-item
 
       .ember-text-field
         opacity: 0.8
         &:hover
           opacity: 1
+
+
+  .photo.selected
+    &:hover
+      .fa-check-circle
+        margin-top: 0
+
+    .fa-check-circle
+      opacity: $o-active
+      margin-top: -0.5em
+
+      @include transition(opacity, 0, ease-in-out)
+      opacity: $o-hover-photo + $o-active
+
+      &:hover
+        opacity: $o-hover-item + $o-active
+
 
 .albums
   @extend .your-photos
@@ -208,6 +266,7 @@ div.upload
 .image-click
   width: 100%
   height: 100%
+  overflow: hidden
 .folder-click
   @extend .image-click
   cursor: pointer
