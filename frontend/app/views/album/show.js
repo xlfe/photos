@@ -36,28 +36,31 @@ export default Em.View.extend({
             screenHeight = (Em.$(window).height() - 25 ) * 0.99,
             photo = this.get('controller.model'),
             image = this.$('img'),
+            full = this.get('displayUrl'),
+            thumbnail = photo.get('_loaded') || full,
             tmpImage = new Image();
 
-        image.hide();
+        tmpImage.src = full;
 
-        tmpImage.src = this.get('displayUrl');
+        var imageWidth = photo.get('width'),
+            imageHeight = photo.get('height');
+
+        if (imageWidth > screenWidth || imageHeight > screenHeight) {
+            var ratio = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
+            imageWidth /= ratio;
+            imageHeight /= ratio;
+        }
+
+        image[0].src = thumbnail;
+        image.css({
+            'width': imageWidth + 'px',
+            'height': imageHeight + 'px',
+            'top': ( Em.$(window).height() - imageHeight - 25 ) / 2 + 'px',
+            'left': ( Em.$(window).width() - imageWidth ) / 2 + 'px'
+        });
+
         tmpImage.onload = function () {
-            image.show();
-            var imageWidth = photo.get('width'),
-                imageHeight = photo.get('height');
-
-            if (imageWidth > screenWidth || imageHeight > screenHeight) {
-                var ratio = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
-                imageWidth /= ratio;
-                imageHeight /= ratio;
-            }
-
-            image.css({
-                'width': imageWidth + 'px',
-                'height': imageHeight + 'px',
-                'top': ( Em.$(window).height() - imageHeight - 25 ) / 2 + 'px',
-                'left': ( Em.$(window).width() - imageWidth ) / 2 + 'px'
-            });
+            image[0].src = full;
         };
 
 //        console.log('controllerFor',this.get('controller.controllers.album').get('model'))

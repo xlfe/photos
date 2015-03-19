@@ -19,6 +19,7 @@ export default Em.Component.extend({
             img_src = this.get_img_url(long_edge);
 
             this.$().css({'background-image': 'url(' + img_src + ')'});
+        return img_src;
     },
     setup: function () {
         var sz = this.get('photo.display_sz');
@@ -36,7 +37,7 @@ export default Em.Component.extend({
             width: w + 'px'
         });
 
-        this.background_img(w, h);
+        this.set('photo._loaded',this.background_img(w, h));
 
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function () {
