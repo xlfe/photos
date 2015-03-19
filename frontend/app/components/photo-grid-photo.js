@@ -10,6 +10,7 @@ export default Em.Component.extend({
     attributeBindings: ['draggable'],
     draggable: "true",
     classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:', 'highlight-left:'],
+    selection: 'fa fa-check-circle fa-2x',
     get_img_url: function (long_edge_width) {
         return this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
     },

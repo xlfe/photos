@@ -1,3 +1,10 @@
+@mixin transition($transition-property, $transition-time, $method)
+  -webkit-transition: $transition-property $transition-time $method
+  -moz-transition: $transition-property $transition-time $method
+  -ms-transition: $transition-property $transition-time $method
+  -o-transition: $transition-property $transition-time $method
+  transition: $transition-property $transition-time $method
+
 body
   padding-top: 55px
   margin-bottom: 30px
@@ -45,10 +52,7 @@ li.header-img-link, li.menu-link, .action-pointer
   @include align-content(space-between)
 
   .photo
-    //@include flex-basis(250px)
-    //@include flex-grow(.3)
     width: 320px
-    //max-width: 500px
     height: 180px
     border: 1px solid white
 
@@ -56,16 +60,40 @@ li.header-img-link, li.menu-link, .action-pointer
     background-position: center
     background-repeat: no-repeat
 
+    .fa,.ember-text-field
+      //@include transition(opacity, 0.2s, ease-in)
+      opacity: 0
+
+    .fa
+      display: block
+      color: #1dd200
+      float: left
+      margin: 3px
+      margin-left: 10px
+
 
     .ember-text-field
+      display: block
       background: rgba(255,255,255,0.80)
       border: none
       width: 100%
       padding-left: 5px
-      opacity: 0.3
       color: black
-      &:hover
-        opacity: 1
+
+    &:hover
+
+      *
+        @include transition(opacity, 0.25s, ease-in-out)
+
+      .fa
+        opacity: 0.25
+        &:hover
+          opacity: 1
+
+      .ember-text-field
+        opacity: 0.8
+        &:hover
+          opacity: 1
 
 .albums
   @extend .your-photos

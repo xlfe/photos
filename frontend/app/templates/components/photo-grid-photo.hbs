@@ -1,6 +1,8 @@
 
 {{input type="text" value=photo.title classNames="title" clicked=none}}
 
+<i {{bind-attr class=selection}} {{action 'selection'}}></i>
+
 {{#link-to 'album.show' photo}}
     <div class="image-click"></div>
 {{/link-to}}
