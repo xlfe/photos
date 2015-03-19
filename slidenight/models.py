@@ -35,7 +35,7 @@ class Photo(ndb.Model):
 
         excluded_properties = ['blob','gs','owner']
 
-    owner = ndb.KeyProperty(kind=User, required=False)
+    # owner = ndb.KeyProperty(kind=User, required=False)
     uploaded = ndb.DateTimeProperty(auto_now_add=True)
     modified = ndb.DateTimeProperty(auto_now=True)
     original_metadata = ndb.JsonProperty()
@@ -43,7 +43,7 @@ class Photo(ndb.Model):
     height = ndb.IntegerProperty()
     orientation = ndb.IntegerProperty()
 
-    pos = ndb.IntegerProperty()
+    pos = ndb.IntegerProperty(required=True)
 
     title = ndb.StringProperty(indexed=False)
     caption = ndb.TextProperty(indexed=False)
@@ -54,8 +54,9 @@ class Photo(ndb.Model):
     taken = ndb.DateTimeProperty()
     blob = ndb.BlobKeyProperty()
     gs = ndb.StringProperty()
-    filename = ndb.StringProperty()
+    filename = ndb.StringProperty(required=True)
     album = ndb.KeyProperty(Album)
+    md5 = ndb.StringProperty(required=True)
 
     # serving_url = ndb.ComputedProperty(lambda k: k._serving_url)
     serving_url = ndb.StringProperty()

@@ -11,6 +11,7 @@ export default DS.Model.extend({
     height: attr('number', {transient: true}),
     path: attr('string'),
     uploaded: attr('isodatetime', {transient: true}),
+    md5: attr('string'),
     serving_url: attr('string', {transient: true}),
     orientation: attr('number', {transient: true}),
     original_metadata: attr('object'),

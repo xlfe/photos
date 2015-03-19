@@ -33,9 +33,10 @@ export default Em.Controller.extend({
             type: 'POST',
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
-                filename: file.name,
-                size: file.bytes,
-                type: file.type,
+                filename: file.get('name'),
+                size: file.get('bytes'),
+                type: file.get('type'),
+                md5: file.get('md5'),
                 album: album
             }),
             dataType: 'json',
@@ -97,6 +98,7 @@ export default Em.Controller.extend({
             form.append('path', file.get('path'));
             form.append('lastModifiedDate', file.get('file').lastModifiedDate);
             form.append('file', data, file.get('name'));
+            form.append('md5', file.get('md5'));
             data = form;
         }
 
@@ -146,6 +148,7 @@ export default Em.Controller.extend({
                             id: response['bucket'] + '/' + response['name'],
                             path: file.get('path'),
                             lastModifiedDate: file.get('file').lastModifiedDate,
+                            md5: file.get('md5'),
                             album: file.get('album'),
                             name: file.get('name')
                         }),
@@ -244,7 +247,7 @@ export default Em.Controller.extend({
 
         if (preparing.length + ready.length < conc) {
             queued.slice(0, conc - preparing.length - ready.length).forEach(function (f) {
-//                console.log('preparing', f);
+                //console.log('preparing', f);
                 self.prepare_upload(f);
             });
         }
@@ -290,7 +293,6 @@ export default Em.Controller.extend({
             }
         },
         toggleVal: function() {
-            console.log('Hmm')
             this.toggleProperty('toggleValue');
         }
     },
@@ -304,7 +306,19 @@ export default Em.Controller.extend({
         this.set('close_caption','Cancel');
         this.set('cancel',false);
     },
-    save_disabled: true,
+    save_disabled: function() {
+
+        if (Em.isNone(this.get('files'))){
+            return true;
+        }
+        if (this.get('files').filter(function(_){
+                return _.get('_status') !== -1 && _.get('_status') !== 6;
+            }).length > 0){
+            return false;
+        }
+
+        return true;
+    }.property('files.@each._status'),
     save_caption: 'Upload',
     close_caption: 'Cancel',
     cancel: false,
@@ -328,6 +342,6 @@ export default Em.Controller.extend({
         }
         return undefined;
 
-    }.property('can_accept_folders','toggleValue'),
+    }.property('can_accept_folders','toggleValue')
 });
 

@@ -11,6 +11,7 @@ from rest_gae.permissions import *
 import os
 import logging
 from models import *
+from hashlib import md5
 
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
@@ -53,7 +54,7 @@ class PrepareUpload(CrosssiteAllowed):
 
         params = json.loads(self.request.body)
 
-        required = ['album','filename','size','type']
+        required = ['album','filename','size','type','md5']
         for r in required:
             assert r in params
         for p in params:
@@ -108,6 +109,7 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         blobstore_filename = '/gs/' + params['id']
         album = ndb.Key(urlsafe=params['album'])
         _album = album.get()
+        assert _album is not None
 
 
         img = images.Image(filename=blobstore_filename)
@@ -141,6 +143,7 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
                       title=params['name'],
                       path=params['path'],
                       pos = first,
+                      md5 = params['md5'],
                       filename=params['name'],
                       album=album,
                       width=img.width,
@@ -205,6 +208,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             path=self.request.get('path'),
             filename=name,
             album=album,
+            md5=self.request.get('md5'),
             width=img.width,
             height= img.height,
             orientation = orientation,
