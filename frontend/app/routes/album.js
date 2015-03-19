@@ -47,11 +47,17 @@ export default Em.Route.extend({
         return new Em.RSVP.Promise(function(resolve,reject){
 
             store.find('album', params.album_id).then(function (album) {
-                store.find('photo', query_params).then(function (photos) {
-                    album.set('photos', photos);
-                    get_more(album,photos);
+
+                //Only reload photos if we need to...
+                if (Em.isEmpty(album.get('photos'))) {
+                    store.find('photo', query_params).then(function (photos) {
+                        album.set('photos', photos);
+                        get_more(album,photos);
+                        resolve(album);
+                    });
+                } else {
                     resolve(album);
-                });
+                }
             });
         });
     }

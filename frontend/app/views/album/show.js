@@ -34,13 +34,16 @@ export default Em.View.extend({
 
         var screenWidth = Em.$(window).width() * 0.99,
             screenHeight = (Em.$(window).height() - 25 ) * 0.99,
+            _this = this,
             photo = this.get('controller.model'),
-            image = this.$('img'),
+            image = this.$('#lightbox'),
             full = this.get('displayUrl'),
             thumbnail = photo.get('_loaded') || full,
             tmpImage = new Image();
 
-        tmpImage.src = full;
+        if (thumbnail !== full){
+            tmpImage.src = full;
+        }
 
         var imageWidth = photo.get('width'),
             imageHeight = photo.get('height');
@@ -51,19 +54,21 @@ export default Em.View.extend({
             imageHeight /= ratio;
         }
 
-        image[0].src = thumbnail;
+        image.hide();
         image.css({
             'width': imageWidth + 'px',
             'height': imageHeight + 'px',
             'top': ( Em.$(window).height() - imageHeight - 25 ) / 2 + 'px',
-            'left': ( Em.$(window).width() - imageWidth ) / 2 + 'px'
+            'left': ( Em.$(window).width() - imageWidth ) / 2 + 'px',
+            'background-image': 'url(' + thumbnail + ')',
+            'background-size': imageWidth + 'px, ' + imageHeight + 'px'
         });
+        image.show();
 
         tmpImage.onload = function () {
-            image[0].src = full;
+            image.css({'background-image': 'url(' + full + ')'});
         };
 
-//        console.log('controllerFor',this.get('controller.controllers.album').get('model'))
     }.observes('controller.model').on('didInsertElement'),
 
     gestures: {
