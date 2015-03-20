@@ -61,24 +61,33 @@ export default Em.View.extend({
 
         });
 
-        function done() {
+        function done(e) {
+
+            var min_move = 30,
+                click = (Math.abs(e.pageX - initialW) <= min_move && Math.abs(e.pageY - initialH) <= min_move),
+                photos = _this.get('controller.model.photos');
+
+            Em.$(".photo").each(function () {
+
+                var selection = Em.$(".photo-select"),
+                    photo_elem = Em.$(this),
+                    result = doObjectsCollide(selection, photo_elem),
+                    id = Em.$(this).attr('data-photo'),
+                    photo = photos.findBy('id', id);
+
+                if (result === true && click === true){
+                    photo.toggleProperty('selected');
+                } else {
+                    if (photo.get('_selected') === true) {
+                        photo.set('_selected', false);
+                    }
+                }
+            });
+
             Em.$(".photo-select").removeClass("active");
             Em.$(".photo-select").width(0).height(0);
             Em.$(document).unbind("mousemove", openSelector);
             Em.$(document).unbind("mouseup", done);
-            var photos = _this.get('controller.model.photos');
-
-            Em.$(".photo").each(function () {
-
-                var id = Em.$(this).attr('data-photo'),
-                    photo = photos.findBy('id', id);
-
-                if (photo.get('_selected') === true) {
-                    photo.set('_selected', false);
-                }
-
-            });
-
         }
 
         function openSelector(e) {
@@ -129,8 +138,6 @@ export default Em.View.extend({
                 }
 
             });
-
-
         }
     }
 });
