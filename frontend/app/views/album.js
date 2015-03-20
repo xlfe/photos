@@ -2,8 +2,8 @@ import Em from 'ember';
 
 //selection
 //photo_elem
-function doObjectsCollide(s, p) { // a and b are your objects
-    var margin = 20,
+function doObjectsCollide(s, p,margin) { // a and b are your objects
+    var margin = margin||20,
         aTop = s.offset().top - margin,
         aLeft = s.offset().left - margin,
         bTop = p.offset().top - margin,
@@ -74,7 +74,7 @@ export default Em.View.extend({
             Em.$(".photo").each(function () {
 
                 var photo_elem = Em.$(this),
-                    result = doObjectsCollide(selection, photo_elem),
+                    result = doObjectsCollide(selection, photo_elem,-1),
                     id = Em.$(this).attr('data-photo'),
                     photo = photos.findBy('id', id);
 
