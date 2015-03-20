@@ -63,14 +63,17 @@ export default Em.View.extend({
 
         function done(e) {
 
+            Em.$(document).unbind("mousemove", openSelector);
+            Em.$(document).unbind("mouseup", done);
+
             var min_move = 30,
                 click = (Math.abs(e.pageX - initialW) <= min_move && Math.abs(e.pageY - initialH) <= min_move),
-                photos = _this.get('controller.model.photos');
+                photos = _this.get('controller.model.photos'),
+                selection = Em.$(".photo-select");
 
             Em.$(".photo").each(function () {
 
-                var selection = Em.$(".photo-select"),
-                    photo_elem = Em.$(this),
+                var photo_elem = Em.$(this),
                     result = doObjectsCollide(selection, photo_elem),
                     id = Em.$(this).attr('data-photo'),
                     photo = photos.findBy('id', id);
@@ -86,8 +89,6 @@ export default Em.View.extend({
 
             Em.$(".photo-select").removeClass("active");
             Em.$(".photo-select").width(0).height(0);
-            Em.$(document).unbind("mousemove", openSelector);
-            Em.$(document).unbind("mouseup", done);
         }
 
         function openSelector(e) {
@@ -112,17 +113,17 @@ export default Em.View.extend({
                     "top": e.pageY
                 });
             }
-            selectElements();
+            Em.run.debounce(this,selectElements,25);
         }
 
         function selectElements(e) {
-            var photos = _this.get('controller.model.photos');
-            Em.$(".photo").each(function () {
-                var selection = Em.$(".photo-select");
-                var photo_elem = Em.$(this);
-                var result = doObjectsCollide(selection, photo_elem);
+            var photos = _this.get('controller.model.photos'),
+                selection = Em.$(".photo-select");
 
-                var id = Em.$(this).attr('data-photo'),
+            Em.$(".photo").each(function () {
+                var photo_elem = Em.$(this);
+                var result = doObjectsCollide(selection, photo_elem),
+                    id = Em.$(this).attr('data-photo'),
                     photo = photos.findBy('id', id);
 
                 if (result === true) {
@@ -136,7 +137,6 @@ export default Em.View.extend({
                         photo.set('_selected', false);
                     }
                 }
-
             });
         }
     }

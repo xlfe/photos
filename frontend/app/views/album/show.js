@@ -98,8 +98,8 @@ export default Em.View.extend({
             //Escape - close
             controller.transitionToRoute('album');
             return;
-        } else if (evt.which === 39) {
-            //Right
+        } else if (evt.which === 39 || evt.which == 32) {
+            //Right or space
             controller.go_photo(1);
             return;
         } else if (evt.which === 37) {
