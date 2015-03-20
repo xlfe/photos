@@ -96,8 +96,8 @@ export default Em.View.extend({
             var h = Math.abs(initialH - e.pageY);
 
             Em.$(".photo-select").css({
-                'width': w,
-                'height': h
+                'width': Math.min(w, Em.$(document).width() - initialW-5 ),
+                'height': Math.min(h,Em.$(document).height() - initialH -5)
             });
             if (e.pageX <= initialW && e.pageY >= initialH) {
                 Em.$(".photo-select").css({
