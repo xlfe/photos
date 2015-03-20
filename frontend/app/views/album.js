@@ -39,6 +39,8 @@ export default Em.View.extend({
                     photo = photos.findBy('id', id);
                 if (photo.get('selected') === true){
                     return;
+                } else if (Em.$('.your-photos').hasClass('selection') === false){
+                    return;
                 }
 
             } else if (Em.$(e.target).hasClass('your-photos') !== true){
