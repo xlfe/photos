@@ -70,7 +70,6 @@ export default Em.View.extend({
         };
 
     }.observes('controller.model').on('didInsertElement'),
-
     gestures: {
         swipeLeft: function () {
             this.get('controller').go_photo(-1);
@@ -85,10 +84,6 @@ export default Em.View.extend({
             }
         }
     },
-    //click: function() {
-    //
-    //    console.log('controllerFor',this.get('controller.controllers.album').get('model.photos.arrangedContent'))
-    //},
     keyUp: function (evt) {
 
         var _this = evt.data._this,
@@ -97,18 +92,19 @@ export default Em.View.extend({
         if (evt.which === 27) {
             //Escape - close
             controller.transitionToRoute('album');
-            return;
         } else if (evt.which === 39 || evt.which == 32) {
             //Right or space
             controller.go_photo(1);
-            return;
         } else if (evt.which === 37) {
             //Left
             controller.go_photo(-1);
-            return;
+        } else {
+            console.log(evt.which);
         }
 
-        console.log(evt.which);
+        evt.stopPropagation();
+        evt.preventDefault();
+        return false;
     }
 });
 

@@ -50,6 +50,7 @@ function default_sort(manualSort) {
 
 export default Em.Controller.extend({
     queryParams: ['path'],
+    needs: ['application'],
 
     sort_by: function (by, direction) {
 
@@ -92,11 +93,18 @@ export default Em.Controller.extend({
     album_class: function() {
         var base_class='your-photos';
 
+
+        if (this.get('controllers.application').get('currentPath').endsWith('.show')){
+            base_class += ' noscroll ';
+        }
+
         if (this.get('selected').length > 0){
             return base_class + ' selection';
         }
+
+
         return base_class;
-    }.property('selected.length'),
+    }.property('selected.length','controllers.application.currentPath'),
     folders: function () {
         // Show all folders that have this path or below
 
