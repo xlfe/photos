@@ -20,15 +20,18 @@ function doObjectsCollide(s, p,margin) { // a and b are your objects
 
 
 export default Em.View.extend({
+    size_photos: function(){
+        this.get('controller').size_photos();
+    },
     didInsertElement: function () {
         var _this = this,
-            initialW, initialH;
+            initialX, initialY;
 
         Em.$(window).resize(function () {
-            Em.run.debounce(_this, _this.didInsertElement, 100);
+            Em.run.debounce(_this, _this.size_photos, 100);
         });
+        this.size_photos();
 
-        this.get('controller').size_photos();
 
         Em.$(".your-photos").mousedown(function (e) {
 
@@ -53,21 +56,21 @@ export default Em.View.extend({
                 'top': e.pageY
             });
 
-            initialW = e.pageX;
-            initialH = e.pageY;
+            initialX = e.pageX;
+            initialY = e.pageY;
 
             Em.$(document).bind("mouseup",done);
-            Em.$(document).bind("mousemove", openSelector);
+            Em.$(document).bind("mousemove", make_selection);
 
         });
 
         function done(e) {
 
-            Em.$(document).unbind("mousemove", openSelector);
+            Em.$(document).unbind("mousemove", make_selection);
             Em.$(document).unbind("mouseup", done);
 
             var min_move = 30,
-                click = (Math.abs(e.pageX - initialW) <= min_move && Math.abs(e.pageY - initialH) <= min_move),
+                click = (Math.abs(e.pageX - initialX) <= min_move && Math.abs(e.pageY - initialY) <= min_move),
                 photos = _this.get('controller.model.photos'),
                 selection = Em.$(".photo-select");
 
@@ -91,28 +94,40 @@ export default Em.View.extend({
             Em.$(".photo-select").width(0).height(0);
         }
 
-        function openSelector(e) {
-            var w = Math.abs(initialW - e.pageX);
-            var h = Math.abs(initialH - e.pageY);
+        function make_selection(e) {
+            var x = e.pageX,
+                y = e.pageY,
+                ps = Em.$('.photo-select'),
+                w = Math.abs(initialX - x),
+                h = Math.abs(initialY - y),
+                yp = Em.$('.your-photos'),
+                max_w = yp.outerWidth() - initialX - 10,
+                max_h = yp.outerHeight() + yp.position().top - initialY;
 
-            Em.$(".photo-select").css({
-                'width': Math.min(w, Em.$(document).width() - initialW-5 ),
-                'height': Math.min(h,Em.$(document).height() - initialH -5)
-            });
-            if (e.pageX <= initialW && e.pageY >= initialH) {
-                Em.$(".photo-select").css({
-                    'left': e.pageX
+                ps.css({
+                    left: Math.min(x,initialX)
                 });
-            } else if (e.pageY <= initialH && e.pageX >= initialW) {
-                Em.$(".photo-select").css({
-                    'top': e.pageY
-                });
-            } else if (e.pageY < initialH && e.pageX < initialW) {
-                Em.$(".photo-select").css({
-                    'left': e.pageX,
-                    "top": e.pageY
-                });
+            if (x <= initialX) {
+                max_w = initialX;
             }
+
+            if (y <= initialY) {
+
+                if (yp.position().top > y) {
+                    h = initialY - yp.position().top - 10;
+                }
+                max_h = initialY - yp.position().top;
+            }
+
+            ps.css({
+                top: Math.min(initialY,Math.max(yp.position().top +10,y))
+            });
+
+            ps.css({
+                width: Math.min(w,max_w),
+                height: Math.min(h,max_h)
+            });
+
             Em.run.debounce(this,selectElements,25);
         }
 

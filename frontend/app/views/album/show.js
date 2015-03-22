@@ -54,7 +54,7 @@ export default Em.View.extend({
             imageHeight /= ratio;
         }
 
-        image.hide();
+        //image.hide();
         image.css({
             'width': imageWidth + 'px',
             'height': imageHeight + 'px',
@@ -63,7 +63,7 @@ export default Em.View.extend({
             'background-image': 'url(' + thumbnail + ')',
             'background-size': imageWidth + 'px, ' + imageHeight + 'px'
         });
-        image.show();
+        //image.show();
 
         tmpImage.onload = function () {
             image.css({'background-image': 'url(' + full + ')'});
@@ -92,11 +92,11 @@ export default Em.View.extend({
         if (evt.which === 27) {
             //Escape - close
             controller.transitionToRoute('album');
-        } else if (evt.which === 39 || evt.which == 32) {
-            //Right or space
+        } else if (evt.which === 39 || evt.which === 32 || evt.which === 75) {
+            //Right or space or K
             controller.go_photo(1);
-        } else if (evt.which === 37) {
-            //Left
+        } else if (evt.which === 37 || evt.which === 74) {
+            //Left or J
             controller.go_photo(-1);
         } else {
             console.log(evt.which);

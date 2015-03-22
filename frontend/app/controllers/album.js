@@ -7,7 +7,7 @@ var Folder = Em.Object.extend({
     is_folder: true
 });
 
-var scrollPosition = [];
+var scrollPosition = [0,0];
 
 function below_folder(path, folder) {
     if (folder.length === 0){
@@ -116,7 +116,6 @@ export default Em.Controller.extend({
             // lock scroll position, but retain settings for later
 
             var html = Em.$('html'); // it would make more sense to apply this to body, but IE7 won't have that
-            html.data('scroll-position', scrollPosition);
             html.data('previous-overflow', html.css('overflow'));
             html.css('overflow', 'hidden');
             window.scrollTo(scrollPosition[0], scrollPosition[1]);
@@ -126,7 +125,6 @@ export default Em.Controller.extend({
 
             // un-lock scroll position
             var html = Em.$('html');
-            var scrollPosition = html.data('scroll-position');
             html.css('overflow', html.data('previous-overflow'));
             window.scrollTo(scrollPosition[0], scrollPosition[1])
 

@@ -6,12 +6,6 @@ export default DS.Model.extend({
     name: DS.attr('string'),
     manualSort: DS.attr('list'),
     minHeight: DS.attr('number'),
-    sortOptions: [
-        {name: 'Uploaded date/time', val: 'uploaded'},
-        {name: 'Photo title', val: 'title'},
-        {name: 'Digitized', val: 'original_metadata.DateTime'},
-        {name: 'Manual', val: 'position'}
-    ],
 
     am_loaded: function () {
         this.set('saving', false);

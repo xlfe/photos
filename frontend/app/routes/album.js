@@ -31,11 +31,7 @@ export default Em.Route.extend({
                 query_params['limit'] = query_params['limit'] * 2;
 
                 store.find('photo',query_params).then(function(more){
-
-                    more.forEach(function(m){
-                        album.get('photos.content').pushObject(m);
-                    });
-
+                    album.get('photos.content').pushObjects(more.get('content'));
                     get_more(album,more);
                 });
             } else {
