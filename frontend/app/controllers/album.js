@@ -7,6 +7,8 @@ var Folder = Em.Object.extend({
     is_folder: true
 });
 
+var scrollPosition = [];
+
 function below_folder(path, folder) {
     if (folder.length === 0){
         return true;
@@ -94,10 +96,6 @@ export default Em.Controller.extend({
         var base_class='your-photos';
 
 
-        if (this.get('controllers.application').get('currentPath').endsWith('.show')){
-            base_class += ' noscroll ';
-        }
-
         if (this.get('selected').length > 0){
             return base_class + ' selection';
         }
@@ -105,6 +103,35 @@ export default Em.Controller.extend({
 
         return base_class;
     }.property('selected.length','controllers.application.currentPath'),
+    scrollKeeper: function () {
+
+
+        if (this.get('controllers.application').get('currentPath').endsWith('.show')) {
+            scrollPosition = [
+                self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
+                self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+            ];
+
+
+            // lock scroll position, but retain settings for later
+
+            var html = Em.$('html'); // it would make more sense to apply this to body, but IE7 won't have that
+            html.data('scroll-position', scrollPosition);
+            html.data('previous-overflow', html.css('overflow'));
+            html.css('overflow', 'hidden');
+            window.scrollTo(scrollPosition[0], scrollPosition[1]);
+        } else {
+
+
+
+            // un-lock scroll position
+            var html = Em.$('html');
+            var scrollPosition = html.data('scroll-position');
+            html.css('overflow', html.data('previous-overflow'));
+            window.scrollTo(scrollPosition[0], scrollPosition[1])
+
+        }
+    }.observes('controllers.application.currentPath'),
     folders: function () {
         // Show all folders that have this path or below
 
