@@ -8,7 +8,7 @@ var attr = DS.attr,
 
 export default DS.Model.extend(autosave,{
 
-    autosave_properties: ['title','caption'],
+    autosave_properties: ['title','caption','pos'],
 
     //ReadOnly
 

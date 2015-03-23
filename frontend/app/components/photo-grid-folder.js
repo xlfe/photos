@@ -1,11 +1,7 @@
 import PGPC from '../components/photo-grid-photo';
 
 export default PGPC.extend({
-    classNameBindings: [':folder'],
-    //get_img_url: function (long_edge_width) {
-    //    return this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
-    //},
-
+    classNames: ['folder'],
     background_img: function (width, height) {
         console.log('folder')
 

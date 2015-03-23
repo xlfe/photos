@@ -6,7 +6,14 @@ from google.appengine.api import images
 from google.appengine.ext import blobstore
 import logging
 import datetime
+import os
 
+
+import httplib2
+from oauth2client.appengine import AppAssertionCredentials
+
+
+DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
 class User(ndb.Model):
 
@@ -66,14 +73,22 @@ class Photo(ndb.Model):
     serving_url = ndb.StringProperty()
 
     @property
-    def _serving_url(self):
+    def _blobinfo(self):
         if self.blob:
-            _key = self.blob
+            return self.blob
         else:
-            _key = blobstore.create_gs_key(self.gs)
-        return images.get_serving_url(blob_key=_key,secure_url=True)
+            return blobstore.create_gs_key(self.gs)
+    @property
+    def _serving_url(self):
+        return images.get_serving_url(blob_key=self._blobinfo,secure_url=True)
 
 
+    @staticmethod
+    def after_delete(deleted_keys,models):
+
+        logging.info(models)
+        for m in models:
+            blobstore.delete(m._blobinfo)
 
 
 

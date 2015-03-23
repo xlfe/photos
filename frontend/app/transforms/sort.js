@@ -5,7 +5,7 @@ import Em from 'ember';
 
 export default DS.Transform.extend({
     deserialize: function (serialized) {
-        return Em.isNone() ? null : new Big(serialized);
+        return Em.isNone(serialized) ? null : new Big(serialized);
     },
     serialize: function (deserialized) {
         return Em.isNone(deserialized) ? null : deserialized.toString();

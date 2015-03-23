@@ -30,6 +30,33 @@
         </a>
     </li>
 
+    {{#if controller.selected}}
+        <li class="menu-link">
+            <a href="#" title="Clear the current selection" {{action 'cancel_selection'}}>
+
+                {{controller.selected.length}} selected
+                <i class="fa fa-close fa-lg"></i>
+            </a>
+        </li>
+        <li class="menu-link">
+            <a href="#" title="Delete selected photos" {{action 'delete_selection'}}>
+                {{#if controller.progress_delete}}
+                    <i class="fa fa-spinner fa-spin fa-lg"></i>
+                {{/if}}
+                <i class="fa fa-trash fa-lg"></i>
+                {{#if controller.confirm_delete}}
+
+                    <span class="alert-danger" role="alert">
+                        Please confirm deleting {{controller.selected.length}} photos?
+                        </span>
+
+                {{/if}}
+
+            </a>
+        </li>
+    {{/if}}
+
+
 </ul>
 
 <ul class="nav navbar-nav navbar-right">
@@ -41,16 +68,12 @@
             {{/if}}
             <span>
 
-                {{#if controller.selected}}
-                    {{controller.selected.length}} selected
-                    <span class="fa fa-close" {{action 'cancel_selection'}}></span> -
-                {{/if}}
                 {{model.photos.length}} Photos
             </span>
             <div class="spacer"></div>
-            <span class="fa fa-image"></span>
-            {{input type="range" min=150 max=800 steps=50 value=model.minHeight}}
-            <span class="fa fa-image fa-2x"></span>
+            <span {{action 'smaller'}}class="fa fa-image"></span>
+            {{input type="range" min=150 max=800 steps=50 value=minHeight}}
+            <span {{action 'larger'}} class="fa fa-image fa-2x"></span>
         </a>
     </li>
 

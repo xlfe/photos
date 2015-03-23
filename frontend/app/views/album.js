@@ -76,7 +76,12 @@ export default Em.View.extend({
 
             Em.$(".photo").each(function () {
 
-                var photo_elem = Em.$(this),
+                var photo_elem = Em.$(this);
+
+                if (photo_elem.hasClass('folder')){
+                    return;
+                }
+                var
                     result = doObjectsCollide(selection, photo_elem,-1),
                     id = Em.$(this).attr('data-photo'),
                     photo = photos.findBy('id', id);
@@ -137,6 +142,9 @@ export default Em.View.extend({
 
             Em.$(".photo").each(function () {
                 var photo_elem = Em.$(this);
+                if (photo_elem.hasClass('folder')){
+                    return;
+                }
                 var result = doObjectsCollide(selection, photo_elem),
                     id = Em.$(this).attr('data-photo'),
                     photo = photos.findBy('id', id);

@@ -25,32 +25,57 @@ if (typeof String.prototype.startsWith !== 'function') {
   };
 }
 
+function sort_pos(a,b){
+    var aa = a.get('pos') || new Big(0),
+        bb = b.get('pos') || new Big(0);
+
+    return aa.minus(bb);
+}
 
 export default Em.Controller.extend({
     queryParams: ['path'],
+    minHeight: 200,
+    set_minHeight: function() {
+        var h = Em.$(window).height(),
+            d = 200;
+
+        if (h > 1600){
+            d = 400;
+        } else if (h>1000) {
+            d = 300;
+        } else if (h >640) {
+            d=200;
+        } else {
+            d=150;
+        }
+
+        this.set('minHeight',d);
+
+    }.on('init'),
     needs: ['application'],
 
-    sort_by: function (by, direction) {
-
-        var
-            //manualSort = this.get('model.manualSort'),
-            //ds = default_sort(manualSort),
-            photos = this.get('model.photos.content');
-
-        //if (Em.isNone(by)){
-        //
-        //    photos.sort(ds).forEach(function(_){
-        //        manualSort.pushObject(_.get('pos'));
-        //    });
-        //
-        //    return;
-        //
-        //}
-    },
+    //sort_by: function (by, ascending) {
+    //
+    //    var photos = this.get('model.photos.content'),
+    //        album = this.get('model'),
+    //        names = this.get('model.sort_properties')[0];
+    //
+    //    Em.run(function() {
+    //
+    //        if (Em.isNone(by)){
+    //
+    //            for (var x=0;x<photos.length;x++){
+    //                photos[x].set('pos',new Big(x));
+    //            }
+    //
+    //            album.set('sort_property',1);
+    //
+    //        }
+    //    })
+    //},
     arrangedContent: function () {
 
         var path = this.get('path') || '',
-            sortFn = this.get('model.sort_fn'),
             photos = this.get('model.photos').filter(function(_){
                 if (_.get('currentState.isLoading') === true){
                     return false;
@@ -58,11 +83,11 @@ export default Em.Controller.extend({
                 var photo_path = _.get('path') || '';
                 return photo_path.match('^' + path + '$') !== null;
 
-            }).sort(sortFn);
+            }).sort(sort_pos);
 
         return photos;
 
-    }.property('model.photos.@each.path','path','model.manualSort.@each'),
+    }.property('model.photos.@each.path','path','model.photos.@each.pos'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
             return _.get('selected') === true;
@@ -162,8 +187,9 @@ export default Em.Controller.extend({
         var w = Em.$('.your-photos').width(),
             cw = 0,
             cr = [],
-            min_height = +this.get('model.minHeight') || 320, //Minimum height of each row in pixels
+            min_height = +this.get('minHeight'), //Minimum height of each row in pixels
             p = this.get('folders').concat(this.get('arrangedContent'));
+        console.log(min_height)
 
         //Sizing algorithm is choose a minimum row height, add images until
         // adding an additional image would be wider than the width of the element
@@ -216,7 +242,7 @@ export default Em.Controller.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-    }.observes('arrangedContent.@each', 'model.minHeight', 'path'),
+    }.observes('arrangedContent.@each', 'minHeight', 'path'),
     actions: {
         new_sort: function(){
             this.sort_by();
@@ -224,10 +250,32 @@ export default Em.Controller.extend({
         transition: function(photo){
             this.transitionToRoute('album.show',photo);
         },
+        larger: function() {
+            this.set('minHeight',Math.min(this.get('minHeight')+50,800));
+        },
+        smaller: function(){
+            this.set('minHeight',Math.max(this.get('minHeight')-50,150));
+        },
         cancel_selection: function() {
             this.get('selected').forEach(function(_){
                 _.set('selected',false);
             });
+        },
+        delete_selection: function() {
+            var _this=this;
+            if (Em.isPresent(this.get('confirm_delete'))) {
+
+                _this.set('progress_delete',true);
+                _this.set('confirm_delete',undefined);
+                    _this.get('selected').forEach(function (_) {
+                        _.destroyRecord();
+                    });
+                    _this.set('progress_delete',false);
+            } else {
+
+                this.set('confirm_delete',true);
+
+            }
         }
     }
 });

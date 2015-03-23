@@ -9,7 +9,6 @@ export default Em.View.extend({
     ],
     actions: {
         save: function() {
-            "use strict";
             console.log("sort me")
         }
     }

@@ -25,7 +25,7 @@ OWNER_PERMISSIONS = {
     'GET': PERMISSION_ANYONE,
     'POST': PERMISSION_ANYONE,
     'PUT': PERMISSION_ANYONE,
-    'DELETE': PERMISSION_ADMIN
+    'DELETE': PERMISSION_ANYONE
 }
 
 
@@ -122,10 +122,13 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         meta = img.get_original_metadata()
         meta['__original_file_modified']=params['lastModifiedDate']
 
+        first,last = Photo.allocate_ids(1,parent=album)
+
         photo = Photo(parent=album,
                       gs = blobstore_filename,
                       title=params['name'],
                       path=params['path'],
+                      pos=str(float(first)/15000),
                       md5 = params['md5'],
                       filename=params['name'],
                       album=album,
@@ -161,10 +164,13 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         meta = img.get_original_metadata()
         meta['__original_file_modified']=self.request.get('lastModifiedDate')
 
+
+        first,last = Photo.allocate_ids(1,parent=album)
         photo = Photo(parent=album,
             blob=blob_info.key(),
             title=name,
             path=self.request.get('path'),
+            pos=str(float(first)/15000),
             filename=name,
             album=album,
             md5=self.request.get('md5'),
@@ -189,7 +195,7 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/upload',UploadHandler),
 
         RESTHandler('/api/users',User,permissions=OWNER_PERMISSIONS,user_object=User,  allowed_origin=ALLOWED_ORIGIN),
-        RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN,after_delete_callback=Photo.after_delete),
         RESTHandler('/api/albums',Album,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN),
       ],
     debug=True,
