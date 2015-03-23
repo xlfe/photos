@@ -15,6 +15,8 @@ function diff(lower,higher){
 
 export default Em.Component.extend({
     tagName: 'div',
+    classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:',
+        'highlight-left:','photo.selected:selected','photo.hasFocus:hasFocus'],
     attributeBindings: ['draggable','photo_id:data-photo'],
     draggable: function() {
 
@@ -28,7 +30,6 @@ export default Em.Component.extend({
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),
-    classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:', 'highlight-left:','photo.selected:selected'],
     get_img_url: function (long_edge_width) {
         return this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
     },
@@ -182,6 +183,13 @@ export default Em.Component.extend({
 
     },
     actions: {
+        focus_me: function() {
+            this.set('photo.hasFocus',true);
+        },
+        blur: function(){
+            "use strict";
+            console.log("bliue")
+        },
         selection: function() {
             this.toggleProperty('photo.selected');
         }
