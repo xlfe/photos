@@ -1,4 +1,5 @@
 import Em from 'ember';
+/* global Big */
 
 var drag = {
     photo: null,
@@ -98,56 +99,86 @@ export default Em.Component.extend({
     drop: function () {
 
         var album = this.get('album.arrangedContent'),
+
+            //The item we're draggin
             photo = drag.photo,
-            new_pos = null,
-            prev = null,
+
+            //Where we've dropped the photo
             target = this.get('photo'),
-            pos = drag.position;
+
+            //Before or after?
+            pos = drag.position,
+
+            idx_p = album.indexOf(photo),
+            idx_t = album.indexOf(target),
+
+            lower = null,
+            upper = null,
+
+            multi = !Em.isEmpty(this.get('album.selected'));
 
         this.set('highlight-left', false);
         this.set('highlight-right', false);
 
-        if (photo == target){
+        if (photo === target){
             return;
         }
 
-        if (pos === 'before'){
-            album.forEach(function(_){
-                if (target === _){
-                    if (prev === null){
-                        //Must have dropped at the start of the photos
-                        new_pos = diff(Big(0), target.get('pos')) ;
-                    } else {
-                        if (prev !== photo){
-                            new_pos = diff(prev.get('pos'),target.get('pos'));
-                        } else {
-                            new_pos = prev.get('pos');
-                        }
-                    }
-                }
-                prev = _;
-            });
+        //clog(pos,'photo',idx_p,'target',idx_t,'length',album.length);
 
-        } else if (pos === 'after'){
-            album.forEach(function(_){
-                if (prev === true){
-                    if (_ !== photo){
-                        new_pos = diff(target.get('pos'),_.get('pos'));
-                    } else {
-                        new_pos = _.get('pos');
-                    }
-                    prev = false;
-                }
-                if (_===target){
-                    prev = true;
-                }
-            });
-            if (new_pos === null){
-                new_pos = target.get('pos').add(Big("0.001"));
+        if (pos === 'before') {
+
+            if (album.objectAt(idx_t -1) === photo){
+                //clog("NO MOVE");
+                return;
+            }
+
+            upper = target.get('pos');
+            if (idx_t === 0) {
+                //at the start
+                lower = new Big(0);
+            } else {
+                lower = album.objectAt(idx_t - 1).get('pos');
+            }
+
+        } else {
+
+
+            if (album.objectAt(idx_t +1) === photo){
+                //clog("NO MOVE");
+                return;
+            }
+
+            lower = target.get('pos');
+            if (idx_t === album.length -1) {
+                //at the end
+                upper = lower.add(new Big("1"));
+            } else {
+                upper = album.objectAt(idx_t +1).get('pos');
             }
         }
-        console.log(photo.get('pos').toString(),new_pos.toString());
-        photo.set('pos',new_pos);
+
+        if (upper.eq(lower)){
+            //clog("no move");
+            return;
+        }
+
+        if (multi){
+            var photos = this.get('album.selected'),
+                interval = upper.minus(lower).div(2).div(photos.length);
+
+            photos.forEach(function(p){
+                p.set('pos',lower.add(interval));
+                lower = lower.add(interval);
+            });
+
+            //clog('moved ',photos.length,'photos');
+
+        } else {
+            var new_pos = diff(lower, upper);
+            //clog("moved one photo to",new_pos.toString());
+            photo.set('pos',new_pos);
+        }
 
     },
     actions: {

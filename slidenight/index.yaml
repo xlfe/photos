@@ -13,6 +13,19 @@ indexes:
 - kind: Photo
   properties:
   - name: album
+  - name: path
+  - name: pos
+
+- kind: Photo
+  properties:
+  - name: album
+  - name: path
+    direction: desc
+  - name: pos
+
+- kind: Photo
+  properties:
+  - name: album
   - name: pos
     direction: desc
 
