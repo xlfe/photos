@@ -119,49 +119,26 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         if 'DateTime' not in img.get_original_metadata():
             logging.info(img.get_original_metadata())
 
-        try:
-            orientation = int(img.get_original_metadata()['Orientation'])
-        except KeyError:
-            orientation = None
-
-        # orient_map = {
-        #     3: lambda i: i.rotate(180),
-        #     6: lambda i: i.rotate(90),
-        #     8: lambda i: i.rotate(-90)
-        # }
-
-        # if orientation in orient_map:
-        #     orient_map[orientation](img)
-
-        first,last = Photo.allocate_ids(1,parent=album)
-
         meta = img.get_original_metadata()
         meta['__original_file_modified']=params['lastModifiedDate']
 
-        photo = Photo(parent=album, id=first,
+        photo = Photo(parent=album,
                       gs = blobstore_filename,
                       title=params['name'],
                       path=params['path'],
-                      pos = first,
                       md5 = params['md5'],
                       filename=params['name'],
                       album=album,
                       width=img.width,
                       height= img.height,
-                      orientation = orientation,
                       original_metadata=meta
                       )
-
-        # if orientation in [6,8]:
-        #     photo.width = img.height
-        #     photo.height = img.width
 
         photo.serving_url = photo._serving_url
         photo.put()
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(photo.key.urlsafe()))
-
 
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     """Only used by the dev_appserver"""
@@ -174,7 +151,6 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         album = ndb.Key(urlsafe=self.request.get('album'))
         _album = album.get()
 
-
         img = images.Image(blob_key=blob_info.key())
         img.rotate(0)
         img.execute_transforms(parse_source_metadata=True)
@@ -182,42 +158,20 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         if 'DateTime' not in img.get_original_metadata():
             logging.info(img.get_original_metadata())
 
-        try:
-            orientation = int(img.get_original_metadata()['Orientation'])
-        except KeyError:
-            orientation = None
-
-        # orient_map = {
-        #     3: lambda i: i.rotate(180),
-        #     6: lambda i: i.rotate(90),
-        #     8: lambda i: i.rotate(-90)
-        # }
-
-        # if orientation in orient_map:
-        #     orient_map[orientation](img)
-
-        first,last = Photo.allocate_ids(1,parent=album)
-
         meta = img.get_original_metadata()
         meta['__original_file_modified']=self.request.get('lastModifiedDate')
 
-        photo = Photo(parent=album, id=first,
+        photo = Photo(parent=album,
             blob=blob_info.key(),
             title=name,
-            pos = first,
             path=self.request.get('path'),
             filename=name,
             album=album,
             md5=self.request.get('md5'),
             width=img.width,
             height= img.height,
-            orientation = orientation,
             original_metadata=meta
         )
-
-        # if orientation in [6,8]:
-        #     photo.width = img.height
-        #     photo.height = img.width
 
         photo.serving_url = photo._serving_url
         photo.put()

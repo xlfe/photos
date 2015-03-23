@@ -25,30 +25,6 @@ if (typeof String.prototype.startsWith !== 'function') {
   };
 }
 
-function default_sort(manualSort) {
-    return function (_a, _b) {
-        _a = _a.get('pos');
-        _b = _b.get('pos');
-
-        var __a = manualSort.indexOf(_a),
-            __b = manualSort.indexOf(_b);
-
-        if (__a === -1) {
-            manualSort.pushObject(_a);
-            __a = manualSort.indexOf(_a);
-        }
-        if (__b === -1) {
-            manualSort.pushObject(_b);
-            __b = manualSort.indexOf(_b);
-        }
-
-        if (__a  < __b) {
-            return -1;
-        }
-        return 1;
-    };
-}
-
 
 export default Em.Controller.extend({
     queryParams: ['path'],
@@ -56,25 +32,25 @@ export default Em.Controller.extend({
 
     sort_by: function (by, direction) {
 
-        var manualSort = this.get('model.manualSort'),
-            ds = default_sort(manualSort),
+        var
+            //manualSort = this.get('model.manualSort'),
+            //ds = default_sort(manualSort),
             photos = this.get('model.photos.content');
 
-        if (Em.isNone(by)){
-
-            photos.sort(ds).forEach(function(_){
-                manualSort.pushObject(_.get('pos'));
-            });
-
-            return;
-
-        }
+        //if (Em.isNone(by)){
+        //
+        //    photos.sort(ds).forEach(function(_){
+        //        manualSort.pushObject(_.get('pos'));
+        //    });
+        //
+        //    return;
+        //
+        //}
     },
     arrangedContent: function () {
 
         var path = this.get('path') || '',
-            manualSort = this.get('model.manualSort'),
-            ds = default_sort(manualSort),
+            sortFn = this.get('model.sort_fn'),
             photos = this.get('model.photos').filter(function(_){
                 if (_.get('currentState.isLoading') === true){
                     return false;
@@ -82,7 +58,7 @@ export default Em.Controller.extend({
                 var photo_path = _.get('path') || '';
                 return photo_path.match('^' + path + '$') !== null;
 
-            }).sort(ds);
+            }).sort(sortFn);
 
         return photos;
 
@@ -95,11 +71,9 @@ export default Em.Controller.extend({
     album_class: function() {
         var base_class='your-photos';
 
-
         if (this.get('selected').length > 0){
             return base_class + ' selection';
         }
-
 
         return base_class;
     }.property('selected.length','controllers.application.currentPath'),
@@ -112,7 +86,6 @@ export default Em.Controller.extend({
                 self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
             ];
 
-
             // lock scroll position, but retain settings for later
 
             var html = Em.$('html'); // it would make more sense to apply this to body, but IE7 won't have that
@@ -120,8 +93,6 @@ export default Em.Controller.extend({
             html.css('overflow', 'hidden');
             window.scrollTo(scrollPosition[0], scrollPosition[1]);
         } else {
-
-
 
             // un-lock scroll position
             var html = Em.$('html');

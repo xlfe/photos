@@ -318,7 +318,7 @@ export default Em.Controller.extend({
         }
 
         return true;
-    }.property('files.@each._status'),
+    }.property('files.@each._status','files.length'),
     save_caption: 'Upload',
     close_caption: 'Cancel',
     cancel: false,

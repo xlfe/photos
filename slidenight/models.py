@@ -25,40 +25,44 @@ class User(ndb.Model):
 
 class Album(ndb.Model):
 
+    FILENAME = 0
+    POS = 1
+
     name = ndb.StringProperty()
-    minHeight = ndb.IntegerProperty(default=200,required=True)
-    manualSort = ndb.IntegerProperty(repeated=True)
+    sort_property = ndb.IntegerProperty(default=0)
 
 class Photo(ndb.Model):
 
     class RESTMeta:
 
-        excluded_properties = ['blob','gs','owner']
+        excluded_properties = ['blob','gs','original_metadata']
 
-    # owner = ndb.KeyProperty(kind=User, required=False)
-    uploaded = ndb.DateTimeProperty(auto_now_add=True)
-    modified = ndb.DateTimeProperty(auto_now=True)
-    original_metadata = ndb.JsonProperty()
-    width = ndb.IntegerProperty()
-    height = ndb.IntegerProperty()
-    orientation = ndb.IntegerProperty()
-
-    pos = ndb.IntegerProperty(required=True)
 
     title = ndb.StringProperty(indexed=False)
-    caption = ndb.TextProperty(indexed=False)
+    caption = ndb.StringProperty(indexed=False)
     tags = ndb.StringProperty(repeated=True)
     path = ndb.StringProperty()
-    last_modified = ndb.DateTimeProperty()
+    pos = ndb.StringProperty()
 
+    #Read only
+    filename = ndb.StringProperty(required=True)
+    md5 = ndb.StringProperty(required=True)
     taken = ndb.DateTimeProperty()
+
+    uploaded = ndb.DateTimeProperty(auto_now_add=True)
+    width = ndb.IntegerProperty(required=True)
+    height = ndb.IntegerProperty(required=True)
+
+    modified = ndb.DateTimeProperty(auto_now=True)
+
+
+
+    #Other data
+    original_metadata = ndb.JsonProperty()
     blob = ndb.BlobKeyProperty()
     gs = ndb.StringProperty()
-    filename = ndb.StringProperty(required=True)
     album = ndb.KeyProperty(Album)
-    md5 = ndb.StringProperty(required=True)
 
-    # serving_url = ndb.ComputedProperty(lambda k: k._serving_url)
     serving_url = ndb.StringProperty()
 
     @property
