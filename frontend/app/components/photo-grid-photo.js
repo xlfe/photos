@@ -98,26 +98,20 @@ export default Em.Component.extend({
 
         var
             //album controller
-            album = this.get('album'),
+            album = this.get('album.arrangedContent'),
 
             //The item we're draggin
-            photo = album.get('drag.photo'),
+            photo = this.get('album.drag.photo'),
 
             //Before or after?
-            pos = album.get('drag.position'),
+            pos = this.get('album.drag.position'),
 
             //Where we've dropped the photo
             target = this.get('photo');
 
         if(Em.isNone(target)){
-
-            target = this.get('folder');
-
-            console.log('whoa there nellie, that be a folder!');
+            //whoa there nellie, that be a folder! - lets handle that over in photo-grid-folder?
             return;
-        } else {
-            album = this.get('album.arrangedContent');
-            console.log("not a folder?")
         }
 
 
@@ -146,12 +140,12 @@ export default Em.Component.extend({
                 return;
             }
 
-            upper = target.get('pos');
+            upper = new Big(target.get('pos'));
             if (idx_t === 0) {
                 //at the start
                 lower = new Big(0);
             } else {
-                lower = album.objectAt(idx_t - 1).get('pos');
+                lower = new Big(album.objectAt(idx_t - 1).get('pos'));
             }
 
         } else {
@@ -162,12 +156,12 @@ export default Em.Component.extend({
                 return;
             }
 
-            lower = target.get('pos');
+            lower = new Big(target.get('pos'));
             if (idx_t === album.length -1) {
                 //at the end
                 upper = lower.add(new Big("1"));
             } else {
-                upper = album.objectAt(idx_t +1).get('pos');
+                upper = new Big(album.objectAt(idx_t +1).get('pos'));
             }
         }
 
@@ -177,20 +171,24 @@ export default Em.Component.extend({
         }
 
         if (multi){
+
             var photos = this.get('album.selected'),
                 interval = upper.minus(lower).div(2).div(photos.length);
 
-            photos.forEach(function(p){
-                p.set('pos',lower.add(interval));
-                lower = lower.add(interval);
-            });
+            Em.run(function(){
+
+                photos.forEach(function(p){
+                    p.set('pos',lower.add(interval).toString());
+                    lower = lower.add(interval);
+                });
+            })
 
             //clog('moved ',photos.length,'photos');
 
         } else {
             var new_pos = diff(lower, upper);
             //clog("moved one photo to",new_pos.toString());
-            photo.set('pos',new_pos);
+            photo.set('pos',new_pos.toString());
         }
 
     },

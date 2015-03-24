@@ -55,16 +55,32 @@ export default Em.Component.extend({
 
         if (multi){
 
+            var photos = this.get('album.selected'),
+                dest = this.get('album')._arrangedContent(folder.get('path')),
+                interval = Big(0.1),
+                max = Big(0);
+
+            dest.forEach(function(_){
+                var p = new Big(_.get('pos'));
+                if (p.gt(max)){
+                    max=p;
+                }
+            });
+
+            console.log('moving',photos.length, 'photos to dest folder with',dest.length,'photos and max pos of',max.toString());
+
+            Em.run(function(){
+                photos.forEach(function(p){
+                    max = max.add(interval);
+                    p.set('path',folder.get('path'));
+                    p.set('pos',max.toString());
+                });
+            })
+
         } else {
-
             photo.set('path',folder.get('path'));
-
             console.log('one photo moved to',folder.get('path'));
         }
 
-
-
-
     }
-
 });

@@ -8,7 +8,8 @@ var attr = DS.attr,
 
 export default DS.Model.extend(autosave,{
 
-    autosave_properties: ['title','caption','pos','path'],
+    autosave_properties: ['title','caption'],
+    autosave_properties_immediate: ['pos','path'],
 
     //ReadOnly
 
@@ -24,7 +25,7 @@ export default DS.Model.extend(autosave,{
     //Mutable
     title:      attr('string'),
     caption:    attr('string'),
-    pos:        attr('sort'),
+    pos:        attr('string'),
     path:       attr('string'),
 
 

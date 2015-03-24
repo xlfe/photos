@@ -5,10 +5,11 @@ export default Em.Mixin.create({
     //define these
     save_delay: 5000,
     autosave_properties: [],
+    autosave_properties_immediate: [],
 
     _i_am_loaded: function () {
 
-        var props = this.get('autosave_properties'),
+        var props = this.get('autosave_properties').concat(this.get('autosave_properties_immediate')),
             _this = this;
 
         props.forEach(function(prop){
@@ -34,7 +35,15 @@ export default Em.Mixin.create({
             return;
         }
 
-        Em.run.debounce(this, '_save_me', 5000);
+        var immediate = false;
+
+        for (var k in this.changedAttributes()){
+            if (this.get('autosave_properties_immediate').indexOf(k)!== -1){
+                immediate =true;
+            }
+        }
+
+        Em.run.debounce(this, '_save_me', immediate === true? 25: 5000);
     }
 });
 

@@ -25,10 +25,10 @@ if (typeof String.prototype.startsWith !== 'function') {
 }
 
 function sort_pos(a,b){
-    var aa = a.get('pos') || new Big(0),
-        bb = b.get('pos') || new Big(0);
+    var aa = a.get('pos') || 0,
+        bb = b.get('pos') || 0;
 
-    return aa.minus(bb);
+    return Big(aa).minus(Big(bb));
 }
 
 export default Em.Controller.extend({
@@ -53,9 +53,9 @@ export default Em.Controller.extend({
 
     }.on('init'),
     needs: ['application'],
-    arrangedContent: function () {
+    _arrangedContent: function (path) {
 
-        var path = this.get('path') || '',
+        var path = path || '',
             photos = this.get('model.photos').filter(function(_){
                 if (_.get('currentState.isLoading') === true){
                     return false;
@@ -67,6 +67,9 @@ export default Em.Controller.extend({
 
         return photos;
 
+    },
+    arrangedContent: function(){
+        return this._arrangedContent(this.get('path'));
     }.property('model.photos.@each.path','path','model.photos.@each.pos'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
