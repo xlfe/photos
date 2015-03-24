@@ -1,11 +1,6 @@
 import Em from 'ember';
 /* global Big */
 
-var drag = {
-    photo: null,
-    position: null
-};
-
 function diff(lower,higher){
     if (lower.eq(higher)){
         return lower;
@@ -44,14 +39,11 @@ export default Em.Component.extend({
                 this.toggleProperty('photo.selected');
             } else {
                 this.sendAction('transition',this.get('photo'));
+
             }
 
         }
         return false;
-
-    },
-    background_img: function (width, height) {
-
 
     },
     setup: function () {
@@ -79,23 +71,22 @@ export default Em.Component.extend({
 
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function () {
-        drag['photo'] = this.get('photo');
+        this.get('album').set('drag.photo',this.get('photo'));
     },
     dragOver: function (evt) {
         var left = evt.target.offsetLeft,
             width = evt.target.offsetWidth,
-            mouseX = evt.originalEvent.clientX;
-
-        console.log(evt.target);
+            mouseX = evt.originalEvent.clientX,
+            album = this.get('album');
 
         if (mouseX > left + width / 2) {
             this.set('highlight-left', false);
             this.set('highlight-right', true);
-            drag['position'] = 'after';
+            album.set('drag.position','after');
         } else {
             this.set('highlight-left', true);
             this.set('highlight-right', false);
-            drag['position'] = 'before';
+            album.set('drag.position','before');
         }
         evt.preventDefault();
     },
@@ -105,9 +96,16 @@ export default Em.Component.extend({
     },
     drop: function () {
 
-        var //The item we're draggin
-            photo = drag.photo,
-            album = null,
+        var
+            //album controller
+            album = this.get('album'),
+
+            //The item we're draggin
+            photo = album.get('drag.photo'),
+
+            //Before or after?
+            pos = album.get('drag.position'),
+
             //Where we've dropped the photo
             target = this.get('photo');
 
@@ -119,13 +117,11 @@ export default Em.Component.extend({
             return;
         } else {
             album = this.get('album.arrangedContent');
+            console.log("not a folder?")
         }
 
 
         var
-            //Before or after?
-            pos = drag.position,
-
             idx_p = album.indexOf(photo),
             idx_t = album.indexOf(target),
 

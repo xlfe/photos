@@ -258,10 +258,14 @@ div.upload
   cursor: inherit
   display: block
 
+$highlight-border: 5px solid rgba(255, 249, 0, 0.84) !important
+
+.highlight
+  border: $highlight-border
 .highlight-right
-  border-right: 5px solid rgb(255, 209, 0) !important
+  border-right: $highlight-border
 .highlight-left
-  border-left: 5px solid rgb(255, 209, 0) !important
+  border-left: $highlight-border
 
 .image-click
   width: 100%
@@ -274,7 +278,6 @@ div.upload
 
 
 #lightbox-overlay
-  background-color: #fff
   background-color: rgba(255, 255, 255, .9)
   position: fixed
   z-index: 9998

@@ -8,7 +8,7 @@ var attr = DS.attr,
 
 export default DS.Model.extend(autosave,{
 
-    autosave_properties: ['title','caption','pos'],
+    autosave_properties: ['title','caption','pos','path'],
 
     //ReadOnly
 
@@ -41,7 +41,6 @@ export default DS.Model.extend(autosave,{
         if (req_long_edge === 0 || fetched_long_edge ===0){
             return;
         }
-        console.log(fetched_long_edge,cache)
 
         if (Em.isNone(cache)){
             //Nothing in cache

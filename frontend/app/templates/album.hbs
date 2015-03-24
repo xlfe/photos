@@ -1,10 +1,9 @@
-{{outlet}}
 <div class="container-fluid edge-to-edge">
     <div {{bind-attr class=controller.album_class}}>
         <div class="photo-select"><span></span></div>
 
         {{#each folder in folders}}
-            {{photo-grid-folder folder=folder path="path" album=model}}
+            {{photo-grid-folder folder=folder path="path" album=controller}}
         {{/each}}
 
         {{#each arrangedContent as |photo index|}}
@@ -32,5 +31,4 @@
         {{/unless}}
     </div>
 </div>
-
-
+{{outlet}}

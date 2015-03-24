@@ -1,18 +1,10 @@
 import Em from 'ember';
 
-export default Em.ObjectController.extend({
+export default Em.Controller.extend({
     needs: ['album'],
-    preload: function(photo) {
-        photo.get_image(1600);
-    },
     go_photo: function(idx){
         var new_photo = this.get_photo(idx);
         this.replaceRoute('album.show', new_photo);
-
-        for (var i=1; i<=2; i++) {
-            this.preload(this.get_photo(idx+i));
-            this.preload(this.get_photo(idx-i));
-        }
     },
     get_photo: function (idx) {
         var photo = this.get('model'),

@@ -1,13 +1,12 @@
 import Em from 'ember';
 
 var Folder = Em.Object.extend({
-    height: 200,
-    width: 200,
-    display_sz: [200,200],
+    width: 3,
+    height: 2,
+    display_sz: [3,2],
     is_folder: true
 });
 
-var scrollPosition = [0,0];
 
 function below_folder(path, folder) {
     if (folder.length === 0){
@@ -34,6 +33,7 @@ function sort_pos(a,b){
 
 export default Em.Controller.extend({
     queryParams: ['path'],
+    drag: {},
     minHeight: 200,
     set_minHeight: function() {
         var h = Em.$(window).height(),
@@ -53,26 +53,6 @@ export default Em.Controller.extend({
 
     }.on('init'),
     needs: ['application'],
-
-    //sort_by: function (by, ascending) {
-    //
-    //    var photos = this.get('model.photos.content'),
-    //        album = this.get('model'),
-    //        names = this.get('model.sort_properties')[0];
-    //
-    //    Em.run(function() {
-    //
-    //        if (Em.isNone(by)){
-    //
-    //            for (var x=0;x<photos.length;x++){
-    //                photos[x].set('pos',new Big(x));
-    //            }
-    //
-    //            album.set('sort_property',1);
-    //
-    //        }
-    //    })
-    //},
     arrangedContent: function () {
 
         var path = this.get('path') || '',
@@ -102,30 +82,7 @@ export default Em.Controller.extend({
 
         return base_class;
     }.property('selected.length','controllers.application.currentPath'),
-    scrollKeeper: function () {
 
-
-        if (this.get('controllers.application').get('currentPath').endsWith('.show')) {
-            scrollPosition = [
-                self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
-                self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-            ];
-
-            // lock scroll position, but retain settings for later
-
-            var html = Em.$('html'); // it would make more sense to apply this to body, but IE7 won't have that
-            html.data('previous-overflow', html.css('overflow'));
-            html.css('overflow', 'hidden');
-            window.scrollTo(scrollPosition[0], scrollPosition[1]);
-        } else {
-
-            // un-lock scroll position
-            var html = Em.$('html');
-            html.css('overflow', html.data('previous-overflow'));
-            window.scrollTo(scrollPosition[0], scrollPosition[1])
-
-        }
-    }.observes('controllers.application.currentPath'),
     folders: function () {
         // Show all folders that have this path or below
 
@@ -241,7 +198,7 @@ export default Em.Controller.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-    }.observes('arrangedContent.@each', 'minHeight', 'path'),
+    }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     actions: {
         new_sort: function(){
             this.sort_by();

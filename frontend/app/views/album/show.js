@@ -1,15 +1,28 @@
 import Em from 'ember';
 
+var scrollPosition = [0,0];
+
 export default Em.View.extend({
     needs: ['album'],
     templateName: 'albums/show',
     willDestroyElement: function () {
         Em.$(document).off('keyup', this.keyUp);
         this.$('#lightbox-overlay').off('click', this.overlay_click);
+        window.onscroll = undefined;
     },
     didInsertElement: function () {
         Em.$(document).on('keyup', {_this: this}, this.keyUp);
         this.$('#lightbox-overlay').on('click', {_this: this}, this.overlay_click);
+
+        scrollPosition = [
+            self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
+            self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+        ];
+
+        // lock scroll position, but retain settings for later
+        window.onscroll = function() {
+            window.scrollTo(scrollPosition[0], scrollPosition[1]);
+        }
     },
     overlay_click: function (event) {
         event.data._this.get('controller').transitionToRoute('album');
@@ -47,6 +60,13 @@ export default Em.View.extend({
             'background-size': imageWidth + 'px, ' + imageHeight + 'px'
         });
 
+        //preload photos in either direction
+        var preload = 2;
+        for (var i=1; i<=preload; i++) {
+            this.get('controller').get_photo(i).get_image(1600);
+            this.get('controller').get_photo(-i).get_image(1600);
+        }
+
     }.observes('controller.model').on('didInsertElement'),
     gestures: {
         swipeLeft: function () {
@@ -79,6 +99,7 @@ export default Em.View.extend({
         } else {
             console.log(evt.which);
         }
+
 
         evt.stopPropagation();
         evt.preventDefault();
