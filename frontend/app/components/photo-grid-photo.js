@@ -15,8 +15,14 @@ function diff(lower,higher){
 
 export default Em.Component.extend({
     tagName: 'div',
-    classNameBindings: [':photo', 'context.photo.saving:', 'highlight-right:',
-        'highlight-left:','photo.selected:selected','photo.hasFocus:hasFocus'],
+    classNameBindings: [
+        ':photo',
+        'photo.saving:saving',
+        'highlight-right:',
+        'highlight-left:',
+        'photo.selected:selected',
+        'photo.hasFocus:hasFocus'
+    ],
     attributeBindings: ['draggable','photo_id:data-photo'],
     draggable: function() {
 
@@ -30,9 +36,6 @@ export default Em.Component.extend({
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),
-    get_img_url: function (long_edge_width) {
-        return this.get('photo.serving_url') + '=s' + (+long_edge_width).toFixed(0);
-    },
     click: function(e){
         var selection = this.get('selection_mode') > 0;
         if (Em.$(e.target).hasClass('photo') === true) {
@@ -49,11 +52,7 @@ export default Em.Component.extend({
     },
     background_img: function (width, height) {
 
-        var long_edge = Math.min(1600, Math.max(width, height)),
-            img_src = this.get_img_url(long_edge);
 
-            this.$().css({'background-image': 'url(' + img_src + ')'});
-        return img_src;
     },
     setup: function () {
         var sz = this.get('photo.display_sz');
@@ -64,14 +63,19 @@ export default Em.Component.extend({
 
         var
             w = sz[0],
-            h = sz[1];
+            h = sz[1],
+            img = this.$(),
+            url = this.get('photo').get_image(Math.max(w,h),function(full){
+                img.css({
+                    'background-image': 'url(' + full + ')'
+                });
+            });
 
         this.$().css({
             height: h + 'px',
-            width: w + 'px'
+            width: w + 'px',
+            'background-image': 'url(' + url + ')'
         });
-
-        this.set('photo._loaded',this.background_img(w, h));
 
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function () {
@@ -81,6 +85,8 @@ export default Em.Component.extend({
         var left = evt.target.offsetLeft,
             width = evt.target.offsetWidth,
             mouseX = evt.originalEvent.clientX;
+
+        console.log(evt.target);
 
         if (mouseX > left + width / 2) {
             this.set('highlight-left', false);
@@ -99,14 +105,24 @@ export default Em.Component.extend({
     },
     drop: function () {
 
-        var album = this.get('album.arrangedContent'),
-
-            //The item we're draggin
+        var //The item we're draggin
             photo = drag.photo,
-
+            album = null,
             //Where we've dropped the photo
-            target = this.get('photo'),
+            target = this.get('photo');
 
+        if(Em.isNone(target)){
+
+            target = this.get('folder');
+
+            console.log('whoa there nellie, that be a folder!');
+            return;
+        } else {
+            album = this.get('album.arrangedContent');
+        }
+
+
+        var
             //Before or after?
             pos = drag.position,
 
@@ -185,10 +201,6 @@ export default Em.Component.extend({
     actions: {
         focus_me: function() {
             this.set('photo.hasFocus',true);
-        },
-        blur: function(){
-            "use strict";
-            console.log("bliue")
         },
         selection: function() {
             this.toggleProperty('photo.selected');

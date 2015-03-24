@@ -1,12 +1,10 @@
-{{#link-to 'album' album (query-params path=folder.path)}}
 
-    <span class="title">
-        {{folder.name}}
-    </span>
+<span class="title">
+    {{folder.name}}
+</span>
 
-    (Contains {{folder.images.length}} photos)
+{{folder.images.length}} photos
 
-    <div class="folder-click">
-        <i class="fa fa-folder-open-o fa-5x"></i>
-    </div>
-{{/link-to}}
+<div class="folder-click">
+    <i class="fa fa-folder-open-o fa-5x"></i>
+</div>

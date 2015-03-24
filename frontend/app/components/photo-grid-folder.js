@@ -1,15 +1,10 @@
-import PGPC from '../components/photo-grid-photo';
+import Em from 'ember';
 
-export default PGPC.extend({
-    classNames: ['folder'],
-    background_img: function (width, height) {
-        console.log('folder')
-
-        var long_edge = Math.min(1600, Math.max(width, height)),
-            img_src = this.get_img_url(long_edge);
-
-        //this.$().css({'background-image': 'url(' + img_src + ')'});
-    },
+export default Em.Component.extend({
+    tagName: 'div',
+    classNameBindings: [
+        ':folder'
+    ],
     setup: function() {
         var sz = this.get('folder.display_sz'),
             w = sz[0],
@@ -19,5 +14,9 @@ export default PGPC.extend({
             height: h + 'px',
             width:  w + 'px'
         });
-    }.observes('folder.display_sz').on('didInsertElement')
+
+    }.observes('folder.display_sz').on('didInsertElement'),
+    click: function() {
+        this.sendAction('path',this.get('folder.path'));
+    }
 });

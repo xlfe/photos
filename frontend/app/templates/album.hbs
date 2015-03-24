@@ -4,7 +4,7 @@
         <div class="photo-select"><span></span></div>
 
         {{#each folder in folders}}
-            {{photo-grid-folder folder=folder album=model}}
+            {{photo-grid-folder folder=folder path="path" album=model}}
         {{/each}}
 
         {{#each arrangedContent as |photo index|}}

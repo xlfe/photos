@@ -3,14 +3,7 @@ import Em from 'ember';
 export default Em.ObjectController.extend({
     needs: ['album'],
     preload: function(photo) {
-        var i = new Image(),
-            long_edge = Math.min(1600, Math.max(photo.get('width'), photo.get('height'))),
-            serving_url = photo.get('serving_url') + '=s' + long_edge;
-
-        i.src = serving_url;
-        i.onload = function() {
-            photo.set('_loaded',serving_url);
-        };
+        photo.get_image(1600);
     },
     go_photo: function(idx){
         var new_photo = this.get_photo(idx);

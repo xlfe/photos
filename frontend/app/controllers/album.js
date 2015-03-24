@@ -189,7 +189,6 @@ export default Em.Controller.extend({
             cr = [],
             min_height = +this.get('minHeight'), //Minimum height of each row in pixels
             p = this.get('folders').concat(this.get('arrangedContent'));
-        console.log(min_height)
 
         //Sizing algorithm is choose a minimum row height, add images until
         // adding an additional image would be wider than the width of the element
@@ -249,6 +248,9 @@ export default Em.Controller.extend({
         },
         transition: function(photo){
             this.transitionToRoute('album.show',photo);
+        },
+        path: function(path){
+            this.set('path',path);
         },
         larger: function() {
             this.set('minHeight',Math.min(this.get('minHeight')+50,800));
