@@ -87,8 +87,8 @@ export default Em.View.extend({
         var _this = evt.data._this,
             controller = _this.get('controller');
 
-        if (evt.which === 27) {
-            //Escape - close
+        if (evt.which === 27 || evt.which == 81) {
+            //Escape - close or q for quit
             controller.transitionToRoute('album');
         } else if (evt.which === 39 || evt.which === 32 || evt.which === 75) {
             //Right or space or K

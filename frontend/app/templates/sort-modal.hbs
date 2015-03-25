@@ -3,6 +3,7 @@ model=model
 title='Sort images in this folder'
 custom_save="Sort"
 custom_close="Cancel"
+sort_check="sort_check"
 save='save'
 close='close'
 closeModal='closeModal'
@@ -18,23 +19,55 @@ closeModal='closeModal'
 
             <div class="col-sm-10">
 
-                    {{#each option in view.sortOptions}}
+                <ul class="list-unstyled list-group">
 
-                        {{radio-select option=option register=controller.sort_by}}
+                    {{#each option in sortOptions}}
+                        <li class="list-group-item">
 
+                            <label {{action 'sort_check' option on="mouseUp"}}>
+                                {{input type="radio" name="sort-options" value=option.val checked=option.checked}}
+                                {{option.name}}
+                            </label>
+                        </li>
 
                     {{/each}}
+                </ul>
             </div>
 
         </div>
 
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
+
+            <label class="col-sm-2 control-label">
+                Direction
+            </label>
+
+            <div class="col-sm-10">
                 <div class="checkbox">
                     <label>
-                        {{input type="checkbox" checked=model.sortAscending}} Sort ascending
+                        {{input type="checkbox" checked=sortAscending}} Sort ascending
                     </label>
                 </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-sm-2 control-label">
+                Progress
+            </label>
+
+            <div class="col-sm-10">
+
+
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                        {{pcent}}% complete
+                    </div>
+                </div>
+
+                {{sorted.length}} of {{model.photos.arrangedContent.length}} sorted
+
             </div>
         </div>
 
