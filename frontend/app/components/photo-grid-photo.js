@@ -127,15 +127,13 @@ export default Em.Component.extend({
         this.set('highlight-left', false);
         this.set('highlight-right', false);
 
-        if (photo === target){
+        if (photo === target && multi === false){
             return;
         }
 
-        //clog(pos,'photo',idx_p,'target',idx_t,'length',album.length);
-
         if (pos === 'before') {
 
-            if (album.objectAt(idx_t -1) === photo){
+            if (album.objectAt(idx_t -1) === photo && multi === false){
                 //clog("NO MOVE");
                 return;
             }
@@ -151,7 +149,7 @@ export default Em.Component.extend({
         } else {
 
 
-            if (album.objectAt(idx_t +1) === photo){
+            if (album.objectAt(idx_t +1) === photo && multi === false){
                 //clog("NO MOVE");
                 return;
             }
@@ -165,15 +163,39 @@ export default Em.Component.extend({
             }
         }
 
-        if (upper.eq(lower)){
-            //clog("no move");
-            return;
-        }
-
         if (multi){
 
             var photos = this.get('album.selected'),
-                interval = upper.minus(lower).div(2).div(photos.length);
+                interval = upper.minus(lower).div(2).div(photos.length),
+
+                //Have we selected a continuous block of photos?
+                first = new Big(photos.get('firstObject.pos')),
+                last = new Big(photos.get('lastObject.pos')),
+                first_idx = album.indexOf(photos.get('firstObject')),
+                last_idx = album.indexOf(photos.get('lastObject')),
+                continuous = last_idx-first_idx === photos.length-1,
+                nomove = false;
+
+
+            if (continuous) {
+
+                if (pos === 'before' && upper.eq(first)) {
+
+                        nomove = true;
+
+                } else if (pos === 'after' && lower.eq(last)) {
+
+                        nomove = true;
+                } else if (upper.gte(first) && lower.lte(last)) {
+                    nomove = true;
+                }
+
+                if (nomove === true){
+                    console.log('dropped a continuous selection inside itself')
+                    return;
+                }
+            }
+
 
             Em.run(function(){
 
@@ -181,11 +203,15 @@ export default Em.Component.extend({
                     p.set('pos',lower.add(interval).toString());
                     lower = lower.add(interval);
                 });
-            })
+            });
 
-            //clog('moved ',photos.length,'photos');
 
         } else {
+            if (upper.eq(lower)) {
+                //clog("no move");
+                return;
+            }
+
             var new_pos = diff(lower, upper);
             //clog("moved one photo to",new_pos.toString());
             photo.set('pos',new_pos.toString());
