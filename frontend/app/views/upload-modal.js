@@ -42,7 +42,6 @@ function add_file(file, folders, files,album) {
                 if (album.get('photos').filter(function(photo){
                         return photo.get('md5') === md5;
                 }).length > 0) {
-                    console.log('DUPE',file.name)
                     new_file.setProperties({
                         dupe: true,
                         status: 'Duplicate',

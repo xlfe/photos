@@ -1,6 +1,6 @@
 {{#modal-base
 model=model
-title='Sort album'
+title='Sort images in this folder'
 custom_save="Sort"
 custom_close="Cancel"
 save='save'
@@ -20,18 +20,13 @@ closeModal='closeModal'
 
                     {{#each option in view.sortOptions}}
 
-                        <div class="radio">
-                          <label>
-                              {{input type="radio" name="optionsRadios" value=option.value checked=sort_order}}
-                              {{option.name}}
-                          </label>
-                        </div>
+                        {{radio-select option=option register=controller.sort_by}}
+
 
                     {{/each}}
             </div>
 
         </div>
-
 
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">

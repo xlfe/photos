@@ -4,7 +4,7 @@ export default Em.Controller.extend({
     actions: {
         save: function () {
 
-            console.log(this.get('sort_order'))
+            console.log(this.get('sort_by'))
             //var c = this.get('model.photos');
             //c.update_sort();
             //this.$('.modal').modal('hide');

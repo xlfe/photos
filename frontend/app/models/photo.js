@@ -13,6 +13,7 @@ export default DS.Model.extend(autosave,{
 
     //ReadOnly
 
+    album:      attr('string',      ro),
     filename:   attr('string',      ro),
     md5:        attr('string',      ro),
     taken:      attr('isodatetime', ro),

@@ -31,7 +31,7 @@ export default Em.Route.extend({
                 query_params['limit'] = query_params['limit'] * 2;
 
                 store.find('photo',query_params).then(function(more){
-                    album.get('photos.content').pushObjects(more.get('content'));
+                    //album.get('photos.content').pushObjects(more.get('content'));
                     get_more(album,more);
                 });
             } else {
@@ -44,10 +44,19 @@ export default Em.Route.extend({
 
             store.find('album', params.album_id).then(function (album) {
 
+                album.set('photos', store.filter('photo',function(p){
+                    if(p.get('album') === params.album_id) {
+                        if (p.get('currentState.isLoading') === true || p.get('currentState.isDeleted') === true) {
+                            return false;
+                        }
+                        return true;
+                    }
+                    return false;
+                }));
+
                 //Only reload photos if we need to...
                 if (Em.isEmpty(album.get('photos'))) {
                     store.find('photo', query_params).then(function (photos) {
-                        album.set('photos', photos);
                         get_more(album,photos);
                         resolve(album);
                     });

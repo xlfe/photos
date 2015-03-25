@@ -1,4 +1,5 @@
 import Em from 'ember';
+/* global Big */
 
 var Folder = Em.Object.extend({
     width: 3,
@@ -28,7 +29,8 @@ function sort_pos(a,b){
     var aa = a.get('pos') || 0,
         bb = b.get('pos') || 0;
 
-    return Big(aa).minus(Big(bb));
+    return aa  > bb ? 1 : -1;
+    return new Big(aa).minus(new Big(bb));
 }
 
 export default Em.Controller.extend({
@@ -55,15 +57,13 @@ export default Em.Controller.extend({
     needs: ['application'],
     _arrangedContent: function (path) {
 
-        var path = path || '',
-            photos = this.get('model.photos').filter(function(_){
-                if (_.get('currentState.isLoading') === true){
-                    return false;
-                }
-                var photo_path = _.get('path') || '';
-                return photo_path.match('^' + path + '$') !== null;
+        path = path || '';
 
-            }).sort(sort_pos);
+        var photos = this.get('model.photos').filter(function (_) {
+            var photo_path = _.get('path') || '';
+            return photo_path.match('^' + path + '$') !== null;
+
+        }).sort(sort_pos);
 
         return photos;
 
@@ -228,11 +228,12 @@ export default Em.Controller.extend({
             if (Em.isPresent(this.get('confirm_delete'))) {
 
                 _this.set('progress_delete',true);
-                _this.set('confirm_delete',undefined);
-                    _this.get('selected').forEach(function (_) {
-                        _.destroyRecord();
-                    });
-                    _this.set('progress_delete',false);
+                Em.RSVP.all(_this.get('selected').map(function (_) {
+                    return _.destroyRecord();
+                })).then(function () {
+                    _this.set('progress_delete', false);
+                    _this.set('confirm_delete',undefined);
+                });
             } else {
 
                 this.set('confirm_delete',true);
