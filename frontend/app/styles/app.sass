@@ -11,6 +11,10 @@ body
   width: 100%
   overflow-y: scroll
 
+html,body
+  @include transition(scrollTop, 1s, ease-out)
+
+
 .app-footer
   font-weight: normal
   font-size: smaller
@@ -130,10 +134,11 @@ $o-hover-item: 0.5
       padding-left: 5px
       color: black
 
-    &:hover, &.hasFocus
+    &:hover
       *
-        @include transition(opacity, 0.25s, ease-in-out)
+        @include transition(opacity, 0.25s, ease-out)
 
+    &:hover, &.hasFocus
       .fa-check-circle
         margin-top: 0
         opacity: $o-hover-photo
