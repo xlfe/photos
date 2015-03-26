@@ -11,6 +11,7 @@ Router.map(function() {
             this.route('show', {path: ':photo_id'});
         });
     });
+    this.route('login');
     this.resource('user', {path: ':user_id'});
 });
 

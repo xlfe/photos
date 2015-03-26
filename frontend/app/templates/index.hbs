@@ -1,2 +1,13 @@
 
 
+<h1>
+    Welcome to slidenight
+</h1>
+
+{{#if session.isAuthenticated}}
+{{else}}
+    {{#link-to 'login'}}
+        Not authenticated
+    {{/link-to}}
+{{/if}}
+

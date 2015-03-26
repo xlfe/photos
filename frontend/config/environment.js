@@ -19,6 +19,10 @@ module.exports = function (environment) {
         }
     };
 
+    ENV['simple-auth'] = {
+        authorizer: 'authorizer:custom'
+    };
+
     ENV.api_endpoint = 'api';
 
     if (environment === 'development') {
