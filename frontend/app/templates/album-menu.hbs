@@ -1,6 +1,6 @@
 <ul class="nav navbar-nav">
 
-    {{#link-to "album" model (query-params path=null) tagName="li" class="menu-link"}}
+    {{#link-to "album" model (query-params path=null) tagName="li" class="menu-link" tabindex="-1"}}
         <a>
             <strong>
                 {{controller.model.name}}
@@ -9,7 +9,7 @@
     {{/link-to}}
 
     {{#each p in breadcrumbs}}
-        {{#link-to "album" model (query-params path=p.path) tagName="li" class="menu-link"}}
+        {{#link-to "album" model (query-params path=p.path) tagName="li" class="menu-link" tabindex="-1"}}
             <a>
                 > {{p.name}}
             </a>
@@ -17,14 +17,14 @@
     {{/each}}
 
     <li class="menu-link">
-        <a href="#" {{action 'openModalModel' 'sort-modal' model}}>
+        <a href="#" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
             <i class="fa fa-lg fa-sort"></i>
             Sort
         </a>
     </li>
 
     <li class="menu-link">
-        <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+        <a href="#" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
             <i class="fa fa-lg fa-upload"></i>
             Upload
         </a>
@@ -32,14 +32,14 @@
 
     {{#if controller.selected}}
         <li class="menu-link">
-            <a href="#" title="Clear the current selection" {{action 'cancel_selection'}}>
+            <a href="#" title="Clear the current selection" {{action 'cancel_selection'}} tabindex="-1">
 
                 {{controller.selected.length}} selected
                 <i class="fa fa-close fa-lg"></i>
             </a>
         </li>
         <li class="menu-link">
-            <a href="#" title="Delete selected photos" {{action 'delete_selection'}}>
+            <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
                 {{#if controller.progress_delete}}
                     <i class="fa fa-spinner fa-spin fa-lg"></i>
                 {{/if}}
@@ -62,18 +62,17 @@
 <ul class="nav navbar-nav navbar-right">
 
     <li class="menu-link pull-right slider">
-        <a>
+        <a tabindex="-1">
             {{#if model.more_results}}
                 <i class="fa fa-spin fa-spinner"></i>
             {{/if}}
             <span>
-
                 {{model.photos.length}} Photos
             </span>
             <div class="spacer"></div>
-            <span {{action 'smaller'}}class="fa fa-image"></span>
-            {{input type="range" min=150 max=800 steps=50 value=minHeight}}
-            <span {{action 'larger'}} class="fa fa-image fa-2x"></span>
+            <span {{action 'smaller'}}class="fa fa-image" tabindex="-1"></span>
+            {{input type="range" min=150 max=800 steps=50 value=minHeight tabindex="-1"}}
+            <span {{action 'larger'}} class="fa fa-image fa-2x" tabindex="-1"></span>
         </a>
     </li>
 

@@ -9,7 +9,7 @@
         {{#each arrangedContent as |photo index|}}
             {{photo-grid-photo
             photo=photo
-            idx=index
+            _idx=index
             selection_mode=controller.selected.length
             album=controller
             new_sort="new_sort"

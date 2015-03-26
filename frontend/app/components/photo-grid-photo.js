@@ -19,6 +19,10 @@ export default Em.Component.extend({
         'photo.hasFocus:hasFocus'
     ],
     attributeBindings: ['draggable','photo_id:data-photo'],
+    idx: function(){
+        "use strict";
+        return +this.get('_idx')+1;
+    }.property('_idx'),
     draggable: function() {
 
         if (this.get('photo.selected') === true || this.get('selection_mode') === 0){
