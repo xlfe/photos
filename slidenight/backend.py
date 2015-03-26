@@ -116,11 +116,8 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         img.rotate(0)
         img.execute_transforms(parse_source_metadata=True)
 
-        if 'DateTime' not in img.get_original_metadata():
-            logging.info(img.get_original_metadata())
-
         meta = img.get_original_metadata()
-        meta['__original_file_modified']=params['lastModifiedDate']
+        meta['FileModified']=params['lastModifiedDate']
 
         first,last = Photo.allocate_ids(1,parent=album)
 
@@ -128,13 +125,13 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
                       gs = blobstore_filename,
                       title=params['name'],
                       path=params['path'],
-                      pos=str(float(first)/15000),
+                      pos=str(float(first)/150000),
                       md5 = params['md5'],
                       filename=params['name'],
                       album=album,
                       width=img.width,
                       height= img.height,
-                      original_metadata=meta
+                      metadata=meta
                       )
 
         photo.serving_url = photo._serving_url
@@ -158,25 +155,21 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         img.rotate(0)
         img.execute_transforms(parse_source_metadata=True)
 
-        if 'DateTime' not in img.get_original_metadata():
-            logging.info(img.get_original_metadata())
-
         meta = img.get_original_metadata()
-        meta['__original_file_modified']=self.request.get('lastModifiedDate')
-
+        meta['FileModified']=self.request.get('lastModifiedDate')
 
         first,last = Photo.allocate_ids(1,parent=album)
         photo = Photo(parent=album,
             blob=blob_info.key(),
             title=name,
             path=self.request.get('path'),
-            pos=str(float(first)/15000),
+            pos=str(float(first)/150000),
             filename=name,
             album=album,
             md5=self.request.get('md5'),
             width=img.width,
             height= img.height,
-            original_metadata=meta
+            metadata=meta
         )
 
         photo.serving_url = photo._serving_url

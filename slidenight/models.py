@@ -42,7 +42,7 @@ class Photo(ndb.Model):
 
     class RESTMeta:
 
-        excluded_properties = ['blob','gs','original_metadata']
+        excluded_properties = ['blob','gs']
 
 
     title = ndb.StringProperty(indexed=False)
@@ -57,15 +57,14 @@ class Photo(ndb.Model):
     taken = ndb.DateTimeProperty()
 
     uploaded = ndb.DateTimeProperty(auto_now_add=True)
-    width = ndb.IntegerProperty(required=True)
-    height = ndb.IntegerProperty(required=True)
-
     modified = ndb.DateTimeProperty(auto_now=True)
 
+    width = ndb.IntegerProperty(required=True)
+    height = ndb.IntegerProperty(required=True)
+    metadata = ndb.JsonProperty()
 
 
     #Other data
-    original_metadata = ndb.JsonProperty()
     blob = ndb.BlobKeyProperty()
     gs = ndb.StringProperty()
     album = ndb.KeyProperty(Album)

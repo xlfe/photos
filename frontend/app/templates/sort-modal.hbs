@@ -22,13 +22,13 @@ closeModal='closeModal'
                 <ul class="list-unstyled list-group">
 
                     {{#each option in sortOptions}}
+                        <label class="col-sm-12" {{action 'sort_check' option on="mouseUp"}}>
                         <li class="list-group-item">
 
-                            <label {{action 'sort_check' option on="mouseUp"}}>
                                 {{input type="radio" name="sort-options" value=option.val checked=option.checked}}
                                 {{option.name}}
-                            </label>
                         </li>
+                        </label>
 
                     {{/each}}
                 </ul>
@@ -45,7 +45,7 @@ closeModal='closeModal'
             <div class="col-sm-10">
                 <div class="checkbox">
                     <label>
-                        {{input type="checkbox" checked=sortAscending}} Sort ascending
+                        {{input type="checkbox" checked=sortDescending}} Sort descending
                     </label>
                 </div>
             </div>

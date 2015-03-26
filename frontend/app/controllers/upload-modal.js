@@ -297,7 +297,8 @@ export default Em.Controller.extend({
         }
     },
     reset: function() {
-        this.get('modal').modal('hide');
+        //this.get('modal').modal('hide');
+        this.send('closeModal');
         this.set('cancelling',false);
         this.set('files',[]);
         this.set('done',false);

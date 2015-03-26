@@ -5,7 +5,7 @@ export default Em.View.extend({
         var c = this.get('controller');
         c.set('sorted',[]);
         c.set('sort_by',undefined);
-        c.set('sortAscending',false);
+        c.set('sortDescending',false);
         console.log("reset")
 
     }

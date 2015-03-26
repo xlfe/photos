@@ -16,11 +16,11 @@ export default DS.Model.extend(autosave,{
     album:      attr('string',      ro),
     filename:   attr('string',      ro),
     md5:        attr('string',      ro),
-    taken:      attr('isodatetime', ro),
     uploaded:   attr('isodatetime', ro),
+    modified:   attr('isodatetime', ro),
     width:      attr('number',      ro),
     height:     attr('number',      ro),
-    modified:   attr('isodatetime', ro),
+    metadata:   attr('object',      ro),
     serving_url: attr('string',     ro),
 
     //Mutable
@@ -28,7 +28,7 @@ export default DS.Model.extend(autosave,{
     caption:    attr('string'),
     pos:        attr('string'),
     path:       attr('string'),
-
+    tags:       attr('list'),
 
     get_image: function (req_long_edge,cb) {
 

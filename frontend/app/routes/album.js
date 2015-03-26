@@ -58,11 +58,12 @@ export default Em.Route.extend({
                 if (Em.isEmpty(album.get('photos'))) {
                     store.find('photo', query_params).then(function (photos) {
                         get_more(album,photos);
-                        resolve(album);
                     });
                 } else {
-                    resolve(album);
+                    album.set('more_results',false);
                 }
+
+                resolve(album);
             });
         });
     }
