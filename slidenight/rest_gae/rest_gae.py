@@ -179,6 +179,7 @@ class BaseRESTHandler(webapp2.RequestHandler):
 
         response.headers['Content-Type'] = 'application/json'
         response.headers['Access-Control-Allow-Methods'] = ', '.join(self.permissions.keys())
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept'
 
 
@@ -463,7 +464,7 @@ def get_rest_class(ndb_model, base_url, **kwd):
                     return self.method_not_allowed()
 
                 #get user object
-                self.user = self.user_object().current_user()
+                self.user = self.user_object().current_user() if self.user_object is not None else None
 
                 # Verify permissions
                 accepted_permission = self._get_permission(method_name)

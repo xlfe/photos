@@ -1,13 +1,15 @@
+<div class="container">
 
+    <h1>
+        Welcome to Slidenight
+    </h1>
 
-<h1>
-    Welcome to slidenight
-</h1>
+    {{#if session.isAuthenticated}}
+        You're logged in as {{session.full_name}}
+    {{else}}
+        {{#link-to 'login'}}
+            Please login or register
+        {{/link-to}}
+    {{/if}}
 
-{{#if session.isAuthenticated}}
-{{else}}
-    {{#link-to 'login'}}
-        Not authenticated
-    {{/link-to}}
-{{/if}}
-
+</div>

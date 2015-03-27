@@ -1,19 +1,36 @@
 import Base from 'simple-auth/authenticators/base';
+import Em from 'ember';
 import config from '../config/environment';
 
-export default Base.extend({
-    endpoint : [config.api_host, config.api_endpoint,'login'].join('/'),
-    restore: function (data) {
-        console.log(data);
-        console.log(this.get('store').find('user',data.id))
+var endpoint = [config.api_host, config.api_endpoint,'login'].join('/');
 
+export default Base.extend({
+    restore: function (data) {
+
+        return new Em.RSVP.Promise(function (resolve, reject) {
+
+            Em.$.ajax({
+                url: endpoint,
+                method: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                dataType: 'json',
+                success: function(data){
+                    console.log(data);
+                    resolve(data);
+                },
+                error: function(error){
+                    reject(error.responseJSON || {error:'An unknown error occurred'});
+                }
+            });
+
+        });
     },
     authenticate: function (options) {
-        var ep = this.get('endpoint');
-
-        return new Ember.RSVP.Promise(function (resolve, reject) {
+        return new Em.RSVP.Promise(function (resolve, reject) {
             Em.$.ajax({
-                url: ep,
+                url: endpoint,
                 method:'POST',
                 data: JSON.stringify(options),
                 dataType: 'json',
@@ -27,16 +44,19 @@ export default Base.extend({
         });
     },
     invalidate: function (data) {
-        var ep = this.get('endpoint');
-        return new Ember.RSVP.Promise(function (resolve, reject) {
+        return new Em.RSVP.Promise(function (resolve, reject) {
 
             Em.$.ajax({
-                url: ep,
-                method: 'GET',
+                url: endpoint,
+                method: 'PUT',
+                xhrFields: {
+                    withCredentials: true
+                },
+                dataType: 'json',
                 success: function(){
                     resolve();
                 }
-            })
+            });
         });
     }
 });

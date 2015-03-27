@@ -17,8 +17,12 @@ DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
 config = {
     'webapp2_extras.sessions' : {
-        'secret_key': 'downtheonlyroad8DS9KKJAS8SDJKSDJKFS82JSKksdjfksd*U(#&*(@#8382938',
+        'secret_key': 'sfidosuiofasuidoaufsodfsa*U(#&*(@#8382938'
     }
+}
+
+REGISTER_PERMISSIONS = {
+    'POST': PERMISSION_ANYONE
 }
 
 OWNER_PERMISSIONS = {
@@ -186,7 +190,9 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/prepare-upload',PrepareUpload),
         webapp2.Route('/api/finalize-upload',GCSFinalizeHandler),
         webapp2.Route('/api/upload',UploadHandler),
+        webapp2.Route('/api/login',LoginHandler),
 
+        RESTHandler('/api/register',User,permissions=REGISTER_PERMISSIONS,user_object=None, before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/users',User,permissions=OWNER_PERMISSIONS,user_object=User,  allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN,after_delete_callback=Photo.after_delete),
         RESTHandler('/api/albums',Album,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN),
