@@ -1,10 +1,4 @@
-import Base from 'simple-auth/authenticators/base';
+import Base from 'simple-auth/authorizers/base';
 
 export default Base.extend({
-  restore: function(data) {
-  },
-  authenticate: function(options) {
-  },
-  invalidate: function(data) {
-  }
 });

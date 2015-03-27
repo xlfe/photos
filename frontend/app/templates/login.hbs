@@ -1,6 +1,89 @@
-
 <div class="container">
-    <h1>
-        Login
-    </h1>
+
+    {{#if login}}
+
+        <div class="card card-container">
+            <h1>
+                Login
+            </h1>
+
+
+            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"/>
+
+            <p id="profile-name" class="profile-name-card">
+                Your Slidenight Account
+            </p>
+
+            {{#if error}}
+                <div class="alert alert-danger reauth-email">{{error}}</div>
+            {{/if}}
+
+            <form {{action 'authenticate' on='submit'}} class="form-signin">
+
+
+                {{input type="email" id="inputEmail" class="form-control" required=true autofocus=true value=identification placeholder='Enter your email address'}}
+                {{input id="inputPassword" class="form-control" required=true value=password placeholder='Enter Password' type='password'}}
+
+                <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+
+            </form>
+
+            <a href="" {{action 'show' 'register'}}>
+                Need to register?
+            </a>
+
+            <span class="spacer"></span>
+
+            <a href="" {{action 'show' 'reset'}}>
+                Forgot your password?
+            </a>
+
+        </div>
+
+    {{/if}}
+
+    {{#if reset}}
+        <h2>
+            Reset your password
+        </h2>
+    {{/if}}
+    {{#if register}}
+
+        <div class="card card-container">
+            <h1>
+                Register
+            </h1>
+
+            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"/>
+
+            <p id="profile-name" class="profile-name-card">
+                Enter your details
+            </p>
+
+            {{#if error}}
+                <div class="alert alert-danger reauth-email">{{error}}</div>
+            {{/if}}
+
+            <form {{action 'register' on='submit'}} class="form-signin">
+
+                {{input type="text" id="inputName" class="form-control" pattern="[^\ ]+ [^\ ]+" title="First and last name" required=true autofocus=true value=name placeholder='Enter your name'}}
+                {{input type="email" id="inputEmail" class="form-control" required=true value=email placeholder='Enter your email address'}}
+                {{input id="inputPassword" class="form-control" required=true pattern=".{8,}" title="Your password must be at least 8 characters" value=password placeholder='Enter a password' type='password'}}
+
+                <button class="btn btn-lg btn-primary btn-block btn-signin" {{bind-attr disabled=processing}} type="submit">
+                    Register
+                    {{#if processing}}
+                        <i class="fa fa-spinner fa-spin"></i>
+                    {{/if}}
+                </button>
+
+            </form>
+
+            <a href="" {{action 'show' 'login'}}>
+                Already have an account?
+            </a>
+
+        </div>
+    {{/if}}
 </div>
+
