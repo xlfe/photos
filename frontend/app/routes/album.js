@@ -57,6 +57,9 @@ export default Em.Route.extend({
                 //Only reload photos if we need to...
                 if (Em.isEmpty(album.get('photos'))) {
                     store.find('photo', query_params).then(function (photos) {
+                        if (Em.isEmpty(photos)){
+                            album.set('more_results',false);
+                        }
                         get_more(album,photos);
                     });
                 } else {

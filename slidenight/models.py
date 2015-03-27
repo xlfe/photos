@@ -98,7 +98,6 @@ class LoginHandler(BaseRESTHandler):
 
     def get(self):
 
-
         if 'user' in self.session:
             logging.info(self.session)
             user = ndb.Key(User,self.session['user']).get()
@@ -116,11 +115,14 @@ class LoginHandler(BaseRESTHandler):
 
 class Album(ndb.Model):
 
-    FILENAME = 0
-    POS = 1
+    class RESTMeta:
+
+        user_owner_property = 'owner'
 
     name = ndb.StringProperty()
-    sort_property = ndb.IntegerProperty(default=0)
+    photo_count = ndb.IntegerProperty()
+    owner = ndb.KeyProperty(User)
+    created = ndb.DateTimeProperty(auto_now_add=True)
 
 class Photo(ndb.Model):
 

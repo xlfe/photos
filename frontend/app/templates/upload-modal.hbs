@@ -24,21 +24,22 @@
 
         {{#each file in controller.files}}
 
-            <label class="file">
-                <label class="progress" {{bind-attr style=file.progress}}></label>
+            <div class="file">
+                <div class="progress" {{bind-attr style=file.progress}}></div>
 
-                <label class="name">
+                <div class="name">
                     {{file.name}}
-                </label>
+                </div>
 
-                <label class="size">
-                    {{file.hSize}}
-                </label>
 
-                <label class="status">
+                <div class="status">
                     {{file.status}}
-                </label>
-            </label>
+                </div>
+
+                <div class="size">
+                    {{file.hSize}}
+                </div>
+            </div>
 
 
         {{else}}

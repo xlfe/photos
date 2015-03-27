@@ -232,25 +232,44 @@ div.upload
     font-size: larger
     padding-top: 150px
 
-  label.file
+  .file
     font-weight: normal
     width: 100%
     text-align: left
     padding-left: 10px
     height: 14px
     border-top: 1px solid lightgray
+    display: inline-block
 
-    label
-      position: absolute
+    div
+      //position: absolute
       font-weight: normal
 
+    .name,.size,.status
+      display: inline-block
+
     .name
-      left: 10px
-    .size
-      right: 100px
-    .status
+      left: 5px
+      width: 380px
+      overflow: hidden
+      text-overflow: ellipsis
+      white-space: nowrap
+
+    .size,.status
+      float: right
       text-align: right
-      right: 10px
+
+    .size
+      width: 75px
+      margin-left: 10px
+      margin-right: 10px
+
+    .status
+      width: 80px
+      margin-left: 15px
+      margin-right: 5px
+
+
 
     .progress
       position: absolute

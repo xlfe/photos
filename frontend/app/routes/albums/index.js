@@ -14,12 +14,9 @@ export default Em.Route.extend({
             }
 
             this.get('store').createRecord('album', {
-                name: name,
-                minHeight: 320,
-                sortProperties: 'uploaded',
-                sortAscending: true
+                name: name
             }).save().then(function (_) {
-                _this.transitionTo('album', _);
+                _this.transitionTo('album', _.get('id'));
             });
         }
     }

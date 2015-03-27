@@ -6,6 +6,7 @@ export default DS.Model.extend(autosave,{
 
 
     name: DS.attr('string'),
+    created: DS.attr('isodatetime'),
 
     //Self generated
     photos: [],
