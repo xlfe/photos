@@ -6,8 +6,10 @@ var Router = Ember.Router.extend({
 });
 
 Router.map(function() {
+    this.resource('permissions', {path: '/albums/:album_id/permissions'});
     this.resource('albums',function() {
-        this.resource('album', {path:':album_id'},function(){
+        this.resource('albums.index',{path: ''});
+        this.resource('album', {path:'/:album_id'},function(){
             this.route('show', {path: ':photo_id'});
         });
     });

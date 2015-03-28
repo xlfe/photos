@@ -7,7 +7,6 @@ import os
 import json
 from rest_gae.rest_gae import RESTException,BaseRESTHandler
 from rest_gae.permissions import Permissions
-from rest_gae.permissions import perm_choices
 
 from webapp2_extras import security
 
@@ -120,6 +119,15 @@ class Album(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     permissions = ndb.StructuredProperty(Permissions,repeated=True)
 
+
+
+class Invite(ndb.Model):
+
+    email = ndb.StringProperty()
+    last_emailed = ndb.DateTimeProperty(auto_now=True)
+    album = ndb.KeyProperty(Album)
+    invited_by = ndb.KeyProperty(User)
+    permission = ndb.StructuredProperty(Permissions)
 
 
 

@@ -4,7 +4,7 @@ var scrollPosition = [0,0];
 
 export default Em.View.extend({
     needs: ['album'],
-    templateName: 'albums/show',
+    //templateName: 'albums/show',
     willDestroyElement: function () {
         Em.$(document).off('keyup', this.keyUp);
         this.$('#lightbox-overlay').off('click', this.overlay_click);

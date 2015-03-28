@@ -7,18 +7,7 @@ threadsafe: yes
 handlers:
 - url: /api/.*
   script: backend.app
-#  login: admin
   secure: always
-
-#- url: /index.html
-#  script: backend.app
-#  secure: always
-#  login: required
-
-#- url: /
-#  script: backend.app
-#  secure: always
-#  login: required
 
 - url: /
   static_files: static/index.html

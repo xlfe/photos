@@ -10,6 +10,7 @@
         <tr>
             <th>Name</th>
             <th>Photos</th>
+            <th>Permissions</th>
             <th>Created</th>
         </tr>
         </thead>
@@ -25,6 +26,13 @@
                     {{album.photo_count}}
                 </td>
                 <td>
+                    {{#link-to 'permissions' album.id}}
+                        <i class="fa fa-lg fa-users"></i>
+                        Permissions
+                    {{/link-to}}
+
+                </td>
+                <td>
                     {{album.created}}
                 </td>
             </tr>
@@ -37,6 +45,7 @@
                     New album
                 </a>
             </td>
+            <td></td>
             <td></td>
             <td></td>
         </tr>

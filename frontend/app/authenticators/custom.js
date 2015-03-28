@@ -45,7 +45,6 @@ export default Base.extend({
     },
     invalidate: function (data) {
         return new Em.RSVP.Promise(function (resolve, reject) {
-
             Em.$.ajax({
                 url: endpoint,
                 method: 'PUT',
@@ -53,8 +52,8 @@ export default Base.extend({
                     withCredentials: true
                 },
                 dataType: 'json',
-                success: function(){
-                    resolve();
+                success: function(data){
+                    resolve({});
                 }
             });
         });
