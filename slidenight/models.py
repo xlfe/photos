@@ -1,25 +1,20 @@
 
 from google.appengine.ext import ndb
-from google.appengine.api import users
-from google.appengine.ext.deferred import defer
 from google.appengine.api import images
 from google.appengine.ext import blobstore
 import logging
-import datetime
 import os
 import json
 from rest_gae.rest_gae import RESTException,BaseRESTHandler
+from rest_gae.permissions import Permissions
+from rest_gae.permissions import perm_choices
 
 from webapp2_extras import security
-
-import httplib2
-from oauth2client.appengine import AppAssertionCredentials
 
 HASHING_PW_PEPPER = 'jM3n/Ddp)&QY)R/kcDqzG[4?"C80v8SPSM#We}_x*V[JsQ>$C)7#6WN=XqUZ=RiYeGJ$})nj(B#x$e/K-I>o'
 PW_SALT_LENGTH = 30
 
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
-
 
 class User(ndb.Model):
 
@@ -123,6 +118,10 @@ class Album(ndb.Model):
     photo_count = ndb.IntegerProperty()
     owner = ndb.KeyProperty(User)
     created = ndb.DateTimeProperty(auto_now_add=True)
+    permissions = ndb.StructuredProperty(Permissions,repeated=True)
+
+
+
 
 class Photo(ndb.Model):
 

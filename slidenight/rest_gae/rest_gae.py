@@ -428,7 +428,7 @@ def get_rest_class(ndb_model, base_url, **kwd):
         permissions.update(kwd.get('permissions', {}))
 
         #User object passed when class created
-        user_object = kwd.get('user_object',None)
+        user_model = kwd.get('user_model','User')
 
         allow_http_method_override = kwd.get('allow_http_method_override', True)
         allowed_origin = kwd.get('allowed_origin', None)
@@ -458,46 +458,40 @@ def get_rest_class(ndb_model, base_url, **kwd):
             """Wraps GET/POST/PUT/DELETE methods and adds standard functionality"""
 
             def inner_f(self, model_id):
-                # See if method type is supported
+
+                #Is method allowed?
                 method_name = func.func_name.upper()
                 if method_name not in self.permissions:
                     return self.method_not_allowed()
 
-                #get user object
-                self.user = self.user_object().current_user() if self.user_object is not None else None
+                #See if we know the user
+                self.user = None
+                if 'user' in self.session:
+                    self.user = ndb.Key(self.user_model, self.session['user']).get()
 
-                # Verify permissions
+                # Verify permissions - (pre_validate)
                 accepted_permission = self._get_permission(method_name)
-
                 if accepted_permission is None:
                     return self.unauthorized()
 
                 try:
                     if model_id:
-                        #model_id if we are referencing a single specific database object
 
                         model = self._model_id_to_model(model_id.lstrip('/')) # Get rid of '/' at the beginning
 
-                        model = accepted_permission.post_validate(method_name, model, self.user)
-
-                        if model is None:
+                        #Check specific model permissions (post_validate)
+                        if accepted_permission.post_validate(method_name, model, self.user) is not True:
                             return self.unauthorized()
 
                         result = func(self, model)
                     else:
 
                         #not a specific object
-                        if accepted_permission.allowed_query():
-                            result = func(self, None)
-                        else:
-                            return self.unauthorized()
+                        result = func(self, None)
 
                     if isinstance(result, webapp2.Response):
-                        # webapp2.Response instance - no need for further manipulation (return as-is)
-                        logging.info('no mod')
                         return result
                     else:
-                        # Only return a result (i.e. write to the response object) if it's not a NoResponseResult (used when serving blobs - BlobKeyProperty)
                         return self.success(result)
 
                 except RESTException as exc:
@@ -528,14 +522,18 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 query = self._filter_query() # Filter the results
 
                 permission = self._get_permission('GET')
+                assert permission is not None
 
-                if permission is None:
+                query = permission.apply_permissions_filter(query, self.model, self.user)
+
+                if query is None:
                     return self.unauthorized()
 
-                query = permission.filter_query(query, self.model, self.user)
+                # Order the results
+                query = self._order_query(query)
 
-                query = self._order_query(query) # Order the results
-                (results, cursor) = self._fetch_query(query) # Fetch them (with a limit / specific page, if provided)
+                # Fetch them (with a limit / specific page, if provided)
+                (results, cursor) = self._fetch_query(query)
 
                 response = {
                     self.model._get_kind(): results,
@@ -543,7 +541,6 @@ def get_rest_class(ndb_model, base_url, **kwd):
                         'next_results_url': cursor.urlsafe() if cursor else None
                     }
                 }
-
 
             else:
 
@@ -564,14 +561,11 @@ def get_rest_class(ndb_model, base_url, **kwd):
             kind = model_ember_key(self.model)
 
             try:
-                # Parse POST data as JSON
                 json_data = json.loads(self.request.body)[kind]
             except ValueError as exc:
                 raise RESTException('Invalid JSON POST data - expecting {} but got {}'.format(kind,'-'.join(k for k in self.request.body)))
             except KeyError:
                 raise RESTException('Did not find model of type {} in the JSON data'.format(kind))
-
-            logging.info(json_data)
 
             # for model_to_create in json_data:
             try:
@@ -596,14 +590,13 @@ def get_rest_class(ndb_model, base_url, **kwd):
 
             # Return the newly-created model instance(s)
             return {
-                kind:[model]
+                kind: [model]
             }
 
 
         @rest_method_wrapper
         def put(self, model):
             """PUT endpoint - updates an existing model instance"""
-            # models = {}
 
             try:
                 # Parse PUT data as JSON
@@ -616,14 +609,11 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 logging.info('Model type: ' + model._get_kind())
                 raise RESTException('Entity name mismatch')
 
-            # if model:
-            # Update just one model
-
             if type(json_data) is list:
                 raise RESTException('List not supported on PUT')
 
             permission = self._get_permission('PUT')
-
+            assert permission is not None
 
             # Commit all models in a transaction
             try:
@@ -632,31 +622,8 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 logging.exception('Caught error when trying to make model from data')
                 raise RESTException('Unable to save - {0}'.format(exc))
 
-            # json_data = [json_data]
-            # models.append(model)
-            # else:
-            #     Update several models at once
-                #
-                # if not isinstance(json_data, list):
-                #     raise RESTException('Invalid JSON PUT data')
-                #
-                # for model_to_update in json_data:
-                #
-                #     model_id = model_to_update.pop('id', None)
-                #
-                #     if model_id is None:
-                #         raise RESTException('Missing "id" argument for model')
-                #
-                #     model = self._model_id_to_model(model_id)
-                #     model = self._build_model_from_data(model_to_update, self.model, model)
-                #     models.append(model)
-
-            if not permission.post_validate('PUT', model, self.user):
-                return self.unauthorized()
-
             if self.before_put_callback:
                 model = self.before_put_callback(model, json_data)
-
 
             # Commit all models in a transaction
             try:

@@ -3,15 +3,15 @@
 import webapp2
 import json
 import uuid
-from google.appengine.api import users
-from google.appengine.ext import ndb
-from rest_gae import RESTHandler
-from rest_gae.rest_gae import NDBEncoder
+from rest_gae.rest_gae import RESTHandler
 from rest_gae.permissions import *
-import os
-import logging
 from models import *
-from hashlib import md5
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.api import images
+import httplib2
+from oauth2client.appengine import AppAssertionCredentials
+
 
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
@@ -21,25 +21,7 @@ config = {
     }
 }
 
-REGISTER_PERMISSIONS = {
-    'POST': PERMISSION_ANYONE
-}
 
-OWNER_PERMISSIONS = {
-    'GET': PERMISSION_ANYONE,
-    'POST': PERMISSION_ANYONE,
-    'PUT': PERMISSION_ANYONE,
-    'DELETE': PERMISSION_ANYONE
-}
-
-
-from google.appengine.ext import blobstore
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.api import images
-
-
-import httplib2
-from oauth2client.appengine import AppAssertionCredentials
 
 def allow_crosssite(response,origin='*'):
     response.headers['access-control-allow-origin'] = origin
@@ -129,7 +111,7 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
                       gs = blobstore_filename,
                       title=params['name'],
                       path=params['path'],
-                      pos=str(float(first)/150000),
+                      pos='{0:f}'.format(float(first)/150000),
                       md5 = params['md5'],
                       filename=params['name'],
                       album=album,
@@ -167,7 +149,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             blob=blob_info.key(),
             title=name,
             path=self.request.get('path'),
-            pos=str(float(first)/150000),
+            pos='{0:f}'.format(float(first)/150000),
             filename=name,
             album=album,
             md5=self.request.get('md5'),
@@ -192,10 +174,10 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/upload',UploadHandler),
         webapp2.Route('/api/login',LoginHandler),
 
-        RESTHandler('/api/register',User,permissions=REGISTER_PERMISSIONS,user_object=None, before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
-        RESTHandler('/api/users',User,permissions=OWNER_PERMISSIONS,user_object=User,  allowed_origin=ALLOWED_ORIGIN),
-        RESTHandler('/api/photos',Photo,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN,after_delete_callback=Photo.after_delete),
-        RESTHandler('/api/albums',Album,permissions=OWNER_PERMISSIONS,user_object=User,allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/register',User,   permissions=REGISTER_PERMISSIONS,        before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/users',   User,   permissions=ANON_VIEWER,                 allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/photos',  Photo,  permissions=PERM_APPLY(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,after_delete_callback=Photo.after_delete),
+        RESTHandler('/api/albums',  Album,  permissions=PERM_APPLY(PERMISSION_ALBUM),allowed_origin=ALLOWED_ORIGIN),
       ],
     debug=True,
     config=config

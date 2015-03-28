@@ -67,7 +67,23 @@ export default Em.Route.extend({
                 }
 
                 resolve(album);
-            });
+            },
+                function(error){
+                    reject(error);
+                });
         });
+    },
+    actions: {
+        error: function(error,transition) {
+
+            if (error.status == 401) {
+                alert('Sorry you do not have permission to view that album');
+
+                transition.abort();
+                this.transitionTo('login')
+            }
+            console.log(error);
+
+        }
     }
 });

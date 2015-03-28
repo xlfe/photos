@@ -15,6 +15,15 @@ export default Ember.Route.extend(ApplicationRouteMixin, {
                 outlet: 'modal',
                 parentView: 'application'
             });
+        },
+        error: function(error,transition){
+
+            if (error.status === 401) {
+                transition.abort()
+                return this.transitionTo('login');
+            }
+            console.log(error);
+            return false;
         }
     }
 });

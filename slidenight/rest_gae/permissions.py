@@ -1,166 +1,145 @@
+from google.appengine.ext import ndb
+
+
+class Permissions(ndb.Model):
+
+    user = ndb.KeyProperty('User')
+
+    view = ndb.BooleanProperty()
+    edit = ndb.BooleanProperty()
+    move = ndb.BooleanProperty()
+    upload = ndb.BooleanProperty()
+    delete = ndb.BooleanProperty()
+
+
+    @classmethod
+    def check_user(cls,model,method,user):
+
+        perms = getattr(model,'permissions')
+
+        req_method = {
+            'GET': lambda x: x.view is True,
+            'PUT': lambda x: x.edit is True,
+            'DELETE': lambda x: x.delete is True
+        }
+
+
+        for perm in perms:
+            if perm.user == user.key:
+                if method in req_method:
+                    return req_method[method](model)
+
+        return False
+
 class Permission(object):
-    def pre_validate(self, method, model, user=None):
+
+    def pre_validate(self, method, model, user):
+        #Check permissions before we know if the model exists
         return True
 
-    def filter_query(self, query, model, user=None):
+    def post_validate(self, method, model, user):
+        #Validate permission based on actual model referenced
+        return True
+
+    def apply_permissions_filter(self, query, model, user):
+        #Apply a filter to the query
         return query
 
-    def post_validate(self, method, instances, user=None):
-        return instances
-
-    def allowed_query(self):
-        return True
-
-    def update_field_check(self,model,fields):
+    def update_field_check(self, model, fields):
+        #Check if we're allowed to modify the particular field
         return True
 
 
 class PermissionAnyone(Permission):
-    pass
+    def apply_permissions_filter(self, query, model, user):
+        return None
 
+class PermissionUser(PermissionAnyone):
 
-class PermissionAdmin(Permission):
-    def __init__(self, meta_admin_property):
-        self.meta_admin_property = meta_admin_property
-
-    def _user_is_admin(self, user):
-        if user is None: return False
-        if not hasattr(user, 'RESTMeta') or not hasattr(user.RESTMeta, self.meta_admin_property):
-            raise ValueError('The user model class does not have a properly configured admin property')
-        admin_property = getattr(user.RESTMeta, self.meta_admin_property)
-        return getattr(user, admin_property)
-
-    def pre_validate(self, method, model, user=None):
-        return self._user_is_admin(user)
-
-    def post_validate(self, method, instances, user=None):
-        if self._user_is_admin(user):
-            return instances
-        return False
-
-
-class PermissionUser(Permission):
-    def pre_validate(self, method, model, user=None):
+    #Must be logged in
+    def pre_validate(self, method, model, user):
         return user is not None
 
-    def post_validate(self, method, instances, user=None):
-        if user is not None:
-            return instances
-        return None
-
-import logging
-
-class PermissionInGroup(PermissionUser):
-
-    def _get_groups_property(self,model):
-        if not hasattr(model, 'RESTMeta') or not hasattr(model.RESTMeta, 'group_permissions'):
-            raise ValueError('The model class does not have a properly configured group_permissions property')
-        return getattr(model.RESTMeta, 'group_permissions')
-
-    def pre_validate(self, method, model, user=None):
-        group_perms = self._get_groups_property(model)
-        for group in group_perms[method]:
-            if group in user.groups:
-                return True
-        return False
-
-class PermissionInGroupApplied(PermissionInGroup):
-
-    def _get_groups_accessor(self,model):
-        if not hasattr(model, 'RESTMeta') or not hasattr(model.RESTMeta, 'group_accessor'):
-            raise ValueError('The model class does not have a properly configured group_accessor property')
-        return getattr(model.RESTMeta, 'group_accessor')
-
-    def post_validate(self, method, instance, user):
-
-        group_perms = self._get_groups_property(instance)
-        accessor = self._get_groups_accessor(instance)
-        perms = filter(lambda g: g.lower().startswith(getattr(instance,accessor).lower()),group_perms[method])
-        for group in perms:
-            if group in user.groups:
-                return instance
-        return None
-
-class PermissionInGroupSpecific(PermissionInGroup):
-
-    # def post_validate(self, method, instance, user=None):
-    #     return instance
-
-    def allowed_query(self):
-        return False
-
-class PermissionFinanceOnlyDL(PermissionUser):
-    def pre_validate(self, method, model, user=None):
-        if 'finance' in user.groups:
-            return True
-        return False
-
-class PermissionOwner(PermissionUser):
-
-    def __init__(self, meta_owner_property):
-        self.meta_owner_property = meta_owner_property
+class PermissionObjectOwner(PermissionUser):
 
     def _get_owner_property(self, model):
-        if not hasattr(model, 'RESTMeta') or not hasattr(model.RESTMeta, self.meta_owner_property):
+        if not hasattr(model, 'RESTMeta') or not hasattr(model.RESTMeta, 'user_owner_property'):
             raise ValueError('The user model class does not have a properly configured owner property')
-        return getattr(model.RESTMeta, self.meta_owner_property)
+        return getattr(model.RESTMeta, 'user_owner_property')
 
-    def filter_query(self, query, model, user=None):
-        model_owner_property = getattr(model, self._get_owner_property(model))
-        return query.filter(model_owner_property == user.key)
 
-    def post_validate(self, method, instance, user=None):
+class PermissionAlbum(PermissionObjectOwner):
 
-        owner_property = self._get_owner_property(type(instance))
-        if method == "POST":
-            setattr(instance, owner_property, user.key)
-        else:
-            # logging.info(getattr(instance,owner_property))
-            if getattr(instance, owner_property) != user.key:
-                return None
-        return instance
+    # ...only query for objects they own or have been granted permission to view
+    def apply_permissions_filter(self, query, model, user):
+        owner_property = getattr(model, self._get_owner_property(model))
+        permissions_property = getattr(model, 'permissions')
+        return query.filter(ndb.OR(owner_property == user.key,permissions_property == Permissions(user=user.key,view=True)))
 
-class PermissionOwnerAllowed(PermissionOwner):
-    def __init__(self, meta_owner_property,meta_allowed_property):
-        self.meta_owner_property = meta_owner_property
-        self.meta_allowed_property = meta_allowed_property
+    #They can only modify objects they own
+    def post_validate(self, method, model, user=None):
 
-    def _get_allowed_property(self, model):
-        if not hasattr(model, 'RESTMeta') or not hasattr(model.RESTMeta, self.meta_allowed_property):
-            raise ValueError('The user model class does not have a properly configured allowed property')
-        return getattr(model.RESTMeta, self.meta_allowed_property)
+        owner_property = self._get_owner_property(type(model))
+        permissions_property = getattr(model, 'permissions')
 
-    def filter_query(self, query, model, user=None):
-        model_owner_property = getattr(model, self._get_owner_property(model))
-        return query.filter(model_owner_property == user.key)
+        # new model - set owner property
+        if method == 'POST':
+            setattr(model, owner_property, user.key)
+            return True
 
-    def update_field_check(self,model,fields):
+        # Model owner can do anything
+        if getattr(model, owner_property) == user.key:
+            return True
 
-        allowed = self._get_allowed_property(model)
+        return Permissions.check_user(model,method,user)
 
-        logging.info(fields)
-        logging.info(allowed)
-        return True
+import logging
+class PermissionPhoto(Permission):
 
-    def post_validate(self, method, instance, user=None):
+    # ...only query for photos that are in a album that they own or have been granted permission to view
+    def apply_permissions_filter(self, query, model, user):
 
-        owner_property = self._get_owner_property(type(instance))
-        if method == "POST":
-            setattr(instance, owner_property, user.key)
-        else:
-            # logging.info(getattr(instance,owner_property))
-            if getattr(instance, owner_property) != user.key:
-                return None
-        return instance
+        filter = None
+
+        check_type = lambda x: getattr(x,'_FilterNode__name') == 'album' and getattr(x,'_FilterNode__opsymbol') == u'='
+        get_val = lambda x: getattr(x,'_FilterNode__value')
+
+        try:
+            for f in query.filters:
+                if check_type(f):
+                    filter = get_val(f)
+        except TypeError:
+            if check_type(query.filters):
+                filter = get_val(query.filters)
+
+        if filter is None:
+            logging.exception(query.filters)
+            return None
+
+        assert filter.kind() == 'Album'
+        album = ndb.Key(urlsafe=str(filter)).get()
+        assert album is not None,filter.__dict__
+
+        if album.owner == user.key or Permissions.check_user(album,'GET',user):
+            return query
+
+        logging.info(album)
+
+        return None
+
 
 
 PERMISSION_ANYONE = [PermissionAnyone()]
 PERMISSION_LOGGED_IN_USER = [PermissionUser()]
-PERMISSION_OWNER_USER = [PermissionAdmin('admin_property'), PermissionOwner('user_owner_property')]
-PERMISSION_ADMIN = [PermissionAdmin('admin_property')]
-PERMISSION_ADMIN_OR_ALLOWED = [PermissionAdmin('admin_property'),PermissionOwnerAllowed('user_owner_property','owner_allowed_properties')]
-PERMISSION_IN_GROUP = [PermissionInGroup()]
-PERMISSION_IN_GROUP_SPECIFIC = [PermissionInGroupSpecific()]
-PERMISSION_IN_GROUP_APPLIED = [PermissionInGroupApplied()]
-PERMISSION_NOONE = []
-PERMISSION_FINANCE = [PermissionFinanceOnlyDL()]
+PERMISSION_ALBUM = [PermissionAlbum()]
+PERMISSION_PHOTO = [PermissionPhoto()]
+
+REGISTER_PERMISSIONS = {
+    'POST': PERMISSION_ANYONE
+}
+
+ANON_VIEWER = {
+    'GET': PERMISSION_ANYONE
+}
+
+PERM_APPLY = lambda x: {'GET': x, 'POST': x, 'PUT': x, 'DELETE': x}

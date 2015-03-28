@@ -74,6 +74,7 @@ export default Em.Controller.extend({
             //_this.get('model.photos').pushObject(photo);
             file.set('status','Complete');
             file.set('_status',6);
+            _this.set('model.photo_count',_this.get('model.photos.length'));
         });
     },
     send_chunk: function (file, start) {

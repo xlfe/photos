@@ -2,9 +2,9 @@ import Em from 'ember';
 /* global Big */
 
 var Folder = Em.Object.extend({
-    width: 3,
-    height: 2,
-    display_sz: [3,2],
+    height: 200,
+    width: 300,
+    display_sz: [200,300],
     is_folder: true
 });
 
@@ -30,7 +30,6 @@ function sort_pos(a,b){
         bb = b.get('pos') || 0;
 
     return aa  > bb ? 1 : -1;
-    return new Big(aa).minus(new Big(bb));
 }
 
 export default Em.Controller.extend({
@@ -223,13 +222,38 @@ export default Em.Controller.extend({
                 _.set('selected',false);
             });
         },
+        move_selection: function() {
+
+            var selected=this.get('selected'),
+                new_path = prompt('Please enter the new path for ' + selected.length + ' photos');
+
+            if (Em.isNone(new_path)){
+                return;
+            }
+            if (Em.$.trim(new_path).length ===0){
+                return;
+            }
+
+            Em.run(function(){
+                selected.forEach(function(p){
+                    "use strict";
+                    p.set('path',new_path);
+                });
+            });
+
+        },
         delete_selection: function() {
             var _this=this;
             if (Em.isPresent(this.get('confirm_delete'))) {
 
                 _this.set('progress_delete',true);
                 Em.RSVP.all(_this.get('selected').map(function (_) {
-                    return _.destroyRecord();
+                    _.deleteRecord();
+                    return new Em.RSVP.Promise(function(resolve,reject){
+                        _.save().then(function(){
+                            resolve();
+                        });
+                    });
                 })).then(function () {
                     _this.set('progress_delete', false);
                     _this.set('confirm_delete',undefined);

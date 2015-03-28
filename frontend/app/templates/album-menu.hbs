@@ -38,6 +38,13 @@
                 <i class="fa fa-close fa-lg"></i>
             </a>
         </li>
+
+        <li class="menu-link">
+            <a href="#" title="Move selected photos" {{action 'move_selection'}} tabindex="-1">
+                <i class="fa fa-folder-open fa-lg"></i>
+            </a>
+        </li>
+
         <li class="menu-link">
             <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
                 {{#if controller.progress_delete}}
