@@ -6,6 +6,7 @@ var endpoint = [config.api_host, config.api_endpoint,'login'].join('/');
 
 export default Base.extend({
     restore: function (data) {
+        console.log("Trying to restore");
 
         return new Em.RSVP.Promise(function (resolve, reject) {
 
@@ -28,6 +29,8 @@ export default Base.extend({
         });
     },
     authenticate: function (options) {
+        console.log("trying to authenticate");
+
         return new Em.RSVP.Promise(function (resolve, reject) {
             Em.$.ajax({
                 url: endpoint,
@@ -44,6 +47,8 @@ export default Base.extend({
         });
     },
     invalidate: function (data) {
+        console.log("trying to invalidate");
+
         return new Em.RSVP.Promise(function (resolve, reject) {
             Em.$.ajax({
                 url: endpoint,
@@ -51,9 +56,13 @@ export default Base.extend({
                 xhrFields: {
                     withCredentials: true
                 },
-                dataType: 'json',
                 success: function(data){
+                    console.log("logged out")
                     resolve({});
+                },
+                error: function(error){
+                    console.log("Unable to logout");
+                    reject(error);
                 }
             });
         });

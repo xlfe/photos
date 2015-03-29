@@ -89,6 +89,7 @@ class LoginHandler(BaseRESTHandler):
 
     def put(self):
         self.response.delete_cookie('session')
+        self.response.out.write('Logged out')
 
     def get(self):
 
