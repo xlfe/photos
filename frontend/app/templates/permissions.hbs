@@ -27,7 +27,7 @@
         </div>
 
 
-        {{#if model.allow_anon}}
+        {{#if allow_anon}}
 
             <div class="form-group">
                 <label class="col-sm-3 control-label">
@@ -49,6 +49,96 @@
         {{/if}}
 
     </form>
+
+    <h4>
+        Fine grained permissions
+    </h4>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>View</th>
+            <th>Edit</th>
+            <th>Move</th>
+            <th>Upload</th>
+            <th>Delete</th>
+            <th>Owner</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td>
+                {{session.full_name}}
+            </td>
+            <td><i class="fa fa-check"></i></td>
+            <td><i class="fa fa-check"></i></td>
+            <td><i class="fa fa-check"></i></td>
+            <td><i class="fa fa-check"></i></td>
+            <td><i class="fa fa-check"></i></td>
+            <td><i class="fa fa-check"></i></td>
+            <td></td>
+        </tr>
+
+        {{#if model.allow_anon}}
+
+            <tr>
+                <td>
+                    Anyone with the <a {{bind-attr href=model.public_url}}>public link</a>
+                </td>
+                <td><i class="fa fa-check"></i></td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td></td>
+            </tr>
+
+        {{/if}}
+
+        {{#each album in controller.model.none}}
+            <tr>
+                <td>
+                    {{#link-to 'album' album.id}}
+                        {{album.name}}
+                    {{/link-to}}
+                </td>
+                <td>
+                    {{album.photo_count}}
+                </td>
+                <td>
+                    {{#link-to 'permissions' album.id}}
+                        <i class="fa fa-lg fa-users"></i>
+                        Permissions
+                    {{/link-to}}
+
+                </td>
+                <td>
+                    {{album.created}}
+                </td>
+            </tr>
+        {{/each}}
+        <tr>
+            <td>
+
+                <a href="" {{action 'add_permission'}}>
+                    <i class="fa fa-lg fa-plus"></i>
+                    Add user
+                </a>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
 
 
 </div>

@@ -17,7 +17,19 @@ export default Em.Mixin.create({
         });
 
         this.set('_saving', false);
-    }.on('didLoad'),
+    }.on('ready'),
+
+    _remove: function(){
+        "use strict";
+
+        var props = this.get('autosave_properties').concat(this.get('autosave_properties_immediate')),
+            _this = this;
+
+        props.forEach(function(prop){
+            Em.removeObserver(_this,prop,_this,'_keep_watch');
+        });
+
+    }.on('becameInvalid'),
 
     _save_me: function () {
         var _this = this;
