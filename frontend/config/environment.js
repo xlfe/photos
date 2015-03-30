@@ -20,7 +20,9 @@ module.exports = function (environment) {
     };
 
     ENV['simple-auth'] = {
-        authorizer: 'authorizer:custom'
+        authorizer: 'authorizer:custom',
+        routeAfterAuthentication: 'albums',
+        routeIfAlreadyAuthenticated: 'albums'
     };
 
     ENV.api_endpoint = 'api';

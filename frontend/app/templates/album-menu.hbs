@@ -16,20 +16,39 @@
         {{/link-to}}
     {{/each}}
 
-    <li class="menu-link">
-        <a href="#" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
-            <i class="fa fa-lg fa-sort"></i>
-            Sort
-        </a>
-    </li>
+    {{#if controller.permissions.move}}
 
-    <li class="menu-link">
-        <a href="#" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
-            <i class="fa fa-lg fa-upload"></i>
-            Upload
-        </a>
-    </li>
+        <li class="menu-link">
+            <a href="#" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
+                <i class="fa fa-lg fa-sort"></i>
+                Sort
+            </a>
+        </li>
+    {{/if}}
 
+    {{#if controller.permissions.upload}}
+
+
+        <li class="menu-link">
+            <a href="#" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
+                <i class="fa fa-lg fa-upload"></i>
+                Upload
+            </a>
+        </li>
+
+    {{/if}}
+
+    {{#if controller.permissions.owner}}
+
+        {{#link-to "permissions" model.id tagName="li" class="menu-link" tabindex="-1"}}
+            <a>
+
+                <i class="fa fa-users fa-lg"></i>
+                Permissions
+            </a>
+        {{/link-to}}
+
+    {{/if}}
     {{#if controller.selected}}
         <li class="menu-link">
             <a href="#" title="Clear the current selection" {{action 'cancel_selection'}} tabindex="-1">
@@ -39,28 +58,36 @@
             </a>
         </li>
 
-        <li class="menu-link">
-            <a href="#" title="Move selected photos" {{action 'move_selection'}} tabindex="-1">
-                <i class="fa fa-folder-open fa-lg"></i>
-            </a>
-        </li>
+        {{#if controller.permissions.move}}
 
-        <li class="menu-link">
-            <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
-                {{#if controller.progress_delete}}
-                    <i class="fa fa-spinner fa-spin fa-lg"></i>
-                {{/if}}
-                <i class="fa fa-trash fa-lg"></i>
-                {{#if controller.confirm_delete}}
 
-                    <span class="alert-danger" role="alert">
+            <li class="menu-link">
+                <a href="#" title="Move selected photos" {{action 'move_selection'}} tabindex="-1">
+                    <i class="fa fa-folder-open fa-lg"></i>
+                </a>
+            </li>
+        {{/if}}
+
+        {{#if controller.permissions.delete}}
+            <li class="menu-link">
+                <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
+                    {{#if controller.progress_delete}}
+                        <i class="fa fa-spinner fa-spin fa-lg"></i>
+                    {{/if}}
+                    <i class="fa fa-trash fa-lg"></i>
+                    {{#if controller.confirm_delete}}
+
+                        <span class="alert-danger" role="alert">
                         Please confirm deleting {{controller.selected.length}} photos?
                         </span>
 
-                {{/if}}
+                    {{/if}}
 
-            </a>
-        </li>
+                </a>
+            </li>
+
+        {{/if}}
+
     {{/if}}
 </ul>
 
@@ -74,6 +101,7 @@
             <span>
                 {{model.photos.length}} Photos
             </span>
+
             <div class="spacer"></div>
             <span {{action 'smaller'}}class="fa fa-image" tabindex="-1"></span>
             {{input type="range" min=150 max=800 steps=50 value=minHeight tabindex="-1"}}

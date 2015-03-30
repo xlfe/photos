@@ -78,12 +78,12 @@ export default Em.Controller.extend({
     album_class: function() {
         var base_class='your-photos';
 
-        if (this.get('selected').length > 0){
+        if (this.get('selected').length > 0 && this.get('permissions.move') === true){
             return base_class + ' selection';
         }
 
         return base_class;
-    }.property('selected.length','controllers.application.currentPath'),
+    }.property('selected.length','permissions.move'),
 
     folders: function () {
         // Show all folders that have this path or below
@@ -201,6 +201,20 @@ export default Em.Controller.extend({
             scale_row(cr);
         }
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
+    permissions: function(){
+        "use strict";
+
+        return {
+            view: true,
+            edit: false,
+            no_edit: true,
+            move: false,
+            upload: false,
+            delete: false,
+            owner: false
+        }
+
+    }.property('allow_anon','session.isAuthenticated'),
     actions: {
         new_sort: function(){
             this.sort_by();

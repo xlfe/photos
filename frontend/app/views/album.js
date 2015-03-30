@@ -32,6 +32,9 @@ export default Em.View.extend({
         });
         this.size_photos();
 
+        if (this.get('controller.permissions.move') !== true){
+            return;
+        }
 
         Em.$(".your-photos").mousedown(function (e) {
 

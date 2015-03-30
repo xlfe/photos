@@ -26,6 +26,7 @@ export default Em.Controller.extend(LoginControllerMixin, {
             var _this = this;
 
             this._super().then(function () {
+                this.transition
 
             }, function (error) {
                 _this.set('error', error.error);
@@ -45,6 +46,7 @@ export default Em.Controller.extend(LoginControllerMixin, {
                 data: JSON.stringify({user: data}),
                 dataType: 'json',
                 success: function (_data) {
+                    console.log(_data,data);
                     _this.set('identification', data['email'].toLowerCase());
 
                     _this.send('authenticate');

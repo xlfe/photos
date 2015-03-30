@@ -1,4 +1,54 @@
+<div class="container">
+    <h3>
+        Edit permissions for
+        {{#link-to 'album' model.id}}
+            <strong>
+                {{model.name}}
+            </strong>
+        {{/link-to}}
+    </h3>
 
-<h3>
-    Edit permissions
-</h3>
+
+    <form class="form-horizontal" role="form">
+
+        <div class="form-group">
+
+            <label class="col-sm-3 control-label">
+                Allow anyone to view the album?
+            </label>
+
+            <div class="col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        {{input type="checkbox" checked=model.allow_anon}} Anonymous Viewers
+                    </label>
+                </div>
+            </div>
+        </div>
+
+
+        {{#if model.allow_anon}}
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">
+                    Public sharing URL:
+                </label>
+
+                <div class="col-sm-9">
+                    <p class="form-control-static">
+
+                        <a {{bind-attr href=model.public_url}}>
+                            {{model.public_url}}
+                        </a>
+                    </p>
+
+                </div>
+            </div>
+
+
+        {{/if}}
+
+    </form>
+
+
+</div>

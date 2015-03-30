@@ -25,13 +25,17 @@ export default Em.Component.extend({
     }.property('_idx'),
     draggable: function() {
 
+        if (this.get('album.permissions.move') !== true){
+            return false;
+        }
+
         if (this.get('photo.selected') === true || this.get('selection_mode') === 0){
             return true;
         }
 
         return false;
 
-    }.property('photo.selected','selection_mode'),
+    }.property('photo.selected','selection_mode','album.permissions.move'),
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),

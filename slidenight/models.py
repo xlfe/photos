@@ -117,6 +117,7 @@ class Album(ndb.Model):
     name = ndb.StringProperty()
     photo_count = ndb.IntegerProperty()
     owner = ndb.KeyProperty(User)
+    allow_anon = ndb.BooleanProperty(default=False)
     created = ndb.DateTimeProperty(auto_now_add=True)
     permissions = ndb.StructuredProperty(Permissions,repeated=True)
 

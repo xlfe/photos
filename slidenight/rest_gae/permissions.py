@@ -60,7 +60,7 @@ class PermissionUser(PermissionAnyone):
     def pre_validate(self, method, model, user):
         return user is not None
 
-class PermissionObjectOwner(PermissionUser):
+class PermissionObjectOwner(Permission):
 
     def _get_owner_property(self, model):
         if not hasattr(model, 'RESTMeta') or not hasattr(model.RESTMeta, 'user_owner_property'):
@@ -78,6 +78,11 @@ class PermissionAlbum(PermissionObjectOwner):
 
     #They can only modify objects they own
     def post_validate(self, method, model, user=None):
+
+        if user is None:
+            if method == 'GET' and model.allow_anon is True:
+                return True
+            return False
 
         owner_property = self._get_owner_property(type(model))
         permissions_property = getattr(model, 'permissions')
@@ -120,10 +125,8 @@ class PermissionPhoto(Permission):
         album = ndb.Key(urlsafe=str(filter)).get()
         assert album is not None,filter.__dict__
 
-        if album.owner == user.key or Permissions.check_user(album,'GET',user):
+        if album.allow_anon is True or album.owner == user.key or Permissions.check_user(album,'GET',user):
             return query
-
-        logging.info(album)
 
         return None
 
