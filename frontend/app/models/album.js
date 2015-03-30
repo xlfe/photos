@@ -10,6 +10,7 @@ export default DS.Model.extend(autosave,{
     photo_count: DS.attr('number'),
     allow_anon: DS.attr('boolean'),
 
+    owner: DS.belongsTo('user', {async:true}),
     //Self generated
     photos: [],
     more_results: true,

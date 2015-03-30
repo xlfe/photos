@@ -202,19 +202,38 @@ export default Em.Controller.extend({
         }
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
-        "use strict";
+
+        if (this.get('session.isAuthenticated') === false) {
+            if (this.get('model.allow_anon') === true) {
+                return {
+                    view: true,
+                    edit: false,
+                    no_edit: true,
+                    move: false,
+                    upload: false,
+                    delete: false,
+                    owner: false
+                }
+            } else {
+                throw('Hmm');
+            }
+        }
+
+        var is_owner = this.get('model.owner.id') === this.get('session.id');
 
         return {
             view: true,
-            edit: false,
-            no_edit: true,
-            move: false,
-            upload: false,
-            delete: false,
-            owner: false
+
+            edit: is_owner,
+            no_edit: !is_owner,
+
+            move: is_owner,
+            upload: is_owner,
+            delete: is_owner,
+            owner: is_owner
         }
 
-    }.property('allow_anon','session.isAuthenticated'),
+    }.property('model.allow_anon','App.session.isAuthenticated'),
     actions: {
         new_sort: function(){
             this.sort_by();
@@ -226,10 +245,10 @@ export default Em.Controller.extend({
             this.set('path',path);
         },
         larger: function() {
-            this.set('minHeight',Math.min(this.get('minHeight')+50,800));
+            this.set('minHeight',Math.min(this.get('minHeight')+150,800));
         },
         smaller: function(){
-            this.set('minHeight',Math.max(this.get('minHeight')-50,150));
+            this.set('minHeight',Math.max(this.get('minHeight')-150,150));
         },
         cancel_selection: function() {
             this.get('selected').forEach(function(_){
