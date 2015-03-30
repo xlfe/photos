@@ -19,8 +19,8 @@
 
             <div class="col-sm-9">
                 <div class="checkbox">
-                    <label>
-                        {{input type="checkbox" checked=model.allow_anon}} Anonymous Viewers
+                    <label {{action 'toggle_anon'}}>
+                        {{input type="checkbox" checked=allow_anon}} Anonymous Viewers
                     </label>
                 </div>
             </div>
@@ -69,57 +69,44 @@
         </thead>
         <tbody>
 
-        <tr>
-            <td>
-                {{session.full_name}}
-            </td>
-            <td><i class="fa fa-check"></i></td>
-            <td><i class="fa fa-check"></i></td>
-            <td><i class="fa fa-check"></i></td>
-            <td><i class="fa fa-check"></i></td>
-            <td><i class="fa fa-check"></i></td>
-            <td><i class="fa fa-check"></i></td>
-            <td></td>
-        </tr>
-
-        {{#if model.allow_anon}}
-
+        {{#each perm in model.resolved_permissions}}
             <tr>
                 <td>
-                    Anyone with the <a {{bind-attr href=model.public_url}}>public link</a>
+                    {{perm._user.full_name}}
                 </td>
-                <td><i class="fa fa-check"></i></td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
+                <td>
+                    {{#if perm.view}}
+                        <i class="fa fa-check"></i>
+                    {{/if}}
+                </td>
+                <td>
+                    {{#if perm.edit}}
+                        <i class="fa fa-check"></i>
+                    {{/if}}
+                </td>
+                <td>
+                    {{#if perm.move}}
+                        <i class="fa fa-check"></i>
+                    {{/if}}
+                </td>
+                <td>
+                    {{#if perm.upload}}
+                        <i class="fa fa-check"></i>
+                    {{/if}}
+                </td>
+                <td>
+                    {{#if perm.delete}}
+                        <i class="fa fa-check"></i>
+                    {{/if}}
+                </td>
+                <td>
+                    {{#if perm.owner}}
+                        <i class="fa fa-check"></i>
+                    {{/if}}
+                </td>
                 <td></td>
             </tr>
 
-        {{/if}}
-
-        {{#each album in controller.model.none}}
-            <tr>
-                <td>
-                    {{#link-to 'album' album.id}}
-                        {{album.name}}
-                    {{/link-to}}
-                </td>
-                <td>
-                    {{album.photo_count}}
-                </td>
-                <td>
-                    {{#link-to 'permissions' album.id}}
-                        <i class="fa fa-lg fa-users"></i>
-                        Permissions
-                    {{/link-to}}
-
-                </td>
-                <td>
-                    {{album.created}}
-                </td>
-            </tr>
         {{/each}}
         <tr>
             <td>

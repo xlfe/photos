@@ -202,38 +202,22 @@ export default Em.Controller.extend({
         }
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
+        var anon = this.get('session.isAuthenticated') === false,
+            my_id = this.get('session.id'),
+            perms = this.get('model.resolved_permissions').filter(function(_){
 
-        if (this.get('session.isAuthenticated') === false) {
-            if (this.get('model.allow_anon') === true) {
-                return {
-                    view: true,
-                    edit: false,
-                    no_edit: true,
-                    move: false,
-                    upload: false,
-                    delete: false,
-                    owner: false
+                if (anon === true){
+                    return Em.isNone(_.get('user'));
+                } else {
+                    return _.get('user') === my_id;
                 }
-            } else {
-                throw('Hmm');
-            }
-        }
+            });
 
-        var is_owner = this.get('model.owner.id') === this.get('session.id');
+        console.log(perms[0]);
 
-        return {
-            view: true,
+        return perms[0];
 
-            edit: is_owner,
-            no_edit: !is_owner,
-
-            move: is_owner,
-            upload: is_owner,
-            delete: is_owner,
-            owner: is_owner
-        }
-
-    }.property('model.allow_anon','App.session.isAuthenticated'),
+    }.property('model.permissions.@each','session.isAuthenticated'),
     actions: {
         new_sort: function(){
             this.sort_by();

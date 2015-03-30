@@ -18,9 +18,11 @@ export default Em.Object.extend({
             this.set(k,false);
             Ember.addObserver(this, k, this, this.object_obs);
         }
+        Ember.addObserver(this, 'user', this, this.object_obs);
 
         this.object_obs();
     },
+    user: null,
 
     object: {},
     object_obs: function(){
@@ -30,6 +32,15 @@ export default Em.Object.extend({
             obj[k] = this.get(k);
         }
 
+        this.set('no_edit',obj['edit'] === false);
+        obj['user'] = this.get('user')
+
+         if (Em.isNone(obj.user)===true) {
+             this.set('_user', {
+                 full_name: 'Anonymous Users'
+             });
+         }
+
         this.set('object',obj);
     },
 
@@ -37,6 +48,7 @@ export default Em.Object.extend({
         for (var k in obj){
             this.set(k,obj[k]);
         }
+        return this;
     }
 });
 

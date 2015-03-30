@@ -1,18 +1,43 @@
 import DS from 'ember-data';
 import autosave from '../models/autosave';
+import perm from '../objects/permissions';
 
 export default DS.Model.extend(autosave,{
     autosave_properties: ['name','photo_count'],
-    autosave_properties_immediate: ['allow_anon'],
-
 
     name: DS.attr('string'),
     created: DS.attr('isodatetime'),
     photo_count: DS.attr('number'),
-    allow_anon: DS.attr('boolean'),
-
     owner: DS.belongsTo('user', {async:true}),
     permissions: DS.attr('list'),
+
+    resolved_permissions: function() {
+        var _this = this;
+
+        var perms = this.get('permissions').map(function(p){
+                var _p = perm.create().load(p);
+
+                if (!Em.isNone(_p.get('user'))){
+                    _p.set(_this.store.find('user',_p.get('user')))
+                }
+
+                return _p;
+            }),
+            owner = this.get('owner');
+
+
+        return [perm.create().load({
+            view: true,
+            edit: true,
+            move: true,
+            upload: true,
+            delete: true,
+            owner: true,
+            user: this.get('owner.id'),
+            _user: owner
+        })].concat(perms);
+
+    }.property('permissions.@each'),
     //Self generated
     photos: [],
     more_results: true,

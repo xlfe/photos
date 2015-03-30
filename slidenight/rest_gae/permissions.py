@@ -25,9 +25,14 @@ class Permissions(ndb.Model):
 
 
         for perm in perms:
-            if perm.user == user.key:
-                if method in req_method:
-                    return req_method[method](model)
+            if user is None and perm.user is not None:
+                continue
+
+            if user is not None and perm.user != user.key:
+                continue
+
+            if method in req_method:
+                return req_method[method](perm)
 
         return False
 
@@ -79,11 +84,6 @@ class PermissionAlbum(PermissionObjectOwner):
     #They can only modify objects they own
     def post_validate(self, method, model, user=None):
 
-        if user is None:
-            if method == 'GET' and model.allow_anon is True:
-                return True
-            return False
-
         owner_property = self._get_owner_property(type(model))
         permissions_property = getattr(model, 'permissions')
 
@@ -93,7 +93,7 @@ class PermissionAlbum(PermissionObjectOwner):
             return True
 
         # Model owner can do anything
-        if getattr(model, owner_property) == user.key:
+        if user is not None and getattr(model, owner_property) == user.key:
             return True
 
         return Permissions.check_user(model,method,user)
@@ -125,7 +125,10 @@ class PermissionPhoto(Permission):
         album = ndb.Key(urlsafe=str(filter)).get()
         assert album is not None,filter.__dict__
 
-        if album.allow_anon is True or album.owner == user.key or Permissions.check_user(album,'GET',user):
+        if Permissions.check_user(album,'GET',user):
+            return query
+
+        elif user is not None and album.owner == user.key:
             return query
 
         return None
