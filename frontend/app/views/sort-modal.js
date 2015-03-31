@@ -6,6 +6,7 @@ export default Em.View.extend({
         c.set('sorted',[]);
         c.set('sort_by',undefined);
         c.set('sortDescending',false);
+        c.set('sortNatural',true);
         console.log("reset")
 
     }
