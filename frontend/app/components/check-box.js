@@ -12,6 +12,6 @@ export default Em.Component.extend({
         this.toggleProperty('value');
         Em.run.later(function(){
             _this.sendAction('save');
-        })
+        });
     }
 });

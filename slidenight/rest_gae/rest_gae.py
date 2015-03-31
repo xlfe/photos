@@ -14,6 +14,7 @@ try:
 except ImportError as e:
     dateutil = None
 
+PROFILING = False
 import logging
 
 model_ember_key = lambda (model):model._get_kind().lower()[0] + model._get_kind()[1:]
@@ -415,8 +416,9 @@ class BaseRESTHandler(webapp2.RequestHandler):
             # Return as-is (no need for further manipulation)
             return value
 
-
-
+if PROFILING:
+    import cProfile, pstats
+    import StringIO
 
 def get_rest_class(ndb_model, base_url, **kwd):
     """Returns a RESTHandlerClass with the ndb_model and permissions set according to input"""
@@ -465,7 +467,7 @@ def get_rest_class(ndb_model, base_url, **kwd):
 
             def inner_f(self, model_id):
 
-                #Is method allowed?
+                # Is method allowed?
                 method_name = func.func_name.upper()
                 if method_name not in self.permissions:
                     return self.method_not_allowed()
@@ -483,7 +485,7 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 try:
                     if model_id:
 
-                        model = self._model_id_to_model(model_id.lstrip('/')) # Get rid of '/' at the beginning
+                        model = self._model_id_to_model(model_id.lstrip('/'))  # Get rid of '/' at the beginning
 
                         #Check specific model permissions (post_validate)
                         if accepted_permission.post_validate(method_name, model, self.user) is not True:
@@ -503,8 +505,29 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 except RESTException as exc:
                     return self.error(exc)
 
-            return inner_f
 
+
+            if PROFILING:
+
+                def _profile(s, model_id):
+
+                    prof = cProfile.Profile()
+                    kwargs = {}#{'self':s,'model_id':model_id}
+                    args=[s,model_id]
+
+                    retval = prof.runcall(inner_f,*args,**kwargs)
+                    # prof = prof.runctx("inner_f", {'self':self,'model_id':model_id}, {'inner_f':inner_f})
+
+                    stream = StringIO.StringIO()
+                    stats = pstats.Stats(prof, stream=stream)
+                    stats.sort_stats("time")  # Or cumulative
+                    stats.print_stats(80)  # 80 = how many to print
+                    logging.info("Profile data:\n%s", stream.getvalue())
+                    return retval
+                return _profile
+
+            else:
+                return inner_f
 
         #
         # REST endpoint methods

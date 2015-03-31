@@ -40,12 +40,14 @@ export default DS.Model.extend(autosave,{
             cache = this.get('_in_cache'),
             image = new Image();
 
-        if (req_long_edge === 0 || fetched_long_edge ===0){
+
+        if (req_long_edge === 0 || fetched_long_edge ===0 ){
             return;
         }
 
         if (Em.isNone(cache)){
             //Nothing in cache
+
             image.onload = function() {
                 _this.set('_in_cache',fetched_long_edge);
             };
@@ -54,7 +56,7 @@ export default DS.Model.extend(autosave,{
 
         } else {
 
-            if (+cache > +fetched_long_edge) {
+            if (+cache > +fetched_long_edge || this.get('_saving') === true) {
                 //Don't fetch a smaller version of what we already have cached...
                 return surl + cache;
             } else {

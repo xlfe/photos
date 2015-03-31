@@ -15,8 +15,8 @@ export default Em.View.extend({
         this.$('#lightbox-overlay').on('click', {_this: this}, this.overlay_click);
 
         scrollPosition = [
-            self.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft,
-            self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+            document.documentElement.scrollLeft || document.body.scrollLeft,
+            document.documentElement.scrollTop || document.body.scrollTop
         ];
 
         // lock scroll position, but retain settings for later

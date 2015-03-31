@@ -1,3 +1,4 @@
+import Em from 'ember';
 import DS from 'ember-data';
 import autosave from '../models/autosave';
 import perm from '../objects/permissions';

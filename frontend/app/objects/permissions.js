@@ -35,9 +35,9 @@ export default Em.Object.extend({
 
         for (var k in this.get('permissions')) {
             this.set(k, false);
-            Ember.addObserver(this, k, this, this.object_obs);
+            Em.addObserver(this, k, this, this.object_obs);
         }
-        Ember.addObserver(this, 'user', this, this.object_obs);
+        Em.addObserver(this, 'user', this, this.object_obs);
 
         this.object_obs();
     },

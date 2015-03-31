@@ -5,7 +5,7 @@ import config from '../config/environment';
 var endpoint = [config.api_host, config.api_endpoint,'login'].join('/');
 
 export default Base.extend({
-    restore: function (data) {
+    restore: function (options) {
 
         return new Em.RSVP.Promise(function (resolve, reject) {
 
@@ -16,9 +16,8 @@ export default Base.extend({
                     withCredentials: true
                 },
                 dataType: 'json',
-                success: function(data){
-                    console.log(data);
-                    resolve(data);
+                success: function(_data){
+                    resolve(_data);
                 },
                 error: function(error){
                     reject(error.responseJSON || {error:'An unknown error occurred'});
@@ -44,7 +43,7 @@ export default Base.extend({
             });
         });
     },
-    invalidate: function (data) {
+    invalidate: function (options) {
 
         return new Em.RSVP.Promise(function (resolve, reject) {
             Em.$.ajax({
@@ -54,11 +53,9 @@ export default Base.extend({
                     withCredentials: true
                 },
                 success: function(data){
-                    console.log("logged out")
                     resolve({});
                 },
                 error: function(error){
-                    console.log("Unable to logout");
                     reject(error);
                 }
             });

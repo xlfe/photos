@@ -15,7 +15,7 @@ export default Em.Route.extend({
     model: function (params) {
         var store = this.get('store'),
             query_params = {
-                'limit':150,
+                'limit':100,
                 'order_by': 'path,pos',
                 'q': "album=KEY('" + params.album_id + "')"
             };
@@ -28,7 +28,7 @@ export default Em.Route.extend({
                 album.set('more_results',true);
 
                 query_params['cursor'] = more_results;
-                query_params['limit'] = query_params['limit'] * 2;
+                //query_params['limit'] = query_params['limit'] * 2;
 
                 store.find('photo',query_params).then(function(more){
                     //album.get('photos.content').pushObjects(more.get('content'));

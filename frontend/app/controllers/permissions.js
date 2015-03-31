@@ -1,6 +1,5 @@
 import Em from 'ember';
 import perm from '../objects/permissions';
-import Invite from '../models/invite';
 
 export default Em.Controller.extend({
 
@@ -33,20 +32,20 @@ export default Em.Controller.extend({
                 name = '';
 
             if (parts.length > 1){
-                name = parts.slice(0,parts.length-1).join(' ')
-                name = name.replace(/"/g,'')
+                name = parts.slice(0,parts.length-1).join(' ');
+                name = name.replace(/"/g,'');
             }
             mail = mail.replace(/</g,'').replace(/>/g,'').replace(/,* *$/,'');
 
-            if (mail.trim() == name.trim()){
+            if (mail.trim() === name.trim()){
                 name = ''
             }
 
-            if (mail.trim().length == 0){
+            if (mail.trim().length === 0){
                 return null;
             }
 
-            var mm = $.trim(mail.toLowerCase());
+            var mm = Em.$.trim(mail.toLowerCase());
 
             if (mm.length > 0) {
 

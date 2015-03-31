@@ -193,6 +193,7 @@ class Photo(ndb.Model):
     class RESTMeta:
 
         excluded_properties = ['blob','gs']
+        excluded_input_properties = ['filename','md5','uploaded','modified','width','height','metadata']
 
 
     title = ndb.StringProperty(indexed=False)
@@ -202,24 +203,23 @@ class Photo(ndb.Model):
     pos = ndb.StringProperty()
 
     #Read only
-    filename = ndb.StringProperty(required=True)
-    md5 = ndb.StringProperty(required=True)
-    taken = ndb.DateTimeProperty()
+    filename = ndb.StringProperty(required=True,indexed=False)
+    md5 = ndb.StringProperty(required=True,indexed=False)
 
-    uploaded = ndb.DateTimeProperty(auto_now_add=True)
-    modified = ndb.DateTimeProperty(auto_now=True)
+    uploaded = ndb.DateTimeProperty(auto_now_add=True,indexed=False)
+    modified = ndb.DateTimeProperty(auto_now=True,indexed=False)
 
-    width = ndb.IntegerProperty(required=True)
-    height = ndb.IntegerProperty(required=True)
-    metadata = ndb.JsonProperty()
+    width = ndb.IntegerProperty(required=True,indexed=False)
+    height = ndb.IntegerProperty(required=True,indexed=False)
+    metadata = ndb.JsonProperty(indexed=False)
 
 
     #Other data
-    blob = ndb.BlobKeyProperty()
-    gs = ndb.StringProperty()
+    blob = ndb.BlobKeyProperty(indexed=False)
+    gs = ndb.StringProperty(indexed=False)
     album = ndb.KeyProperty(Album)
 
-    serving_url = ndb.StringProperty()
+    serving_url = ndb.StringProperty(indexed=False)
 
     @property
     def _blobinfo(self):

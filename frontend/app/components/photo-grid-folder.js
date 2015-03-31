@@ -1,4 +1,5 @@
 import Em from 'ember';
+/* global Big */
 
 export default Em.Component.extend({
     tagName: 'div',
@@ -14,7 +15,7 @@ export default Em.Component.extend({
             h = sz[1];
 
         if (Em.isNone(this.$())){
-            return
+            return;
         }
 
         this.$().css({
@@ -57,8 +58,8 @@ export default Em.Component.extend({
 
             var photos = this.get('album.selected'),
                 dest = this.get('album')._arrangedContent(folder.get('path')),
-                interval = Big(0.1),
-                max = Big(0);
+                interval = new Big(0.1),
+                max = new Big(0);
 
             dest.forEach(function(_){
                 var p = new Big(_.get('pos'));
@@ -67,7 +68,7 @@ export default Em.Component.extend({
                 }
             });
 
-            console.log('moving',photos.length, 'photos to dest folder with',dest.length,'photos and max pos of',max.toString());
+            //console.log('moving',photos.length, 'photos to dest folder with',dest.length,'photos and max pos of',max.toString());
 
             Em.run(function(){
                 photos.forEach(function(p){
@@ -75,11 +76,11 @@ export default Em.Component.extend({
                     p.set('path',folder.get('path'));
                     p.set('pos',max.toString());
                 });
-            })
+            });
 
         } else {
             photo.set('path',folder.get('path'));
-            console.log('one photo moved to',folder.get('path'));
+            //console.log('one photo moved to',folder.get('path'));
         }
 
     }

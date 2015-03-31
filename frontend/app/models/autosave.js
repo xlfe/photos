@@ -33,11 +33,11 @@ export default Em.Mixin.create({
 
     _save_me: function () {
         var _this = this;
-        this.set('saving', true);
+        this.set('_saving', true);
         this.save().then(function () {
             //To allow the transition to take effect
             setTimeout(function(){
-                _this.set('saving', false);
+                _this.set('_saving', false);
             },500);
         });
     },

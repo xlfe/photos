@@ -12,7 +12,7 @@ export default Em.Component.extend({
     tagName: 'div',
     classNameBindings: [
         ':photo',
-        'photo.saving:saving',
+        'photo._saving:saving',
         'highlight-right:',
         'highlight-left:',
         'photo.selected:selected',
@@ -71,11 +71,16 @@ export default Em.Component.extend({
                 });
             });
 
-        this.$().css({
+        var style = {
             height: h + 'px',
-            width: w + 'px',
-            'background-image': 'url(' + url + ')'
-        });
+            width: w + 'px'
+        };
+
+        if (!Em.isNone(url)){
+            style['background-image'] = 'url(' + url + ')';
+        }
+
+        this.$().css(style);
 
     }.observes('photo.display_sz').on('didInsertElement'),
     dragStart: function () {
@@ -123,8 +128,7 @@ export default Em.Component.extend({
         }
 
 
-        var
-            idx_p = album.indexOf(photo),
+        var idx_p = album.indexOf(photo),
             idx_t = album.indexOf(target),
 
             lower = null,
@@ -199,7 +203,7 @@ export default Em.Component.extend({
                 }
 
                 if (nomove === true){
-                    console.log('dropped a continuous selection inside itself')
+                    //console.log('dropped a continuous selection inside itself')
                     return;
                 }
             }

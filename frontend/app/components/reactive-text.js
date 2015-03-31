@@ -11,7 +11,7 @@ export default Em.TextField.extend({
             additional = 0,
             transition = 0,
             photoHeight = me.parent('.photo').outerHeight(),
-            y = self.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+            y = document.documentElement.scrollTop || document.body.scrollTop;
 
         if ((photoHeight) < ypHeight) {
             additional = (ypHeight - photoHeight) / 5;
@@ -22,18 +22,16 @@ export default Em.TextField.extend({
         } else {
             if (y < photoTop - ypTop - additional) {
 
-                $('html,body').animate(
+                Em.$('html,body').animate(
                     {
                         scrollTop: photoTop - ypTop - additional
                     },
                     400);
             } else {
 
-                $('html,body').animate(
-                    {
+                Em.$('html,body').animate({
                         scrollTop: photoTop - ypTop - additional
-                    },
-                    transition);
+                    },transition);
             }
 
         }

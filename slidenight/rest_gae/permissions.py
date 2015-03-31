@@ -21,9 +21,6 @@ class Permissions(ndb.Model):
             'DELETE': lambda x: x.delete is True
         }
 
-        allowed = False
-
-
         for perm in perms:
             if user is None and perm.user is not None:
                 continue
@@ -33,16 +30,16 @@ class Permissions(ndb.Model):
 
             if method in req_method:
                 if req_method[method](perm) is True:
-                    allowed = True
+                    return True
 
         for perm in perms:
             if perm.user is None:
 
                 if method in req_method:
                     if req_method[method](perm) is True:
-                        allowed = True
+                        return True
 
-        return allowed
+        return False
 
 class Permission(object):
 

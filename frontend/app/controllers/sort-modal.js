@@ -1,4 +1,5 @@
 import Em from 'ember';
+/* global Big */
 
 
 var naturalSort = function(a, b) {
@@ -97,6 +98,7 @@ export default Em.Controller.extend({
                 min = new Big(0.1),
                 max = new Big(0.9),
                 sorter = Em.ArrayController.create(),
+                saved = 0,
                 interval = max.minus(min).div(photos.length);
 
             Em.run(function(){
@@ -110,7 +112,13 @@ export default Em.Controller.extend({
                 sorter.set('content',photos);
 
                 sorter.get('arrangedContent').forEach(function (_) {
+                    _.set('_saving',true);
                     _.set('pos', min.toString());
+                    _.save().then(function(_p){
+                        saved +=1;
+                        _p.set('_saving',false);
+                    });
+
                     min = min.add(interval);
                 });
             });
