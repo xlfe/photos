@@ -59,14 +59,28 @@ export default Em.Controller.extend({
         return _invites;
 
     }.property('invites'),
-    saved_invites: function() {
+    view_only: true,
+    saved_invites: function () {
         var id = this.get('model.id'),
-            invites = this.get('store').filter('invite',function(i){
-            return i.get('album') === id;
-        });
+            _this = this,
+            invites = this.get('store').filter('invite', function (i) {
+                return i.get('album') === id;
+            });
 
-        this.get('store').find('invite',{
-            'q': "album=KEY('" + id + "')"
+
+        new Em.RSVP.Promise(function(resolve,reject){
+
+            _this.get('store').find('invite', {
+                'q': "album=KEY('" + id + "')"
+            }).then(function () {
+                "use strict";
+                _this.set('view_only', false);
+                resolve();
+
+            }, function (response) {
+                _this.set('view_only', true);
+                reject();
+            });
         });
         return invites;
 
@@ -133,6 +147,10 @@ export default Em.Controller.extend({
             perms.removeObject(perm);
             this.get('model').save();
 
+        },
+        error: function(){
+            "use strict";
+            return false;
         }
     }
 

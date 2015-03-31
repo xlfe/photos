@@ -21,6 +21,8 @@ class Permissions(ndb.Model):
             'DELETE': lambda x: x.delete is True
         }
 
+        allowed = False
+
 
         for perm in perms:
             if user is None and perm.user is not None:
@@ -30,9 +32,17 @@ class Permissions(ndb.Model):
                 continue
 
             if method in req_method:
-                return req_method[method](perm)
+                if req_method[method](perm) is True:
+                    allowed = True
 
-        return False
+        for perm in perms:
+            if perm.user is None:
+
+                if method in req_method:
+                    if req_method[method](perm) is True:
+                        allowed = True
+
+        return allowed
 
 class Permission(object):
 
@@ -78,8 +88,8 @@ class PermissionAlbum(PermissionObjectOwner):
         owner_property = getattr(model, self._get_owner_property(model))
         permissions_property = getattr(model, 'permissions')
         p = Permissions(user=user.key,view=True)
-        logging.info(p)
-        return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p))
+        n = Permissions(user=None,view=True)
+        return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p,permissions_property == n))
 
     #They can only modify objects they own
     def post_validate(self, method, model, user=None):

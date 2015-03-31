@@ -54,7 +54,7 @@ export default Em.Object.extend({
         }
 
         this.set('no_edit', obj['edit'] === false);
-        obj['user'] = 'ag9kZXZ-c2xpZGUtbmlnaHRyEQsSBFVzZXIYgICAgICA2AoM';//this.get('user')
+        obj['user'] = this.get('user');
 
         if (Em.isNone(obj.user) === true) {
             this.set('_user', {

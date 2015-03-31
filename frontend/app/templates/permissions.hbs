@@ -1,6 +1,11 @@
 <div class="container">
     <h3>
-        Edit permissions for
+        {{#if controller.view_only}}
+
+            View permissions for
+        {{else}}
+            Edit permissions for
+        {{/if}}
         {{#link-to 'album' model.id}}
             <strong>
                 {{model.name}}
@@ -11,20 +16,22 @@
 
     <form class="form-horizontal" role="form">
 
-        <div class="form-group">
+        {{#unless controller.view_only}}
+            <div class="form-group">
 
-            <label class="col-sm-3 control-label">
-                Allow anyone to view the album?
-            </label>
+                <label class="col-sm-3 control-label">
+                    Allow anyone to view the album?
+                </label>
 
-            <div class="col-sm-9">
-                <div class="checkbox">
-                    <label {{action 'toggle_anon'}}>
-                        {{input type="checkbox" checked=allow_anon}} Anonymous Viewers
-                    </label>
+                <div class="col-sm-9">
+                    <div class="checkbox">
+                        <label {{action 'toggle_anon'}}>
+                            {{input type="checkbox" checked=allow_anon}} Anonymous Viewers
+                        </label>
+                    </div>
                 </div>
             </div>
-        </div>
+        {{/unless}}
 
         {{#if allow_anon}}
 
@@ -52,7 +59,11 @@
     <hr>
 
     <h4>
-        Manage User Permissions
+        {{#if controller.view_only}}
+            View User Permissions
+        {{else}}
+            Manage User Permissions
+        {{/if}}
     </h4>
 
     <table class="table table-hover">
@@ -87,13 +98,18 @@
                     <td>
                         {{perm._user.full_name}}
                     </td>
-                    {{check-box save="save" value=perm.view}}
-                    {{check-box save="save" value=perm.edit}}
-                    {{check-box save="save" value=perm.move}}
-                    {{check-box save="save" value=perm.upload}}
-                    {{check-box save="save" value=perm.delete}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.view}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.edit}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.move}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.upload}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.delete}}
                     <td></td>
-                    <td class="check-box" {{action 'remove' perm}}><i class="fa fa-trash"></i></td>
+
+                    {{#if controller.view_only}}
+                        <td></td>
+                    {{else}}
+                        <td class="check-box" {{action 'remove' perm}}><i class="fa fa-trash"></i></td>
+                    {{/if}}
                 {{/if}}
             </tr>
         {{/each}}
@@ -145,7 +161,7 @@
 
                         <a title="Send the invite email again" {{action 'send_again' perm}} class="check-box">
 
-                        Send again <i class="fa fa-forward"></i>
+                            Send again <i class="fa fa-forward"></i>
                         </a>
 
                     </td>
@@ -156,54 +172,57 @@
         </table>
     {{/if}}
 
-    <hr>
-    <h4>
-        Invite people to collaborate
-    </h4>
+    {{#unless controller.view_only}}
 
-    <p>
-        Paste their emails below
+        <hr>
+        <h4>
+            Invite people to collaborate
+        </h4>
 
-    </p>
+        <p>
+            Paste their emails below
 
-    {{textarea value=controller.invites class="email-input col-lg-5"}}
+        </p>
 
-    {{#if controller.invite_list}}
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>Email</th>
-                <th>View</th>
-                <th>Edit</th>
-                <th>Move</th>
-                <th>Upload</th>
-                <th>Delete</th>
-            </tr>
-            </thead>
-            <tbody>
+        {{textarea value=controller.invites class="email-input col-lg-5"}}
 
-            {{#each perm in controller.invite_list}}
+        {{#if controller.invite_list}}
+            <table class="table table-hover">
+                <thead>
                 <tr>
-                    <td class="col-sm-4">
-                        {{perm.email}}
-                    </td>
-                    {{check-box value=perm.view}}
-                    {{check-box value=perm.edit}}
-                    {{check-box value=perm.move}}
-                    {{check-box value=perm.upload}}
-                    {{check-box value=perm.delete}}
+                    <th>Email</th>
+                    <th>View</th>
+                    <th>Edit</th>
+                    <th>Move</th>
+                    <th>Upload</th>
+                    <th>Delete</th>
                 </tr>
-            {{/each}}
-            <tr>
-                <td colspan="6" class="check-box" {{action 'send_invites'}}>
+                </thead>
+                <tbody>
 
-                    <i class="fa fa-lg fa-mail-forward"></i>
-                    Send invites
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    {{/if}}
+                {{#each perm in controller.invite_list}}
+                    <tr>
+                        <td class="col-sm-4">
+                            {{perm.email}}
+                        </td>
+                        {{check-box value=perm.view}}
+                        {{check-box value=perm.edit}}
+                        {{check-box value=perm.move}}
+                        {{check-box value=perm.upload}}
+                        {{check-box value=perm.delete}}
+                    </tr>
+                {{/each}}
+                <tr>
+                    <td colspan="6" class="check-box" {{action 'send_invites'}}>
 
+                        <i class="fa fa-lg fa-mail-forward"></i>
+                        Send invites
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        {{/if}}
+
+    {{/unless}}
 
 </div>
