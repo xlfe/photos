@@ -21,6 +21,9 @@ export default Ember.Route.extend(ApplicationRouteMixin, {
             if (error.status === 401) {
                 transition.abort()
                 return this.transitionTo('login');
+            } else {
+                transition.abort();
+                alert("Sorry - something went wrong!");
             }
             console.log(error);
             return false;

@@ -17,11 +17,18 @@ export default Em.Controller.extend({
         }
     }.property('model.permissions.@each'),
     actions: {
-        add_permission: function(){
-            "use strict";
+        invite_user: function(){
             //console.log(this.get('model'))
             //var  p = new perm;
             //this.get('model.permissions').pushObject(p);
+        },
+        save: function() {
+            var perms = this.get('model._resolved_permissions').map(function(p){console.log(p.object); return p.object;}),
+                _this = this;
+            this.set('model.permissions',perms);
+            Em.run.debounce(function(){
+                _this.get('model').save();
+            },2000);
         },
         toggle_anon: function() {
 
@@ -39,6 +46,15 @@ export default Em.Controller.extend({
             }
 
             this.get('model').save();
+        },
+        remove: function(_perm) {
+            var user  = _perm.get('user'),
+                perms = this.get('model.permissions'),
+                perm = perms.findBy('user',user);
+
+            perms.removeObject(perm);
+            this.get('model').save();
+
         }
     }
 

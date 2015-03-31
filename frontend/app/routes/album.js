@@ -76,13 +76,11 @@ export default Em.Route.extend({
     actions: {
         error: function(error,transition) {
 
-            if (error.status == 401) {
-                alert('Sorry you do not have permission to view that album');
+            alert('Sorry you do not have permission to view that album');
 
-                transition.abort();
-                this.transitionTo('login')
-            }
-            console.log(error);
+            transition.abort();
+            this.transitionTo('login')
+            return false;
 
         }
     }

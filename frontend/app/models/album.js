@@ -11,20 +11,22 @@ export default DS.Model.extend(autosave,{
     owner: DS.belongsTo('user', {async:true}),
     permissions: DS.attr('list'),
 
-    resolved_permissions: function() {
+    _resolved_permissions: function() {
         var _this = this;
 
-        var perms = this.get('permissions').map(function(p){
+        return this.get('permissions').map(function (p) {
                 var _p = perm.create().load(p);
 
-                if (!Em.isNone(_p.get('user'))){
-                    _p.set(_this.store.find('user',_p.get('user')))
+                if (!Em.isNone(_p.get('user'))) {
+                    _p.set(_this.store.find('user', _p.get('user')))
                 }
 
                 return _p;
-            }),
-            owner = this.get('owner');
+            });
 
+    }.property('permissions.@each'),
+    resolved_permissions: function() {
+        var owner = this.get('owner');
 
         return [perm.create().load({
             view: true,
@@ -35,7 +37,7 @@ export default DS.Model.extend(autosave,{
             owner: true,
             user: this.get('owner.id'),
             _user: owner
-        })].concat(perms);
+        })].concat(this.get('_resolved_permissions'));
 
     }.property('permissions.@each'),
     //Self generated

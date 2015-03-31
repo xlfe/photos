@@ -26,7 +26,6 @@
             </div>
         </div>
 
-
         {{#if allow_anon}}
 
             <div class="form-group">
@@ -71,42 +70,30 @@
 
         {{#each perm in model.resolved_permissions}}
             <tr>
-                <td>
-                    {{perm._user.full_name}}
-                </td>
-                <td>
-                    {{#if perm.view}}
-                        <i class="fa fa-check"></i>
-                    {{/if}}
-                </td>
-                <td>
-                    {{#if perm.edit}}
-                        <i class="fa fa-check"></i>
-                    {{/if}}
-                </td>
-                <td>
-                    {{#if perm.move}}
-                        <i class="fa fa-check"></i>
-                    {{/if}}
-                </td>
-                <td>
-                    {{#if perm.upload}}
-                        <i class="fa fa-check"></i>
-                    {{/if}}
-                </td>
-                <td>
-                    {{#if perm.delete}}
-                        <i class="fa fa-check"></i>
-                    {{/if}}
-                </td>
-                <td>
-                    {{#if perm.owner}}
-                        <i class="fa fa-check"></i>
-                    {{/if}}
-                </td>
-                <td></td>
+                {{#if perm.owner}}
+                    <td>
+                        {{perm._user.full_name}}
+                    </td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td></td>
+                {{else}}
+                    <td>
+                        {{perm._user.full_name}}
+                    </td>
+                    {{check-box save="save" value=perm.view}}
+                    {{check-box save="save" value=perm.edit}}
+                    {{check-box save="save" value=perm.move}}
+                    {{check-box save="save" value=perm.upload}}
+                    {{check-box save="save" value=perm.delete}}
+                    <td></td>
+                    <td class="check-box" {{action 'remove' perm}}><i class="fa fa-trash"></i></td>
+                {{/if}}
             </tr>
-
         {{/each}}
         <tr>
             <td>

@@ -213,7 +213,6 @@ export default Em.Controller.extend({
                 }
             });
 
-        console.log(perms[0]);
 
         return perms[0];
 
