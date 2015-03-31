@@ -8,6 +8,10 @@ var Folder = Em.Object.extend({
     is_folder: true
 });
 
+RegExp.quote = function(str) {
+    return (str+'').replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+};
+
 
 function below_folder(path, folder) {
     if (folder.length === 0){
@@ -16,7 +20,7 @@ function below_folder(path, folder) {
     if (Em.isNone(path)){
         return false;
     }
-    return path.match('^' + folder + '(/.*)?$') !== null;
+    return path.match('^' + RegExp.quote(folder)+ '(/.*)?$') !== null;
 }
 
 if (typeof String.prototype.startsWith !== 'function') {
@@ -60,7 +64,7 @@ export default Em.Controller.extend({
 
         var photos = this.get('model.photos').filter(function (_) {
             var photo_path = _.get('path') || '';
-            return photo_path.match('^' + path + '$') !== null;
+            return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
 
         }).sort(sort_pos);
 
@@ -117,7 +121,7 @@ export default Em.Controller.extend({
                 name: k,
                 path: cp.length > 0 ? cp + '/' + k : k,
                 images: photos.filter(function (_) {
-                    return below_folder(_.get('path'), k);
+                    return below_folder(_.get('path'), cp.length>0? cp + '/' +k:k);
                 })
             });
         });
