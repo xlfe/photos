@@ -7,9 +7,11 @@ import os
 import json
 from rest_gae.rest_gae import RESTException,BaseRESTHandler
 from rest_gae.permissions import Permissions
+from deferred_tasks import send_email
 
 from webapp2_extras import security
 
+DOMAIN = "https://slide-night.appspot.com"
 HASHING_PW_PEPPER = 'jM3n/Ddp)&QY)R/kcDqzG[4?"C80v8SPSM#We}_x*V[JsQ>$C)7#6WN=XqUZ=RiYeGJ$})nj(B#x$e/K-I>o'
 PW_SALT_LENGTH = 30
 
@@ -111,7 +113,6 @@ class LoginHandler(BaseRESTHandler):
 class Album(ndb.Model):
 
     class RESTMeta:
-
         user_owner_property = 'owner'
 
     name = ndb.StringProperty()
@@ -124,11 +125,66 @@ class Album(ndb.Model):
 
 class Invite(ndb.Model):
 
+    class RESTMeta:
+
+        user_owner_property = 'owner'
+
     email = ndb.StringProperty()
-    last_emailed = ndb.DateTimeProperty(auto_now=True)
+    last_emailed = ndb.DateTimeProperty()
     album = ndb.KeyProperty(Album)
-    invited_by = ndb.KeyProperty(User)
-    permission = ndb.StructuredProperty(Permissions)
+    permissions = ndb.StructuredProperty(Permissions)
+    owner = ndb.KeyProperty(User)
+
+
+    @staticmethod
+    def after_put_callback(updated_keys,model):
+
+        template = "{from} has invited you to collaborate on their SlideNight album '{album}'.\n\n" +\
+                "Please click on the link below to access their album:\n" +\
+                DOMAIN + "/invites/{invite}\n\n\n" +\
+                "Regards,\nThe SlideNight Team"
+
+        album = model.album.get()
+        owner = model.owner.get()
+        data = {
+            'from':owner.full_name,
+            'album':album.name,
+            'invite':model.key.urlsafe()
+        }
+        _template = template.format(**data)
+
+        send_email(to=model.email,subject="{} has invited you to collaborate".format(owner.full_name),body=_template)
+
+        return model
+
+
+class ClaimHandler(BaseRESTHandler):
+    permissions = {'OPTIONS':True,'POST':True}
+
+    def post(self):
+
+        json_data = json.loads(self.request.body)
+        user = ndb.Key('User',self.session['user']).get()
+        assert user is not None
+
+        invite = ndb.Key(urlsafe=json_data['invite']).get()
+        assert invite is not None
+        assert invite._get_kind() == 'Invite'
+
+        album = invite.album.get()
+
+        if user.key == album.owner:
+            return self.error({'message':'The owner cannot claim the invite'})
+
+        invite.permissions.user = user.key
+        logging.info(invite.permissions)
+        album.permissions.append(invite.permissions)
+        album.put()
+        invite.key.delete()
+
+        return self.success({'message':'success'})
+
+
 
 
 

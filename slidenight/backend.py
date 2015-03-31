@@ -12,7 +12,6 @@ from google.appengine.api import images
 import httplib2
 from oauth2client.appengine import AppAssertionCredentials
 
-
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
 config = {
@@ -20,8 +19,6 @@ config = {
         'secret_key': 'sfidosuiofasuidoaufsodfsa*U(#&*(@#8382938'
     }
 }
-
-
 
 def allow_crosssite(response,origin='*'):
     response.headers['access-control-allow-origin'] = origin
@@ -167,13 +164,14 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
 ALLOWED_ORIGIN = '*'
 
-
 app = webapp2.WSGIApplication([
         webapp2.Route('/api/prepare-upload',PrepareUpload),
         webapp2.Route('/api/finalize-upload',GCSFinalizeHandler),
         webapp2.Route('/api/upload',UploadHandler),
         webapp2.Route('/api/login',LoginHandler),
+        webapp2.Route('/api/claim',ClaimHandler),
 
+        RESTHandler('/api/invites', Invite, permissions=PERM_APPLY(PERMISSION_INVITE),after_post_callback=Invite.after_put_callback,after_put_callback=Invite.after_put_callback,allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/register',User,   permissions=REGISTER_PERMISSIONS,        before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/users',   User,   permissions=ANON_VIEWER,                 allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/photos',  Photo,  permissions=PERM_APPLY(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,after_delete_callback=Photo.after_delete),

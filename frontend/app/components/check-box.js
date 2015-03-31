@@ -2,9 +2,13 @@ import Em from 'ember';
 
 export default Em.Component.extend({
     tagName: 'td',
-    classNames: 'check-box',
+    classNameBindings: 'disabled::check-box',
     click: function(){
-        var _this = this;
+        var _this = this,
+            disabled = this.get('disabled');
+        if (disabled === true){
+            return;
+        }
         this.toggleProperty('value');
         Em.run.later(function(){
             _this.sendAction('save');

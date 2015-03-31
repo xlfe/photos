@@ -17,10 +17,9 @@ export default DS.Model.extend(autosave,{
         return this.get('permissions').map(function (p) {
                 var _p = perm.create().load(p);
 
-                if (!Em.isNone(_p.get('user'))) {
-                    _p.set(_this.store.find('user', _p.get('user')))
-                }
-
+            if (!Em.isNone(p.user)) {
+                _p.set('_user',_this.store.find('user', p.user));
+            }
                 return _p;
             });
 

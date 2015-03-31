@@ -1,15 +1,13 @@
 from google.appengine.ext import ndb
 
-
 class Permissions(ndb.Model):
-
-    user = ndb.KeyProperty('User')
 
     view = ndb.BooleanProperty()
     edit = ndb.BooleanProperty()
     move = ndb.BooleanProperty()
     upload = ndb.BooleanProperty()
     delete = ndb.BooleanProperty()
+    user = ndb.KeyProperty()
 
 
     @classmethod
@@ -79,7 +77,9 @@ class PermissionAlbum(PermissionObjectOwner):
     def apply_permissions_filter(self, query, model, user):
         owner_property = getattr(model, self._get_owner_property(model))
         permissions_property = getattr(model, 'permissions')
-        return query.filter(ndb.OR(owner_property == user.key,permissions_property == Permissions(user=user.key,view=True)))
+        p = Permissions(user=user.key,view=True)
+        logging.info(p)
+        return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p))
 
     #They can only modify objects they own
     def post_validate(self, method, model, user=None):
@@ -99,10 +99,10 @@ class PermissionAlbum(PermissionObjectOwner):
         return Permissions.check_user(model,method,user)
 
 import logging
-class PermissionPhoto(Permission):
+class AlbumQuery():
 
     # ...only query for photos that are in a album that they own or have been granted permission to view
-    def apply_permissions_filter(self, query, model, user):
+    def album_from_query(self, query):
 
         filter = None
 
@@ -114,16 +114,28 @@ class PermissionPhoto(Permission):
                 if check_type(f):
                     filter = get_val(f)
         except TypeError:
-            if check_type(query.filters):
-                filter = get_val(query.filters)
+            try:
+                if check_type(query.filters):
+                    filter = get_val(query.filters)
+            except AttributeError:
+                return None
 
         if filter is None:
-            logging.exception(query.filters)
             return None
 
         assert filter.kind() == 'Album'
         album = ndb.Key(urlsafe=str(filter)).get()
         assert album is not None,filter.__dict__
+        return album
+
+
+class PermissionPhoto(Permission,AlbumQuery):
+
+    def apply_permissions_filter(self, query, model, user):
+
+        album = self.album_from_query(query)
+        if album is None:
+            return None
 
         if Permissions.check_user(album,'GET',user):
             return query
@@ -133,12 +145,36 @@ class PermissionPhoto(Permission):
 
         return None
 
+class PermissionInvite(PermissionUser,AlbumQuery):
 
+    #only the album owner can query for the invites in an album
+    def apply_permissions_filter(self, query, model, user):
+        album = self.album_from_query(query)
+        if album is None:
+            return None
+
+        if album.owner != user.key:
+            return None
+
+        return query
+
+    #only the album owner can modify invites through the API
+    def post_validate(self, method, model, user):
+
+        album = model.album.get()
+        if album is None:
+            return False
+
+        if album.owner != user.key:
+            return False
+
+        return True
 
 PERMISSION_ANYONE = [PermissionAnyone()]
 PERMISSION_LOGGED_IN_USER = [PermissionUser()]
 PERMISSION_ALBUM = [PermissionAlbum()]
 PERMISSION_PHOTO = [PermissionPhoto()]
+PERMISSION_INVITE = [PermissionInvite()]
 
 REGISTER_PERMISSIONS = {
     'POST': PERMISSION_ANYONE

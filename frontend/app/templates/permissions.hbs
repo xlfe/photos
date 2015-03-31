@@ -49,14 +49,16 @@
 
     </form>
 
+    <hr>
+
     <h4>
-        Fine grained permissions
+        Manage User Permissions
     </h4>
 
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Name</th>
+            <th class="col-sm-4">Name</th>
             <th>View</th>
             <th>Edit</th>
             <th>Move</th>
@@ -95,24 +97,113 @@
                 {{/if}}
             </tr>
         {{/each}}
-        <tr>
-            <td>
-
-                <a href="" {{action 'add_permission'}}>
-                    <i class="fa fa-lg fa-plus"></i>
-                    Add user
-                </a>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
         </tbody>
     </table>
+
+
+
+
+
+
+    {{#if controller.saved_invites}}
+        <hr>
+        <h4>
+            Invites awaiting responses
+        </h4>
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>View</th>
+                <th>Edit</th>
+                <th>Move</th>
+                <th>Upload</th>
+                <th>Delete</th>
+                <th>Last emailed</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {{#each perm in controller.saved_invites}}
+                <tr>
+                    <td class="col-sm-4">
+                        {{perm.email}}
+                    </td>
+                    {{check-box disabled=true value=perm.view}}
+                    {{check-box disabled=true value=perm.edit}}
+                    {{check-box disabled=true value=perm.move}}
+                    {{check-box disabled=true value=perm.upload}}
+                    {{check-box disabled=true value=perm.delete}}
+                    <td>
+                        {{#if perm.last_emailed}}
+                            {{from-now perm.last_emailed}}
+                        {{else}}
+                            Never
+                        {{/if}}
+
+                        <a title="Send the invite email again" {{action 'send_again' perm}} class="check-box">
+
+                        Send again <i class="fa fa-forward"></i>
+                        </a>
+
+                    </td>
+                    <td class="check-box" {{action 'delete' perm}}><i class="fa fa-trash"></i></td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    {{/if}}
+
+    <hr>
+    <h4>
+        Invite people to collaborate
+    </h4>
+
+    <p>
+        Paste their emails below
+
+    </p>
+
+    {{textarea value=controller.invites class="email-input col-lg-5"}}
+
+    {{#if controller.invite_list}}
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>View</th>
+                <th>Edit</th>
+                <th>Move</th>
+                <th>Upload</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {{#each perm in controller.invite_list}}
+                <tr>
+                    <td class="col-sm-4">
+                        {{perm.email}}
+                    </td>
+                    {{check-box value=perm.view}}
+                    {{check-box value=perm.edit}}
+                    {{check-box value=perm.move}}
+                    {{check-box value=perm.upload}}
+                    {{check-box value=perm.delete}}
+                </tr>
+            {{/each}}
+            <tr>
+                <td colspan="6" class="check-box" {{action 'send_invites'}}>
+
+                    <i class="fa fa-lg fa-mail-forward"></i>
+                    Send invites
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {{/if}}
 
 
 </div>

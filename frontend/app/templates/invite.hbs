@@ -1,0 +1,22 @@
+<div class="container">
+
+    {{#unless session.isAuthenticated}}
+
+        <h3>
+            Hello and welcome to Slidenight!
+        </h3>
+
+        <h4>
+            You've reached this page because you have been invited to collaborate on a Slidenight album.
+        </h4>
+
+        <h4>
+            In order to continue (and access the album),
+            you'll need to {{#link-to 'login' (query-params do="register")}}register{{/link-to}}
+            or
+            {{#link-to 'login' (query-params do="login")}}login{{/link-to}}.
+        </h4>
+    {{/unless}}
+
+</div>
+

@@ -19,6 +19,8 @@
     "ember-hammer": "~1.0.0",
     "spark-md5": "~0.0.5",
     "big.js": "~3.0.1",
+    "moment-timezone": "~0.3.0",
+    "moment": "~2.9.0",
     "ember-simple-auth": "0.7.3"
   }
 }

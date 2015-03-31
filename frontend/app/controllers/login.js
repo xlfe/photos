@@ -23,10 +23,14 @@ export default Em.Controller.extend(LoginControllerMixin, {
             this.set('do', what);
         },
         authenticate: function () {
-            var _this = this;
+            var _this = this,
+                invite = this.get('session.invite');
 
             this._super().then(function () {
-                this.transition
+
+                if (Em.isNone(invite) === false){
+                    _this.transitionToRoute('invite',invite);
+                }
 
             }, function (error) {
                 _this.set('error', error.error);
@@ -46,7 +50,6 @@ export default Em.Controller.extend(LoginControllerMixin, {
                 data: JSON.stringify({user: data}),
                 dataType: 'json',
                 success: function (_data) {
-                    console.log(_data,data);
                     _this.set('identification', data['email'].toLowerCase());
 
                     _this.send('authenticate');

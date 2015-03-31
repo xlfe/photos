@@ -265,16 +265,22 @@ class BaseRESTHandler(webapp2.RequestHandler):
             except BadValueError, exc:
                 raise RESTException('Invalid "cursor" argument - %s' % self.request.GET.get('cursor'))
 
-        try:
-            (results, cursor, more_available) = query.fetch_page(limit, start_cursor=cursor)
-        except BadRequestError, exc:
-            # This happens when we're using an existing cursor and the other query arguments were messed with
-            raise RESTException('Invalid "cursor" argument - %s' % self.request.GET.get('cursor'))
+        if limit == BaseRESTHandler.DEFAULT_MAX_QUERY_RESULTS:
 
-        if not more_available:
-            cursor = None
+            results = query.fetch()
+            return (results,None)
 
-        return (results, cursor)
+        else:
+            try:
+                (results, cursor, more_available) = query.fetch_page(limit, start_cursor=cursor)
+            except BadRequestError, exc:
+                # This happens when we're using an existing cursor and the other query arguments were messed with
+                raise RESTException('Invalid "cursor" argument - %s' % self.request.GET.get('cursor'))
+
+            if not more_available:
+                cursor = None
+
+            return (results, cursor)
 
 
     def _order_query(self, query):

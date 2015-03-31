@@ -14,6 +14,9 @@ Router.map(function() {
         });
     });
     this.route('login');
+    this.resource('invites', function(){
+        this.resource('invite', {path: '/:invite_id'});
+    });
     this.resource('user', {path: ':user_id'});
 });
 
