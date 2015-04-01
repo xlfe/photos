@@ -100,13 +100,14 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         img.execute_transforms(parse_source_metadata=True)
 
         meta = img.get_original_metadata()
-        meta['FileModified']=params['lastModifiedDate']
+        meta['UploadFileModified']=params['lastModifiedDate']
+        meta['UploadOriginalPath']=params['path']
 
         first,last = Photo.allocate_ids(1,parent=album)
 
         photo = Photo(parent=album,
                       gs = blobstore_filename,
-                      title=params['name'],
+                      title='.'.join(params['name'].split('.')[:-1]),
                       path=params['path'],
                       pos='{0:f}'.format(float(first)/150000),
                       md5 = params['md5'],
@@ -139,12 +140,13 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         img.execute_transforms(parse_source_metadata=True)
 
         meta = img.get_original_metadata()
-        meta['FileModified']=self.request.get('lastModifiedDate')
+        meta['UploadFileModified']=self.request.get('lastModifiedDate')
+        meta['UploadOriginalPath']=self.request.get('path')
 
         first,last = Photo.allocate_ids(1,parent=album)
         photo = Photo(parent=album,
             blob=blob_info.key(),
-            title=name,
+            title='.'.join(name.split('.')[:-1]),
             path=self.request.get('path'),
             pos='{0:f}'.format(float(first)/150000),
             filename=name,
