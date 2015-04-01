@@ -137,6 +137,10 @@ export default Em.Controller.extend({
             return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
                 sortProperties: ['pos'],
                 content: this.get('store').filter('photo',function(_){
+
+                    if (_.get('currentState.isLoading') === true || _.get('currentState.isDeleted') === true) {
+                        return false;
+                    }
                     var photo_path = _.get('path') || '';
                     if (path.length === 0 && photo_path.length===0){ return true;}
                     return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
