@@ -84,9 +84,12 @@ class PermissionAlbum(PermissionObjectOwner):
     def apply_permissions_filter(self, query, model, user):
         owner_property = getattr(model, self._get_owner_property(model))
         permissions_property = getattr(model, 'permissions')
-        p = Permissions(user=user.key,view=True)
-        n = Permissions(user=None,view=True)
-        return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p,permissions_property == n))
+
+        if user:
+            p = Permissions(user=user.key,view=True)
+            return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p))
+
+        return False
 
     #They can only modify objects they own
     def post_validate(self, method, model, user=None):
