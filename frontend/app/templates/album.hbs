@@ -19,14 +19,23 @@
 
         {{#unless folders}}
             {{#unless arrangedContent}}
-                {{#if controller.permissions.upload}}
+                {{#if controller._search}}
                     <div class="box-middle-center">
-                    <span>
-                        No photos found - would you like to
-                        <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
-                            upload some photos</a>?
-                    </span>
+                        <span>
+                            No photos found - enter search terms at the top of the screen.
+                        </span>
                     </div>
+                {{else}}
+
+                    {{#if controller.permissions.upload}}
+                        <div class="box-middle-center">
+                        <span>
+                            No photos found - would you like to
+                            <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+                                upload some photos</a>?
+                        </span>
+                        </div>
+                    {{/if}}
                 {{/if}}
             {{/unless}}
         {{/unless}}

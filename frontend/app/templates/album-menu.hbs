@@ -1,55 +1,60 @@
 <ul class="nav navbar-nav">
+    {{#unless controller._search}}
 
-    {{#link-to "album" model (query-params path=null) tagName="li" class="menu-link" tabindex="-1"}}
-        <a>
-            <strong>
-                {{controller.model.name}}
-            </strong>
+        {{#link-to "album" model (query-params path=null) tagName="li" class="menu-link" tabindex="-1"}}
+            <a>
+                <strong>
+                    {{controller.model.name}}
+                </strong>
+            </a>
+        {{/link-to}}
+
+        {{#each p in breadcrumbs}}
+            {{#link-to "album" model (query-params path=p.path) tagName="li" class="menu-link lbread" tabindex="-1"}}
+                <a>
+                    {{p.name}}
+                </a>
+            {{/link-to}}
+        {{/each}}
+
+    <li class="menu-link">
+        <a href="#" title="Open search mode" {{action 'search'}} tabindex="-1">
+            <i class="fa fa-search fa-lg"></i>
         </a>
-    {{/link-to}}
-
-    {{#each p in breadcrumbs}}
-        {{#link-to "album" model (query-params path=p.path) tagName="li" class="menu-link" tabindex="-1"}}
-            <a>
-                > {{p.name}}
-            </a>
-        {{/link-to}}
-    {{/each}}
-
-    {{#if controller.permissions.move}}
-
-        <li class="menu-link">
-            <a href="#" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
-                <i class="fa fa-lg fa-sort"></i>
-                Sort
-            </a>
-        </li>
-    {{/if}}
-
-    {{#if controller.permissions.upload}}
+    </li>
+    {{else}}
 
 
         <li class="menu-link">
-            <a href="#" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
-                <i class="fa fa-lg fa-upload"></i>
-                Upload
+            <a href="#" title="Cancel search mode" {{action 'search'}} tabindex="-1">
+                <i class="fa fa-close fa-lg"></i>
             </a>
         </li>
 
-    {{/if}}
-
-    {{#if controller.permissions.owner}}
-
-        {{#link-to "permissions" model.id tagName="li" class="menu-link" tabindex="-1"}}
-            <a>
-
-                <i class="fa fa-users fa-lg"></i>
-                Permissions
+        <li class="menu-link">
+            <a tabindex="-1" class="head-input">
+                {{input class="form-control" type="text" value=controller.search}}
             </a>
-        {{/link-to}}
+        </li>
 
-    {{/if}}
-    {{#if controller.selected}}
+        {{#each sp in controller.search_paths}}
+
+        <li class="menu-link">
+            <a title="Remove search param" {{action 'remove_search_path' sp}} href="#">
+
+                <i class="fa fa-search fa-lg"></i>
+                {{sp.name}}
+            </a>
+
+        </li>
+        {{/each}}
+
+    {{/unless}}
+</ul>
+<ul class="nav navbar-nav navbar-right">
+
+    {{#unless controller.selected}}
+    {{else}}
         <li class="menu-link">
             <a href="#" title="Clear the current selection" {{action 'cancel_selection'}} tabindex="-1">
 
@@ -71,9 +76,6 @@
         {{#if controller.permissions.delete}}
             <li class="menu-link">
                 <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
-                    {{#if controller.progress_delete}}
-                        <i class="fa fa-spinner fa-spin fa-lg"></i>
-                    {{/if}}
                     <i class="fa fa-trash fa-lg"></i>
                     {{#if controller.confirm_delete}}
 
@@ -88,21 +90,54 @@
 
         {{/if}}
 
-    {{/if}}
-</ul>
+    {{/unless}}
 
-<ul class="nav navbar-nav navbar-right">
 
-    <li class="menu-link pull-right slider">
-        <a tabindex="-1">
+
+    <li class="menu-link">
+        <a tabindex="-1" title="Select all photos in folder" {{action 'select_all'}}>
             {{#if model.more_results}}
                 <i class="fa fa-spin fa-spinner"></i>
             {{/if}}
             <span>
-                {{model.photos.length}} Photos
+                {{model.photos.length}} photos - ({{controller.arrangedContent.length}} in folder)
             </span>
+        </a>
+    </li>
 
-            <div class="spacer"></div>
+    {{#if controller.permissions.move}}
+
+        <li class="menu-link">
+            <a href="#" title="Sort photos in this folder" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
+                <i class="fa fa-lg fa-sort"></i>
+            </a>
+        </li>
+    {{/if}}
+
+    {{#if controller.permissions.upload}}
+
+
+        <li class="menu-link">
+            <a href="#" title="Upload" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
+                <i class="fa fa-lg fa-upload"></i>
+            </a>
+        </li>
+
+    {{/if}}
+
+    {{#if controller.permissions.owner}}
+
+        {{#link-to "permissions" model.id tagName="li" title="Album permissions" class="menu-link" tabindex="-1"}}
+            <a>
+                <i class="fa fa-users fa-lg"></i>
+            </a>
+        {{/link-to}}
+
+    {{/if}}
+
+
+    <li class="menu-link slider">
+        <a>
             <span {{action 'smaller'}}class="fa fa-image" tabindex="-1"></span>
             {{input type="range" min=150 max=800 steps=50 value=minHeight tabindex="-1"}}
             <span {{action 'larger'}} class="fa fa-image fa-2x" tabindex="-1"></span>

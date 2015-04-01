@@ -10,9 +10,8 @@ export default Em.Component.extend({
         'highlight:'
     ],
     setup: function() {
-        var sz = this.get('folder.display_sz'),
-            w = sz[0],
-            h = sz[1];
+        var w = this.get('folder.display_w'),
+            h = this.get('folder.display_h');
 
         if (Em.isNone(this.$())){
             return;
@@ -23,7 +22,7 @@ export default Em.Component.extend({
             width:  w + 'px'
         });
 
-    }.observes('folder','folder.display_sz').on('didInsertElement'),
+    }.observes('folder','folder.display_h').on('didInsertElement'),
     click: function() {
         this.sendAction('path',this.get('folder.path'));
     },

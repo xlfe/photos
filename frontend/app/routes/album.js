@@ -31,8 +31,9 @@ export default Em.Route.extend({
                 //query_params['limit'] = query_params['limit'] * 2;
 
                 store.find('photo',query_params).then(function(more){
-                    //album.get('photos.content').pushObjects(more.get('content'));
-                    get_more(album,more);
+                    Em.run.later(function(){
+                        get_more(album,more);
+                    });
                 });
             } else {
                 album.set('more_results',false);
@@ -59,8 +60,11 @@ export default Em.Route.extend({
                     store.find('photo', query_params).then(function (photos) {
                         if (Em.isEmpty(photos)){
                             album.set('more_results',false);
+                        } else {
+                            Em.run.later(function(){
+                                get_more(album,photos);
+                            });
                         }
-                        get_more(album,photos);
                     });
                 } else {
                     album.set('more_results',false);

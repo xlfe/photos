@@ -55,15 +55,15 @@ export default Em.Component.extend({
 
     },
     setup: function () {
-        var sz = this.get('photo.display_sz');
 
-        if (Em.isNone(sz)){
+        var w = this.get('photo.display_w'),
+            h = this.get('photo.display_h');
+
+        if (Em.isNone(w) || Em.isNone(h)){
             return;
         }
 
         var
-            w = sz[0],
-            h = sz[1],
             img = this.$(),
             url = this.get('photo').get_image(Math.max(w,h),function(full){
                 img.css({
@@ -82,7 +82,7 @@ export default Em.Component.extend({
 
         this.$().css(style);
 
-    }.observes('photo.display_sz').on('didInsertElement'),
+    }.observes('photo.display_h','photo.display_w').on('didInsertElement'),
     dragStart: function () {
         this.get('album').set('drag.photo',this.get('photo'));
     },

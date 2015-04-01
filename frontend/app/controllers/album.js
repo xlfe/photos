@@ -4,14 +4,56 @@ import Em from 'ember';
 var Folder = Em.Object.extend({
     height: 200,
     width: 300,
-    display_sz: [200,300],
+    display_h: 200,
+    display_w: 300,
     is_folder: true
 });
 
 RegExp.quote = function(str) {
-    return (str+'').replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+    //return (str+'').replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+    return (str+'').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 };
 
+var search_paths = [
+    {
+        name: 'Title',
+        path: 'title'
+    },
+    {
+        name: 'Filename',
+        path: '_filename'
+    }
+];
+
+function search_photo(_paths,term,_){
+    var words = term.split(' ').filter(function(w){return Em.$.trim(w).length >0}).map(function(w){
+            return new RegExp(RegExp.quote(w), "gi");
+        }),
+        match = 0,
+        search = null,
+        matched = 0;
+
+    _paths.forEach(function(sp) {
+        match = 0;
+        search = _.get(sp);
+
+        if (Em.$.trim(search).length === 0){
+            return;
+        }
+
+        words.forEach(function (w) {
+            if (search.match(w)) {
+                match += 1;
+            }
+        });
+
+        if (match === words.length){
+           matched +=1;
+        }
+    });
+
+        return matched > 0;
+}
 
 function below_folder(path, folder) {
     if (folder.length === 0){
@@ -58,12 +100,13 @@ export default Em.Controller.extend({
 
     }.on('init'),
     needs: ['application'],
-    _arrangedContent: function (path) {
+    _arrangedContent: function () {
 
-        path = path || '';
+        var path = this.get('path') || '';
 
         var photos = this.get('model.photos').filter(function (_) {
             var photo_path = _.get('path') || '';
+            if (path.length === 0 && photo_path.length===0){ return true;}
             return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
 
         }).sort(sort_pos);
@@ -71,9 +114,36 @@ export default Em.Controller.extend({
         return photos;
 
     },
-    arrangedContent: function(){
-        return this._arrangedContent(this.get('path'));
-    }.property('model.photos.@each.path','path','model.photos.@each.pos'),
+    arrangedContent: function() {
+        var path = this.get('path') || '',
+            _search = this.get('_search'),
+            search = this.get('search');
+
+        if (_search === true){
+            if (Em.isNone(search) || Em.$.trim(search).length === 0) {
+                return [];
+            }
+
+            var sp = this.get('search_paths').map(function(s){return s.path;});
+
+            return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+                sortProperties: ['path','pos'],
+                content: this.get('store').filter('photo',function(_){
+                    return search_photo(sp,search,_);
+                })
+            });
+
+        } else {
+            return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+                sortProperties: ['pos'],
+                content: this.get('store').filter('photo',function(_){
+                    var photo_path = _.get('path') || '';
+                    if (path.length === 0 && photo_path.length===0){ return true;}
+                    return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
+                })
+            });
+        }
+    }.property('path','_search','search','search_paths.length'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
             return _.get('selected') === true;
@@ -91,6 +161,10 @@ export default Em.Controller.extend({
 
     folders: function () {
         // Show all folders that have this path or below
+
+        if (this.get('_search') === true){
+            return [];
+        }
 
         var photos = this.get('model.photos');
 
@@ -116,7 +190,7 @@ export default Em.Controller.extend({
             }
         });
 
-        return Object.keys(folder_list).map(function (k) {
+        return Object.keys(folder_list).sort().map(function (k) {
             return Folder.create({
                 name: k,
                 path: cp.length > 0 ? cp + '/' + k : k,
@@ -125,7 +199,7 @@ export default Em.Controller.extend({
                 })
             });
         });
-    }.property('path', 'model.photos.@each.path'),
+    }.property('path', 'model.photos.@each.path','_search'),
     breadcrumbs: function () {
         var cp = this.get('path'),
             paths = [];
@@ -149,9 +223,11 @@ export default Em.Controller.extend({
 
         var w = Em.$('.your-photos').width(),
             cw = 0,
+            i=0,
             cr = [],
             min_height = +this.get('minHeight'), //Minimum height of each row in pixels
-            p = this.get('folders').concat(this.get('arrangedContent'));
+            f = this.get('folders'),
+            p = this.get('arrangedContent');
 
         //Sizing algorithm is choose a minimum row height, add images until
         // adding an additional image would be wider than the width of the element
@@ -174,20 +250,21 @@ export default Em.Controller.extend({
             row.forEach(function (__) {
                 var _width = calc_width(__) * scale,
                     _height = __.get('height') / __.get('width') * _width,
-                    existing = __.get('display_sz');
+                    existing_h = __.get('display_w'),
+                    existing_w = __.get('display_w');
 
                 //Only update the size if it has changed
-                if (Em.isPresent(existing)){
-                    if (existing[0] === _width && existing[1] === _height){
-                        return;
-                    }
+                if (existing_w === _width && existing_h === _height){
+                    return;
                 }
 
-                __.set('display_sz', [_width, _height]);
+                __.set('display_w', _width);
+                __.set('display_h', _height);
+
             });
         };
 
-        p.forEach(function (_) {
+        var scale = function (_) {
             var _width = calc_width(_);
 
             if (_width + cw <= w) {
@@ -199,7 +276,9 @@ export default Em.Controller.extend({
                 cr = [_];
                 cw = _width;
             }
-        });
+        };
+        f.forEach(scale);
+        p.forEach(scale);
 
         if (cr.length > 0) {
             scale_row(cr);
@@ -221,6 +300,7 @@ export default Em.Controller.extend({
         return perms[0];
 
     }.property('model.permissions.@each','session.isAuthenticated'),
+    _search: false,
     actions: {
         new_sort: function(){
             this.sort_by();
@@ -242,46 +322,57 @@ export default Em.Controller.extend({
                 _.set('selected',false);
             });
         },
+        select_all: function(){
+            if (Em.isEmpty(this.get('selected')) || this.get('selected.length') < this.get('arrangedContent.length')){
+                this.get('arrangedContent').forEach(function(_){
+                    _.set('selected',true);
+                })
+            } else {
+                this.send('cancel_selection');
+            }
+        },
+        search: function(){
+            this.set('search','');
+            this.set('search_paths',search_paths);
+            this.toggleProperty('_search');
+        },
+        remove_search_path: function(sp){
+            if (this.get('search_paths.length') === 1){
+                return;
+            }
+            this.get('search_paths').removeObject(sp);
+        },
         move_selection: function() {
 
             var selected=this.get('selected'),
+                i=0,
                 new_path = prompt('Please enter the new path for ' + selected.length + ' photos');
 
             if (Em.isNone(new_path)){
                 return;
             }
-            if (Em.$.trim(new_path).length ===0){
-                return;
-            }
 
-            Em.run(function(){
-                selected.forEach(function(p){
-                    "use strict";
-                    p.set('path',new_path);
-                });
+            selected.forEach(function (p) {
+                Em.run.later({p:p},function () {
+                    this.p.set('path', new_path);
+                },i*50);
+                i+=1;
             });
 
         },
         delete_selection: function() {
-            var _this=this;
+            var _this = this,
+                i = 0;
             if (Em.isPresent(this.get('confirm_delete'))) {
-
-                _this.set('progress_delete',true);
-                Em.RSVP.all(_this.get('selected').map(function (_) {
-                    _.deleteRecord();
-                    return new Em.RSVP.Promise(function(resolve,reject){
-                        _.save().then(function(){
-                            resolve();
-                        });
-                    });
-                })).then(function () {
-                    _this.set('progress_delete', false);
-                    _this.set('confirm_delete',undefined);
+                _this.get('selected').map(function (_) {
+                        _.deleteRecord();
+                    Em.run.later(function () {
+                        _.save();
+                    }, i * 20);
+                    i += 1;
                 });
             } else {
-
-                this.set('confirm_delete',true);
-
+                this.set('confirm_delete', true);
             }
         }
     }

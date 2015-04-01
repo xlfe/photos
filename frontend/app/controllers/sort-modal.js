@@ -98,8 +98,8 @@ export default Em.Controller.extend({
                 min = new Big(0.1),
                 max = new Big(0.9),
                 sorter = Em.ArrayController.create(),
-                saved = 0,
-                interval = max.minus(min).div(photos.length);
+                i=0,
+                interval = max.minus(min).div(photos.get('length'));
 
             Em.run(function(){
 
@@ -109,16 +109,23 @@ export default Em.Controller.extend({
                     sorter.set('sortFunction',naturalSort);
                 }
 
-                sorter.set('content',photos);
+                photos.forEach(function(p){
+                    sorter.pushObject(p);
+                });
+
+                photos.forEach(function(_){
+                    _.set('_saving', true);
+                });
 
                 sorter.get('arrangedContent').forEach(function (_) {
-                    _.set('_saving',true);
-                    _.set('pos', min.toString());
-                    _.save().then(function(_p){
-                        saved +=1;
-                        _p.set('_saving',false);
-                    });
 
+                    _.set('pos', min.toString());
+                    Em.run.later({_:_},function(){
+                        this._.save().then(function (_p) {
+                            _p.set('_saving', false);
+                        });
+                    },i*50);
+                    i = i+1;
                     min = min.add(interval);
                 });
             });

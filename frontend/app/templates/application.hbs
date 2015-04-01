@@ -35,7 +35,10 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a {{action 'invalidateSession'}} href="">Logout</a>
+                        <a title="Logout" {{action 'invalidateSession'}} href="#">
+                            <span class="spacer"></span>
+                            <i class="fa fa-sign-out fa-lg"></i>
+                            </a>
                     </li>
                 </ul>
             {{/if}}
