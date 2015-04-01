@@ -120,7 +120,7 @@ export default Em.Controller.extend({
             search = this.get('search');
 
         if (_search === true){
-            if (Em.isNone(search) || Em.$.trim(search).length === 0) {
+            if (Em.isNone(search) || Em.$.trim(search).length <3 ) {
                 return [];
             }
 
@@ -362,6 +362,7 @@ export default Em.Controller.extend({
         },
         delete_selection: function() {
             var _this = this,
+                del = this.get('selected.length'),
                 i = 0;
             if (Em.isPresent(this.get('confirm_delete'))) {
                 _this.get('selected').map(function (_) {
@@ -371,6 +372,10 @@ export default Em.Controller.extend({
                     }, i * 20);
                     i += 1;
                 });
+                Em.run.later(function(){
+                    _this.set('model.photo_count',_this.get('model.photo_count') - del);
+                    _this.get('model').save();
+                },i*20+100);
             } else {
                 this.set('confirm_delete', true);
             }

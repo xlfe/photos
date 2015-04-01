@@ -36,7 +36,7 @@ export default DS.Model.extend(autosave,{
 
 
     _filename: function(){
-        var i = this.get('filename');
+        var i = this.get('filename') ||'';
         return i.substr(0, i.lastIndexOf('.')) || i;
     }.property('filename'),
     get_image: function (req_long_edge,cb) {

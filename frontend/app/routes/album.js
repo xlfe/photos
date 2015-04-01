@@ -37,6 +37,7 @@ export default Em.Route.extend({
                 });
             } else {
                 album.set('more_results',false);
+                album.set('photo_count',album.get('photos.length'));
             }
 
         };
@@ -60,6 +61,7 @@ export default Em.Route.extend({
                     store.find('photo', query_params).then(function (photos) {
                         if (Em.isEmpty(photos)){
                             album.set('more_results',false);
+                            album.set('photo_count',0);
                         } else {
                             Em.run.later(function(){
                                 get_more(album,photos);
