@@ -45,7 +45,7 @@ export default DS.Model.extend(autosave,{
             fetched_long_edge = Math.min(+req_long_edge,+max_long_edge).toFixed(0),
             surl = this.get('serving_url') + '=s',
             id = this.get('id'),
-            cache = _cached[id],
+            cache = +_cached[id] + 0,
             image = new Image();
 
         if (req_long_edge === 0 || fetched_long_edge ===0 ){
@@ -54,16 +54,16 @@ export default DS.Model.extend(autosave,{
 
 
         var onload = function(){
-            _cached[id] = fetched_long_edge;
             _flight[id] = false;
             if (cb) {
                 cb(surl + fetched_long_edge);
             }
         };
 
-        if (Em.isNone(cache)){
+        if (cache == 0){
             //Nothing in cache
 
+            _cached[id] = fetched_long_edge;
             _flight[id] = true;
             image.onload = onload;
             image.src = surl + fetched_long_edge;
@@ -77,6 +77,7 @@ export default DS.Model.extend(autosave,{
             } else {
                 //Use currently cached image, fetch the larger version and then update _in_cache
                 _flight[id] = true;
+                _cached[id] = fetched_long_edge;
                 image.onload = onload;
                 image.src = surl + fetched_long_edge;
                 return surl + cache;

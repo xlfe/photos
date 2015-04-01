@@ -1,6 +1,8 @@
 /* global require, module */
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+var pickFiles = require('broccoli-static-compiler');
+
 
 var app = new EmberApp();
 
@@ -38,6 +40,9 @@ app.import('bower_components/hammerjs/hammer.js');
 app.import('bower_components/ember-hammer/ember-hammer.js');
 
 
+var static = pickFiles('static/', {
+    srcDir: '/',
+    destDir: '/static'
+});
 
-
-module.exports = app.toTree();
+module.exports = app.toTree([static]);
