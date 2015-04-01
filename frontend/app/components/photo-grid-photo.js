@@ -25,7 +25,7 @@ export default Em.Component.extend({
     }.property('_idx'),
     draggable: function() {
 
-        if (this.get('album.permissions.move') !== true){
+        if (this.get('album.permissions.sort') !== true){
             return false;
         }
 
@@ -35,7 +35,7 @@ export default Em.Component.extend({
 
         return false;
 
-    }.property('photo.selected','selection_mode','album.permissions.move'),
+    }.property('photo.selected','selection_mode','album.permissions.sort'),
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),

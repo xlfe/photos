@@ -4,6 +4,8 @@ class Permissions(ndb.Model):
 
     view = ndb.BooleanProperty()
     edit = ndb.BooleanProperty()
+    comment = ndb.BooleanProperty()
+    sort = ndb.BooleanProperty()
     move = ndb.BooleanProperty()
     upload = ndb.BooleanProperty()
     delete = ndb.BooleanProperty()

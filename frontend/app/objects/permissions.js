@@ -23,10 +23,12 @@ var _relies_on = function (vals) {
 export default Em.Object.extend({
 
     permissions: {
-        view: _relies_on(['edit', 'move', 'upload', 'delete']),
-        edit: _relies_on(['move', 'upload', 'delete']),
-        move: _relies_on(['upload', 'delete']),
-        upload: _relies_on(['delete']),
+        view: _relies_on(['edit', 'sort', 'move', 'upload', 'delete']),
+        edit: _relies_on([]),
+        comment: _relies_on([]),
+        sort: _relies_on([]),
+        move: _relies_on([]),
+        upload: _relies_on([]),
         delete: _relies_on([])
     },
 

@@ -32,7 +32,7 @@ export default Em.View.extend({
         });
         this.size_photos();
 
-        if (this.get('controller.permissions.move') !== true){
+        if (this.get('controller.permissions.move') !== true && this.get('controller.permissions.sort') !== true){
             return;
         }
 

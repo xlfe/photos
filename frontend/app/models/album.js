@@ -31,10 +31,13 @@ export default DS.Model.extend(autosave,{
         return [perm.create().load({
             view: true,
             edit: true,
+            comment: true,
+            sort: true,
             move: true,
             upload: true,
             delete: true,
             owner: true,
+
             user: this.get('owner.id'),
             _user: owner
         })].concat(this.get('_resolved_permissions'));

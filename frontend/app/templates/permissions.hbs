@@ -1,7 +1,6 @@
 <div class="container">
     <h3>
         {{#if controller.view_only}}
-
             View permissions for
         {{else}}
             Edit permissions for
@@ -69,10 +68,13 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th class="col-sm-4">Name</th>
+
+            <th class="col-sm-3">Name</th>
             <th>View</th>
-            <th>Edit</th>
-            <th>Move</th>
+            <th>Add/edit details</th>
+            <th>Comment</th>
+            <th>Sort/order</th>
+            <th>Move folders</th>
             <th>Upload</th>
             <th>Delete</th>
             <th>Owner</th>
@@ -93,6 +95,8 @@
                     <td><i class="fa fa-check"></i></td>
                     <td><i class="fa fa-check"></i></td>
                     <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
                     <td></td>
                 {{else}}
                     <td>
@@ -100,6 +104,8 @@
                     </td>
                     {{check-box save="save" disabled=controller.view_only value=perm.view}}
                     {{check-box save="save" disabled=controller.view_only value=perm.edit}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.comment}}
+                    {{check-box save="save" disabled=controller.view_only value=perm.sort}}
                     {{check-box save="save" disabled=controller.view_only value=perm.move}}
                     {{check-box save="save" disabled=controller.view_only value=perm.upload}}
                     {{check-box save="save" disabled=controller.view_only value=perm.delete}}
@@ -130,10 +136,12 @@
         <table class="table table-hover">
             <thead>
             <tr>
-                <th>Email</th>
+                <th class="col-sm-3">Email</th>
                 <th>View</th>
-                <th>Edit</th>
-                <th>Move</th>
+                <th>Add/edit details</th>
+                <th>Comment</th>
+                <th>Sort/order</th>
+                <th>Move folders</th>
                 <th>Upload</th>
                 <th>Delete</th>
                 <th>Last emailed</th>
@@ -144,14 +152,16 @@
 
             {{#each perm in controller.saved_invites}}
                 <tr>
-                    <td class="col-sm-4">
+                    <td>
                         {{perm.email}}
                     </td>
-                    {{check-box disabled=true value=perm.view}}
-                    {{check-box disabled=true value=perm.edit}}
-                    {{check-box disabled=true value=perm.move}}
-                    {{check-box disabled=true value=perm.upload}}
-                    {{check-box disabled=true value=perm.delete}}
+                    {{check-box disabled=true value=perm.permissions.view}}
+                    {{check-box disabled=true value=perm.permissions.edit}}
+                    {{check-box disabled=true value=perm.permissions.comment}}
+                    {{check-box disabled=true value=perm.permissions.sort}}
+                    {{check-box disabled=true value=perm.permissions.move}}
+                    {{check-box disabled=true value=perm.permissions.upload}}
+                    {{check-box disabled=true value=perm.permissions.delete}}
                     <td>
                         {{#if perm.last_emailed}}
                             {{from-now perm.last_emailed}}
@@ -190,10 +200,12 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th>Email</th>
+                    <th class="col-sm-3">Email</th>
                     <th>View</th>
-                    <th>Edit</th>
-                    <th>Move</th>
+                    <th>Add/edit details</th>
+                    <th>Comment</th>
+                    <th>Sort/order</th>
+                    <th>Move folders</th>
                     <th>Upload</th>
                     <th>Delete</th>
                 </tr>
@@ -202,11 +214,13 @@
 
                 {{#each perm in controller.invite_list}}
                     <tr>
-                        <td class="col-sm-4">
+                        <td>
                             {{perm.email}}
                         </td>
                         {{check-box value=perm.view}}
                         {{check-box value=perm.edit}}
+                        {{check-box value=perm.comment}}
+                        {{check-box value=perm.sort}}
                         {{check-box value=perm.move}}
                         {{check-box value=perm.upload}}
                         {{check-box value=perm.delete}}

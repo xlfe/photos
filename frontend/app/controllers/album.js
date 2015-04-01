@@ -156,12 +156,12 @@ export default Em.Controller.extend({
     album_class: function() {
         var base_class='your-photos';
 
-        if (this.get('selected').length > 0 && this.get('permissions.move') === true){
+        if (this.get('selected').length > 0 && (this.get('permissions.sort') === true || this.get('permissions.move') === true)){
             return base_class + ' selection';
         }
 
         return base_class;
-    }.property('selected.length','permissions.move'),
+    }.property('selected.length','permissions.move','permissions.sort'),
 
     folders: function () {
         // Show all folders that have this path or below

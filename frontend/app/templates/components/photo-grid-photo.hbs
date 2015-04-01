@@ -1,5 +1,9 @@
 {{reactive-text type="text" tabindex=idx photo=photo disabled=album.permissions.no_edit readonly=album.permissions.no_edit value=photo.title classNames="title"}}
 {{#if album.permissions.move}}
     <i class="fa fa-check-circle fa-2x" {{action 'selection'}}></i>
+{{else}}
+    {{#if album.permissions.sort}}
+        <i class="fa fa-check-circle fa-2x" {{action 'selection'}}></i>
+    {{/if}}
 {{/if}}
 
