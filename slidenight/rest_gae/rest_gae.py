@@ -356,7 +356,7 @@ class BaseRESTHandler(webapp2.RequestHandler):
                 if getattr(model,ip) != input_properties[ip]:
                     modified.append(ip)
 
-            if check_permissions.update_field_check(cls,modified) is not True:
+            if check_permissions.update_field_check(model,modified,self.user) is not True:
                 raise self.unauthorized()
 
             model.populate(**input_properties)

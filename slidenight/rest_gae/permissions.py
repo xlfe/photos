@@ -13,7 +13,7 @@ class Permissions(ndb.Model):
 
 
     @classmethod
-    def check_user(cls,model,method,user):
+    def get_permission(cls, model, user):
 
         perms = getattr(model,'permissions')
 
@@ -23,25 +23,26 @@ class Permissions(ndb.Model):
             'DELETE': lambda x: x.delete is True
         }
 
+        applied_permission = Permissions()
+
         for perm in perms:
-            if user is None and perm.user is not None:
+
+            #Anon user, but permission is for a specific user
+            if perm.user is not None and user is None:
                 continue
 
+            #Logged in user, but not the user for whom this permission applies
             if user is not None and perm.user != user.key:
                 continue
 
-            if method in req_method:
-                if req_method[method](perm) is True:
-                    return True
+            for t,p in applied_permission._properties.iteritems():
+                if isinstance(p,ndb.BooleanProperty) is False:
+                    continue
+                v = getattr(perm,t,False)
+                if v is True:
+                    setattr(applied_permission,t,True)
 
-        for perm in perms:
-            if perm.user is None:
-
-                if method in req_method:
-                    if req_method[method](perm) is True:
-                        return True
-
-        return False
+        return applied_permission
 
 class Permission(object):
 
@@ -57,7 +58,7 @@ class Permission(object):
         #Apply a filter to the query
         return query
 
-    def update_field_check(self, model, fields):
+    def update_field_check(self, model, fields, user):
         #Check if we're allowed to modify the particular field
         return True
 
@@ -82,22 +83,30 @@ class PermissionObjectOwner(Permission):
 
 class PermissionAlbum(PermissionObjectOwner):
 
+    #Only allow viewing of objects
+    method_reqs = {
+        'GET': lambda x: x.view is True,
+    }
+
     # ...only query for objects they own or have been granted permission to view
     def apply_permissions_filter(self, query, model, user):
+
+        #Only logged in users can search for albums
+        if user is None:
+            return False
+
+        #Only albums that the user has been invited to view or owns
         owner_property = getattr(model, self._get_owner_property(model))
         permissions_property = getattr(model, 'permissions')
+        p = Permissions(user=user.key,view=True)
 
-        if user:
-            p = Permissions(user=user.key,view=True)
-            return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p))
+        return query.filter(ndb.OR(owner_property == user.key,permissions_property ==p))
 
-        return False
 
-    #They can only modify objects they own
-    def post_validate(self, method, model, user=None):
+    #For albums, only the owners can only modify the album, and only those with view permissions can view
+    def post_validate(self, method, model, user):
 
         owner_property = self._get_owner_property(type(model))
-        permissions_property = getattr(model, 'permissions')
 
         # new model - set owner property
         if method == 'POST':
@@ -108,7 +117,14 @@ class PermissionAlbum(PermissionObjectOwner):
         if user is not None and getattr(model, owner_property) == user.key:
             return True
 
-        return Permissions.check_user(model,method,user)
+        if method not in self.method_reqs:
+            return False
+
+        applied = Permissions.get_permission(model, user)
+        if self.method_reqs[method](applied) is True:
+            return True
+
+        return False
 
 import logging
 class AlbumQuery():
@@ -142,20 +158,81 @@ class AlbumQuery():
 
 
 class PermissionPhoto(Permission,AlbumQuery):
+    method_reqs ={
+        'QUERY': lambda x: x.view is True,
+        'GET': lambda x: x.view is True,
+        'POST': lambda x: x.upload is True,
+        'PUT': lambda x: x.edit is True or x.sort is True or x.move is True,
+        'DELETE':lambda x:x.delete is True
+    }
+
+    change_reqs ={
+        'title': lambda x: x.edit is True,
+        'tags': lambda x: x.edit is True,
+        'pos': lambda x:x.sort is True,
+        'path': lambda x:x.move is True
+    }
 
     def apply_permissions_filter(self, query, model, user):
 
-        album = self.album_from_query(query)
-        if album is None:
+        #Only allow searching for photos where we have an album specified
+        try:
+            album = self.album_from_query(query)
+        except AssertionError:
             return None
 
-        if Permissions.check_user(album,'GET',user):
+        #Album owner is allowed
+        if user is not None and album.owner == user.key:
             return query
 
-        elif user is not None and album.owner == user.key:
+        applied = Permissions.get_permission(album, user)
+        if self.method_reqs['QUERY'](applied) is True:
             return query
 
         return None
+
+    def post_validate(self, method, model, user):
+
+        album = model.album.get()
+        assert album is not None
+
+        #Album owner can do anything
+        if user is not None and album.owner == user.key:
+            return True
+
+        applied = Permissions.get_permission(album,user)
+        if method not in self.method_reqs:
+            return False
+
+        if self.method_reqs[method](applied) is True:
+            return True
+
+        return False
+
+
+    def update_field_check(self, model, fields, user):
+
+        album = model.album.get()
+        assert album is not None
+
+        #Album owner can do anything
+        if user is not None and album.owner == user.key:
+            return True
+
+        applied = Permissions.get_permission(album,user)
+
+        for field in fields:
+            if field not in self.change_reqs:
+                return False
+
+            if self.change_reqs[field](applied) is not True:
+                return False
+
+        logging.info('CHANGED '+str(fields))
+        return True
+
+
+
 
 class PermissionInvite(PermissionUser,AlbumQuery):
 
