@@ -130,6 +130,13 @@ export default Em.Controller.extend({
             return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
                 sortProperties: ['path','pos'],
                 content: this.get('store').filter('photo',function(_){
+
+                    if (_.get('currentState.isLoading') === true || _.get('currentState.isDeleted') === true) {
+                        return false;
+                    }
+                    if (_.get('album')!== album){ return false;}
+
+                    var photo_path = _.get('path') || '';
                     return search_photo(sp,search,_);
                 })
             });
