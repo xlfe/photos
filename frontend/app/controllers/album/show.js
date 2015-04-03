@@ -19,7 +19,7 @@ export default Em.Controller.extend({
             new_idx = len - 1;
         }
 
-        return album.objectAt(new_idx) || {get_image:function(){}};
+        return album.objectAt(new_idx);
     }
 });
 

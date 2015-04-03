@@ -39,50 +39,55 @@ export default DS.Model.extend(autosave,{
         var i = this.get('filename') ||'';
         return i.substr(0, i.lastIndexOf('.')) || i;
     }.property('filename'),
-    get_image: function (req_long_edge,cb) {
+    get_image: function (req_long_edge,img) {
 
         var max_long_edge = Math.min(1600, Math.max(this.get('width'), this.get('height'))),
             fetched_long_edge = Math.min(+req_long_edge,+max_long_edge).toFixed(0),
             surl = this.get('serving_url') + '=s',
             id = this.get('id'),
-            cache = +_cached[id] + 0,
-            image = new Image();
+            images = [img];
 
-        if (req_long_edge === 0 || fetched_long_edge ===0 ){
-            return;
-        }
+        if (!Em.isNone(img)){ img.attr('data-last-url',surl); }
 
+        if (req_long_edge === 0 || fetched_long_edge ===0 ){ return; }
 
-        var onload = function(){
-            _flight[id] = false;
-            if (cb) {
-                cb(surl + fetched_long_edge);
-            }
-        };
-
-        if (cache == 0){
-            //Nothing in cache
-
+        if (id in _cached === false){
+            //Nothing in cache - just get the dom image to fetch it and watch it load...
             _cached[id] = fetched_long_edge;
-            _flight[id] = true;
-            image.onload = onload;
-            image.src = surl + fetched_long_edge;
-            return surl + fetched_long_edge;
-
         } else {
 
-            if (+cache > +fetched_long_edge || this.get('_saving') === true || _flight[id] === true) {
-                //Don't fetch a smaller version of what we already have cached...
-                return surl + cache;
+            //Don't fetch a smaller version of what we already have fetched
+            if (_cached[id] >= +fetched_long_edge || this.get('_saving') === true) {
+
+                //If we're already fetching it, make sure we replace the background of this img too
+                if (id in _flight === true) {
+                    _flight[id].pushObject(img);
+                }
             } else {
-                //Use currently cached image, fetch the larger version and then update _in_cache
-                _flight[id] = true;
-                _cached[id] = fetched_long_edge;
-                image.onload = onload;
+                //Use currently cached image, fetch the larger version and then update the img
+                _flight[id] = images;
+                var image = new Image();
+                image.onload = function () {
+
+                    delete _flight[id];
+                    _cached[id] = fetched_long_edge;
+
+                    images.forEach(function (img) {
+                        if (img) {
+                            //Don't replace an image if the dom object has more recently requested something else
+                            if (surl === img.attr('data-last-url') === true) {
+                                img.css({
+                                    'background-image': 'url(' + surl + fetched_long_edge + ')'
+                                });
+                            }
+                        }
+                    });
+                };
                 image.src = surl + fetched_long_edge;
-                return surl + cache;
             }
         }
+
+        return surl + _cached[id];
     },
 
     //Local properties

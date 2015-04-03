@@ -65,22 +65,13 @@ export default Em.Component.extend({
 
         var
             img = this.$(),
-            url = this.get('photo').get_image(Math.max(w,h),function(full){
-                img.css({
-                    'background-image': 'url(' + full + ')'
-                });
-            });
+            url = this.get('photo').get_image(Math.max(w,h),img);
 
-        var style = {
+        this.$().css({
             height: h + 'px',
-            width: w + 'px'
-        };
-
-        if (!Em.isNone(url)){
-            style['background-image'] = 'url(' + url + ')';
-        }
-
-        this.$().css(style);
+            width: w + 'px',
+            'background-image': 'url(' + url + ')'
+        });
 
     }.observes('photo.display_h','photo.display_w').on('didInsertElement'),
     dragStart: function () {

@@ -2,6 +2,21 @@ import Em from 'ember';
 
 var scrollPosition = [0,0];
 
+function max_size_for_window(photo) {
+    var screenWidth = Em.$(window).width() * 0.99,
+        screenHeight = (Em.$(window).height() - 25 ) * 0.99,
+        imageWidth = photo.get('width'),
+        imageHeight = photo.get('height');
+
+    if (imageWidth > screenWidth || imageHeight > screenHeight) {
+        var ratio = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
+        imageWidth /= ratio;
+        imageHeight /= ratio;
+    }
+
+    return [imageWidth, imageHeight];
+}
+
 export default Em.View.extend({
     needs: ['album'],
     //templateName: 'albums/show',
@@ -29,43 +44,36 @@ export default Em.View.extend({
     },
     setPhoto: function () {
 
-        var screenWidth = Em.$(window).width() * 0.99,
-            screenHeight = (Em.$(window).height() - 25 ) * 0.99,
-            photo = this.get('controller.model'),
+        var photo = this.get('controller.model'),
+            c = this.get('controller'),
             image = this.$('#lightbox');
 
-        if (Em.isNone(image)){
+        if (Em.isNone(image)||Em.isNone(photo)){
             return;
         }
         var
-            url = photo.get_image(1600,function(full){
-                image.css({'background-image': 'url(' + full + ')'});
-            });
-
-        var imageWidth = photo.get('width'),
-            imageHeight = photo.get('height');
-
-        if (imageWidth > screenWidth || imageHeight > screenHeight) {
-            var ratio = imageWidth / imageHeight > screenWidth / screenHeight ? imageWidth / screenWidth : imageHeight / screenHeight;
-            imageWidth /= ratio;
-            imageHeight /= ratio;
-        }
+            max_w = max_size_for_window(photo),
+            url = photo.get_image(max_w[0],image);
 
         image.css({
-            'width': imageWidth + 'px',
-            'height': imageHeight + 'px',
-            'top': ( Em.$(window).height() - imageHeight - 25 ) / 2 + 'px',
-            'left': ( Em.$(window).width() - imageWidth ) / 2 + 'px',
+            'width': max_w[0] + 'px',
+            'height': max_w[1] + 'px',
+            'left': ( Em.$(window).width() - max_w[0] ) / 2 + 'px',
+            'top': ( Em.$(window).height() - max_w[1] - 25 ) / 2 + 'px',
             'background-image': 'url(' + url + ')',
-            'background-size': imageWidth + 'px, ' + imageHeight + 'px'
+            'background-size': max_w[0] + 'px, ' + max_w[1] + 'px'
         });
 
         //preload photos in either direction
-        var preload = 2;
-        for (var i=1; i<=preload; i++) {
-            this.get('controller').get_photo(i).get_image(1600);
-            this.get('controller').get_photo(-i).get_image(1600);
-        }
+        [-2,-1,1,2].forEach(function(i){
+            var p = c.get_photo(i);
+
+            if (Em.isNone(p)){
+                return;
+            }
+            var max_w = max_size_for_window(p);
+            p.get_image(Math.max(max_w[0],max_w[1]));
+        });
 
     }.observes('controller.model').on('didInsertElement'),
     gestures: {
