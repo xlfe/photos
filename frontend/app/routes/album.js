@@ -16,7 +16,7 @@ export default Em.Route.extend({
         var store = this.get('store'),
             query_params = {
                 'limit':100,
-                'order_by': 'path,pos',
+                'order': 'path,pos',
                 'q': "album=KEY('" + params.album_id + "')"
             };
 
