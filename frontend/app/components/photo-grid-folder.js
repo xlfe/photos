@@ -27,8 +27,10 @@ export default Em.Component.extend({
         this.sendAction('path',this.get('folder.path'));
     },
     dragOver: function(evt){
-        this.set('highlight',true);
-        evt.preventDefault();
+        if (this.get('canDrop')){
+            this.set('highlight',true);
+            evt.preventDefault();
+        }
     },
     dragLeave: function(){
         this.set('highlight', false);

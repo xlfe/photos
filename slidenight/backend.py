@@ -3,7 +3,7 @@
 import webapp2
 import json
 import uuid
-from rest_gae.rest_gae import RESTHandler
+from rest_gae.rest_gae import RESTHandler,BaseRESTHandler
 from rest_gae.permissions import *
 from models import *
 from google.appengine.ext import blobstore
@@ -31,7 +31,9 @@ class CrosssiteAllowed(webapp2.RequestHandler):
         allow_crosssite(self.response,self.request.host)
         return self.response
 
-class PrepareUpload(CrosssiteAllowed):
+class PrepareUpload(BaseRESTHandler,CrosssiteAllowed):
+
+    permissions = {'OPTIONS':None,'POST':None}
 
     def post(self):
 
@@ -42,6 +44,22 @@ class PrepareUpload(CrosssiteAllowed):
             assert r in params
         for p in params:
             assert p in required
+
+
+        album = ndb.Key(urlsafe=params['album']).get()
+        assert album is not None
+        assert album._get_kind() == 'Album'
+
+        user = None
+        if 'user' in self.session:
+            user = ndb.Key(User, self.session['user']).get()
+
+        if user is not None and user.key == album.owner:
+            pass
+        else:
+            applied = Permissions.get_permission(album,user)
+            if applied.upload is not True:
+                return self.unauthorized()
 
         params['name'] = params['album'] + '/' + uuid.uuid4().hex,
 

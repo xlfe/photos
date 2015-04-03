@@ -116,6 +116,7 @@ export default Em.Controller.extend({
     },
     arrangedContent: function() {
         var path = this.get('path') || '',
+            album = this.get('model.id'),
             _search = this.get('_search'),
             search = this.get('search');
 
@@ -141,13 +142,14 @@ export default Em.Controller.extend({
                     if (_.get('currentState.isLoading') === true || _.get('currentState.isDeleted') === true) {
                         return false;
                     }
+                    if (_.get('album')!== album){ return false;}
                     var photo_path = _.get('path') || '';
                     if (path.length === 0 && photo_path.length===0){ return true;}
                     return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
                 })
             });
         }
-    }.property('path','_search','search','search_paths.length'),
+    }.property('path','_search','search','search_paths.length','model.id'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
             return _.get('selected') === true;
@@ -306,9 +308,6 @@ export default Em.Controller.extend({
     }.property('model.permissions.@each','session.isAuthenticated'),
     _search: false,
     actions: {
-        new_sort: function(){
-            this.sort_by();
-        },
         transition: function(photo){
             this.transitionToRoute('album.show',photo);
         },
@@ -368,18 +367,20 @@ export default Em.Controller.extend({
             var _this = this,
                 del = this.get('selected.length'),
                 i = 0;
+
             if (Em.isPresent(this.get('confirm_delete'))) {
                 _this.get('selected').map(function (_) {
-                        _.deleteRecord();
                     Em.run.later(function () {
-                        _.save();
+                        _.destroyRecord();
                     }, i * 20);
                     i += 1;
                 });
-                Em.run.later(function(){
-                    _this.set('model.photo_count',_this.get('model.photo_count') - del);
-                    _this.get('model').save();
-                },i*20+100);
+                if (this.get('permissions.owner')){
+                    Em.run.later(function(){
+                        _this.set('model.photo_count',_this.get('model.photo_count') - del);
+                        _this.get('model').save();
+                    },i*20+100);
+                }
             } else {
                 this.set('confirm_delete', true);
             }
