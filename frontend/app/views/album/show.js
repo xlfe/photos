@@ -59,7 +59,7 @@ export default Em.View.extend({
             'width': max_w[0] + 'px',
             'height': max_w[1] + 'px',
             'left': ( Em.$(window).width() - max_w[0] ) / 2 + 'px',
-            'top': ( Em.$(window).height() - max_w[1] - 25 ) / 2 + 'px',
+            'top': ( Em.$(window).height() - max_w[1] + 25 ) / 2 + 'px',
             'background-image': 'url(' + url + ')',
             'background-size': max_w[0] + 'px, ' + max_w[1] + 'px'
         });

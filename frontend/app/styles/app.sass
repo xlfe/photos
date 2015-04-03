@@ -307,7 +307,7 @@ $highlight-border: 5px solid rgba(255, 249, 0, 0.84) !important
 
 
 #lightbox-overlay
-  background-color: rgba(255, 255, 255, .9)
+  background-color: rgba(0, 0, 0, .95)
   position: fixed
   z-index: 9998
   top: 0
@@ -317,14 +317,15 @@ $highlight-border: 5px solid rgba(255, 249, 0, 0.84) !important
 
   .details
     position: absolute
-    bottom: 0
+    top: 0
     left: 0
     right: 0
-    height: 20px
-    background-color: white
+    height: 25px
+    background-color: black
     text-align: center
-
-    margin-bottom: 5px
+    .title
+      color: white
+      font-size: 18px
 
 #lightbox
   position: fixed

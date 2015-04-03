@@ -27,6 +27,12 @@ indexes:
   properties:
   - name: album
   - name: pos
+  - name: path
+
+- kind: Photo
+  properties:
+  - name: album
+  - name: pos
     direction: desc
 
 - kind: Photo
