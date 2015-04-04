@@ -37,10 +37,6 @@ export default Em.Component.extend({
             urls.pushObject(url);
         }
 
-        console.log(pos)
-        console.log(size)
-        console.log(urls)
-
         this.$().css({
             height: h + 'px',
             width:  w + 'px',
