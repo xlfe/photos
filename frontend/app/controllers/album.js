@@ -100,9 +100,9 @@ export default Em.Controller.extend({
 
     }.on('init'),
     needs: ['application'],
-    _arrangedContent: function () {
+    _arrangedContent: function (path) {
 
-        var path = this.get('path') || '';
+        path = path || '';
 
         var photos = this.get('model.photos').filter(function (_) {
             var photo_path = _.get('path') || '';

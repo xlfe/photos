@@ -299,12 +299,30 @@ $highlight-border: 5px solid rgba(255, 249, 0, 0.84) !important
   border-left: $highlight-border
 
 .folder
+  .title
+    color: white
+    background-color: rgba(0, 0, 0, 0.51)
+    padding-left: 0.5em
+    text-shadow: 0 0 5px #000
+    z-index: 1000
+    white-space: nowrap
+    overflow: hidden
+
+  .folder-icon
+    float: left
+    overflow: hidden
+    width: 100%
+    opacity: 0.90
+    color: #FFF
+
+.folder
 
   &:hover
     cursor: pointer
     font-weight: bold
 
-
+    .folder-icon
+      font-weight: bold
 
 #lightbox-overlay
   background-color: rgba(0, 0, 0, .95)
