@@ -22,7 +22,7 @@ export default Em.Component.extend({
             return;
         }
 
-        var photos = this._arrangedContent(path, true),
+        var photos = this.get('album')._arrangedContent(path, true),
             vpw = w/Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
             count = 4,
             pos = '0 0, ' + (w/2) + 'px 0px, 0px ' + (h/2) + 'px, ' + (w/2) +'px ' + (h/2) +'px',

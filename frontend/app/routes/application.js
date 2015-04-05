@@ -11,6 +11,10 @@ export default Ember.Route.extend(ApplicationRouteMixin, {
             });
         },
         closeModal: function () {
+            try{
+                Em.$('.modal').modal('hide');
+            }
+            catch(error) {}
             return this.disconnectOutlet({
                 outlet: 'modal',
                 parentView: 'application'
