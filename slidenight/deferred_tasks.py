@@ -11,7 +11,7 @@ class EmailLog(ndb.Model):
 
 
 
-FROM_ADDR = lambda x:'{} <no-reply@slide-night.appspotmail.com>'
+FROM_ADDR = lambda x:'{} <no-reply@slide-night.appspotmail.com>'.format(x)
 
 
 #Mail policy

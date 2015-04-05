@@ -33,7 +33,7 @@ export default Em.Component.extend({
         for (var i =0; i < count; i++){
             var idx = getRandomInt(0,photos.get('length')),
                 photo = photos.objectAt(idx),
-                url = photo.get_image(Math.max(h,w));
+                url = photo.get_image(Math.max(h/2,w/2));
             urls.pushObject(url);
         }
 

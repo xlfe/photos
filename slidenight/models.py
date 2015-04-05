@@ -40,6 +40,8 @@ class User(ndb.Model):
                    DOMAIN + "/verify/{verify}\n\n\n" + \
                    "Regards,\nThe SlideNight Team"
 
+        assert self.validation_key is not None
+
         data = {
             'full_name': self.full_name,
             'verify':    self.validation_key
@@ -74,7 +76,7 @@ class User(ndb.Model):
 
         return model
 
-class ValidateHandler(BaseRESTHandler):
+class VerifyHandler(BaseRESTHandler):
     permissions = {'OPTIONS':True,'GET':True}
 
     def get(self,v):
