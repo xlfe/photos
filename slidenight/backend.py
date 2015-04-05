@@ -6,6 +6,7 @@ import uuid
 from rest_gae.rest_gae import RESTHandler,BaseRESTHandler
 from rest_gae.permissions import *
 from models import *
+from channels import ChannelHandler, ChannelConnectHandler, ChannelDisconnectHandler
 from google.appengine.ext import blobstore, ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
@@ -50,21 +51,12 @@ class PrepareUpload(BaseRESTHandler,CrosssiteAllowed):
         assert album is not None
         assert album._get_kind() == 'Album'
 
-        user = None
-        if 'user' in self.session:
-            user = ndb.Key(User, self.session['user']).get()
+        #Not logged in / email not validated
+        if self.user is None or self.user.validated is not True:
+            return self.unauthorized()
 
-            if user is None:
-                return self.unauthorized()
-
-            if user.validated is not True:
-                return self.unauthorized()
-
-
-        if user is not None and user.key == album.owner:
-            pass
-        else:
-            applied = Permissions.get_permission(album,user)
+        if self.user.key != album.owner:
+            applied = Permissions.get_permission(album,self.user)
             if applied.upload is not True:
                 return self.unauthorized()
 
@@ -197,6 +189,13 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/upload',UploadHandler),
         webapp2.Route('/api/login',LoginHandler),
         webapp2.Route('/api/claim',ClaimHandler),
+
+        #Channel management
+        webapp2.Route('/api/channel', ChannelHandler),
+        webapp2.Route('/_ah/channel/connected/',ChannelConnectHandler ),
+        webapp2.Route('/_ah/channel/disconnected/', ChannelDisconnectHandler),
+
+
         webapp2.Route('/verify/<v>', VerifyHandler),
 
         RESTHandler('/api/invites', Invite, permissions=PERM_APPLY(PERMISSION_INVITE),after_post_callback=Invite.after_put_callback,after_put_callback=Invite.after_put_callback,allowed_origin=ALLOWED_ORIGIN),

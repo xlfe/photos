@@ -1,5 +1,5 @@
 application: slide-night
-version: 10
+version: 11
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -12,6 +12,9 @@ handlers:
 - url: /verify/.*
   script: backend.app
   secure: always
+
+- url: /_ah/channel/(connected|disconnected)/
+  script: backend.app
 
 - url: /
   static_files: static/index.html

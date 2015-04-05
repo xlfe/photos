@@ -152,6 +152,10 @@ class BaseRESTHandler(webapp2.RequestHandler):
                     if (origin != allowed_origin) and (allowed_origin != '*'):
                         return self.permission_denied('Origin not allowed')
 
+            #See if we know the user
+            self.user = None
+            if 'user' in self.session:
+                self.user = ndb.Key('User', self.session['user']).get()
 
             # Dispatch the request.
             response = webapp2.RequestHandler.dispatch(self)
@@ -435,9 +439,6 @@ def get_rest_class(ndb_model, base_url, **kwd):
         permissions = { 'OPTIONS': [PermissionAnyone()] }
         permissions.update(kwd.get('permissions', {}))
 
-        #User object passed when class created
-        user_model = kwd.get('user_model','User')
-
         allow_http_method_override = kwd.get('allow_http_method_override', True)
         allowed_origin = kwd.get('allowed_origin', None)
 
@@ -472,10 +473,6 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 if method_name not in self.permissions:
                     return self.method_not_allowed()
 
-                #See if we know the user
-                self.user = None
-                if 'user' in self.session:
-                    self.user = ndb.Key(self.user_model, self.session['user']).get()
 
                 # Verify permissions - (pre_validate)
                 accepted_permission = self._get_permission(method_name)

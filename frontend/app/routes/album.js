@@ -1,4 +1,5 @@
 import Em from 'ember';
+import Channel from '../subscribers/channel';
 
 export default Em.Route.extend({
     renderTemplate: function () {
@@ -45,6 +46,8 @@ export default Em.Route.extend({
         return new Em.RSVP.Promise(function(resolve,reject){
 
             store.find('album', params.album_id).then(function (album) {
+
+                Channel.unsubscribe_except(params.album_id);
 
                 album.set('photos', store.filter('photo',function(p){
                     if(p.get('album') === params.album_id) {

@@ -2,6 +2,7 @@ import Em from 'ember';
 import DS from 'ember-data';
 import autosave from '../models/autosave';
 import perm from '../objects/permissions';
+import Channel from '../subscribers/channel';
 
 export default DS.Model.extend(autosave,{
     autosave_properties: ['name','photo_count'],
@@ -49,6 +50,14 @@ export default DS.Model.extend(autosave,{
     public_url: function(){
         "use strict";
         return location.protocol + '//' + location.host + '/albums/'+this.get('id');
-    }.property()
+    }.property(),
+
+    subscribe: function() {
+
+        if (this.get('more_results') === false){
+            Channel.subscribe(this.get('id'));
+        }
+
+    }.observes('more_results')
 });
 

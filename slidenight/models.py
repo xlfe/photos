@@ -85,7 +85,6 @@ class VerifyHandler(BaseRESTHandler):
 
         if user is None:
             self.response.out.write("Not found.")
-
         else:
             user.validation_key = None
             user.validated = True
@@ -120,37 +119,37 @@ class LoginHandler(BaseRESTHandler):
         else:
             return self.error(DEFAULT)
 
+    #resend validation email
     def put(self):
-        if 'user' in self.session:
-            user = ndb.Key(User,self.session['user']).get()
 
-            if user:
-                if user.send_validation_email():
-                    return self.success(({'sent':'sent'}))
-                else:
-                    return self.error({'limit':'you have sent too many emails to that address'})
-        return self.unauthorized()
+        if self.user is None:
+            return self.unauthorized()
+
+        if self.user.validated is True:
+            return self.error()
+
+        if self.user.send_validation_email():
+            return self.success(({'sent':'sent'}))
+        else:
+            return self.error({'limit':'you have sent too many emails to that address'})
 
     def delete(self):
+        if self.user is None:
+            return self.unauthorized()
+
         self.response.delete_cookie('session')
         self.response.out.write('Logged out')
 
     def get(self):
 
-        if 'user' in self.session:
-            user = ndb.Key(User,self.session['user']).get()
+        if self.user is not None:
+            return self.success({
+                'id':self.user.key.urlsafe(),
+                'validated':self.user.validated,
+                'full_name':self.user.full_name
+            })
 
-            if user:
-
-                return self.success({
-                    'id':user.key.urlsafe(),
-                    'validated':user.validated,
-                    'full_name':user.full_name
-                })
-
-        return self.error('Unknown user')
-
-
+        return self.unauthorized()
 
 class Album(ndb.Model):
 
@@ -209,8 +208,8 @@ class ClaimHandler(BaseRESTHandler):
     def post(self):
 
         json_data = json.loads(self.request.body)
-        user = ndb.Key('User',self.session['user']).get()
-        assert user is not None
+        if self.user is None:
+            return self.unauthorized()
 
         invite = ndb.Key(urlsafe=json_data['invite']).get()
         assert invite is not None
@@ -218,10 +217,10 @@ class ClaimHandler(BaseRESTHandler):
 
         album = invite.album.get()
 
-        if user.key == album.owner:
+        if self.user.key == album.owner:
             return self.error({'message':'The owner cannot claim the invite'})
 
-        invite.permissions.user = user.key
+        invite.permissions.user = self.user.key
         album.permissions.append(invite.permissions)
         album.put()
         invite.key.delete()
