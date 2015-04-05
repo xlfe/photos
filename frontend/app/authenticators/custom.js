@@ -2,7 +2,8 @@ import Base from 'simple-auth/authenticators/base';
 import Em from 'ember';
 import config from '../config/environment';
 
-var endpoint = [config.api_host, config.api_endpoint,'login'].join('/');
+export var endpoint = [config.api_host, config.api_endpoint,'login'].join('/');
+
 
 export default Base.extend({
     restore: function (options) {
@@ -48,7 +49,7 @@ export default Base.extend({
         return new Em.RSVP.Promise(function (resolve, reject) {
             Em.$.ajax({
                 url: endpoint,
-                method: 'PUT',
+                method: 'DELETE',
                 xhrFields: {
                     withCredentials: true
                 },

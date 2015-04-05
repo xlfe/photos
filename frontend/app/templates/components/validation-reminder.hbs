@@ -1,0 +1,21 @@
+{{#if session.isAuthenticated}}
+    {{#unless session.validated}}
+
+        <div class="alert alert-info">
+            <strong>Note:</strong> You have not validated your email address.
+            You will not be able to upload photos until you have done so.
+
+            {{#if resending}}
+                <i class="fa fa-spin fa-spinner"></i>
+            {{else}}
+                {{#unless resent}}
+                    <a {{action 'resend'}} href="#">
+                        Resend validation email
+                        <i class="fa fa-forward"></i>
+                    </a>
+                {{/unless}}
+            {{/if}}
+        </div>
+
+    {{/unless}}
+{{/if}}

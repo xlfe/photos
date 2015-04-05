@@ -31,11 +31,23 @@ class User(ndb.Model):
     email = ndb.StringProperty()
     password_hash = ndb.StringProperty()
     validated = ndb.BooleanProperty(default=False)
+    validation_key = ndb.StringProperty()
 
+    def send_validation_email(self):
 
-    @classmethod
-    def current_user(self):
-        return None
+        template = "Dear {full_name},\n\nWelcome to SlideNight!\n\n" + \
+                   "Please click the link below to verify we have your email address correct:\n" + \
+                   DOMAIN + "/verify/{verify}\n\n\n" + \
+                   "Regards,\nThe SlideNight Team"
+
+        data = {
+            'full_name': self.full_name,
+            'verify':    self.validation_key
+        }
+        _template = template.format(**data)
+
+        return send_email(to=self.email,subject="{} - please confirm your email address".format(self.full_name),
+                   body=_template,frm='SlideNight Registration')
 
     @staticmethod
     def new_user(model,json_data):
@@ -57,12 +69,31 @@ class User(ndb.Model):
         model.last_name=' '.join(name.split(' ')[1:])
         model.email=email.lower().strip()
         model.password_hash = security.generate_password_hash(pwd, method='sha1', length=PW_SALT_LENGTH, pepper=HASHING_PW_PEPPER)
+        model.validation_key = security.generate_random_string(length=16)
+        model.send_validation_email()
 
         return model
 
+class ValidateHandler(BaseRESTHandler):
+    permissions = {'OPTIONS':True,'GET':True}
+
+    def get(self,v):
+
+        user = User.query(User.validation_key == v).get()
+
+        if user is None:
+            self.response.out.write("Not found.")
+
+        else:
+            user.validation_key = None
+            user.validated = True
+            user.put()
+            self.response.out.write("Thank you! Your email is now validated. Please reopen SlideNight.")
+
+
 
 class LoginHandler(BaseRESTHandler):
-    permissions = {'OPTIONS':True,'GET':True,'PUT':True,'POST':True}
+    permissions = {'OPTIONS':True,'GET':True,'PUT':True,'POST':True,'DELETE':True}
 
     def post(self):
 
@@ -71,8 +102,6 @@ class LoginHandler(BaseRESTHandler):
         json_data = json.loads(self.request.body)
         email = json_data['identification']
         password = json_data['password']
-        logging.info(email)
-        logging.info(password)
 
         user = User.query().filter(User.email == email.lower().strip()).get()
 
@@ -80,29 +109,40 @@ class LoginHandler(BaseRESTHandler):
             return self.error(DEFAULT)
 
         if security.check_password_hash(password, user.password_hash, pepper=HASHING_PW_PEPPER) is True:
-            logging.info(user.key.id())
             self.session['user'] = user.key.id()
             return self.success({
                 'id':user.key.urlsafe(),
+                'validated': user.validated,
                 'full_name': user.full_name
             })
         else:
             return self.error(DEFAULT)
 
     def put(self):
+        if 'user' in self.session:
+            user = ndb.Key(User,self.session['user']).get()
+
+            if user:
+                if user.send_validation_email():
+                    return self.success(({'sent':'sent'}))
+                else:
+                    return self.error({'limit':'you have sent too many emails to that address'})
+        return self.unauthorized()
+
+    def delete(self):
         self.response.delete_cookie('session')
         self.response.out.write('Logged out')
 
     def get(self):
 
         if 'user' in self.session:
-            logging.info(self.session)
             user = ndb.Key(User,self.session['user']).get()
 
             if user:
 
                 return self.success({
                     'id':user.key.urlsafe(),
+                    'validated':user.validated,
                     'full_name':user.full_name
                 })
 
@@ -153,9 +193,12 @@ class Invite(ndb.Model):
         }
         _template = template.format(**data)
 
-        send_email(to=model.email,subject="{} has invited you to collaborate".format(owner.full_name),body=_template)
+        if send_email(to=model.email,subject="{} has invited you to collaborate".format(owner.full_name),body=_template,
+                   frm='SlideNight Invitations'):
 
-        return model
+            return model
+        else:
+            raise RESTException('limit reached - you have sent too many emails to that address')
 
 
 class ClaimHandler(BaseRESTHandler):
@@ -177,7 +220,6 @@ class ClaimHandler(BaseRESTHandler):
             return self.error({'message':'The owner cannot claim the invite'})
 
         invite.permissions.user = user.key
-        logging.info(invite.permissions)
         album.permissions.append(invite.permissions)
         album.put()
         invite.key.delete()
@@ -235,7 +277,6 @@ class Photo(ndb.Model):
     @staticmethod
     def after_delete(deleted_keys,models):
 
-        logging.info(models)
         for m in models:
             blobstore.delete(m._blobinfo)
 

@@ -29,14 +29,21 @@
 
                     {{#if controller.permissions.upload}}
                         <div class="box-middle-center">
-                        <span>
+
+                            {{#if session.validated}}
+                                <span>
                             No photos found - would you like to
                             <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
                                 upload some photos</a>?
                         </span>
+                            {{else}}
+                                {{validation-reminder}}
+                            {{/if}}
                         </div>
                     {{/if}}
+
                 {{/if}}
+
             {{/unless}}
         {{/unless}}
     </div>

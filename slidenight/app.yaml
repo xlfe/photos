@@ -9,6 +9,10 @@ handlers:
   script: backend.app
   secure: always
 
+- url: /validate/.*
+  script: backend.app
+  secure: always
+
 - url: /
   static_files: static/index.html
   upload: static/index.html
@@ -44,3 +48,6 @@ libraries:
 
 builtins:
 - deferred: on
+
+inbound_services:
+- channel_presence

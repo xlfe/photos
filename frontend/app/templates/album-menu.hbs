@@ -116,12 +116,19 @@
 
     {{#if controller.permissions.upload}}
 
-
-        <li class="menu-link">
-            <a href="#" title="Upload" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
-                <i class="fa fa-lg fa-upload"></i>
-            </a>
-        </li>
+        {{#if session.validated}}
+            <li class="menu-link">
+                <a href="#" title="Upload" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
+                    <i class="fa fa-lg fa-upload"></i>
+                </a>
+            </li>
+        {{else}}
+            <li class="menu-link disabled">
+                <a title="Please validate your email to upload photos" tabindex="-1">
+                    <i class="fa fa-lg fa-upload"></i>
+                </a>
+            </li>
+        {{/if}}
 
     {{/if}}
 

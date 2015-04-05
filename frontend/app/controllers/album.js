@@ -100,14 +100,19 @@ export default Em.Controller.extend({
 
     }.on('init'),
     needs: ['application'],
-    _arrangedContent: function (path) {
+    _arrangedContent: function (path, include_below) {
 
         path = path || '';
+        include_below = include_below || false;
 
         var photos = this.get('model.photos').filter(function (_) {
             var photo_path = _.get('path') || '';
             if (path.length === 0 && photo_path.length===0){ return true;}
-            return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
+            if (include_below ===true){
+               return below_folder(photo_path,path);
+            } else {
+                return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
+            }
 
         }).sort(sort_pos);
 

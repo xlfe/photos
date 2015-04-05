@@ -6,7 +6,7 @@ import uuid
 from rest_gae.rest_gae import RESTHandler,BaseRESTHandler
 from rest_gae.permissions import *
 from models import *
-from google.appengine.ext import blobstore
+from google.appengine.ext import blobstore, ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 import httplib2
@@ -53,6 +53,13 @@ class PrepareUpload(BaseRESTHandler,CrosssiteAllowed):
         user = None
         if 'user' in self.session:
             user = ndb.Key(User, self.session['user']).get()
+
+            if user is None:
+                return self.unauthorized()
+
+            if user.validated is not True:
+                return self.unauthorized()
+
 
         if user is not None and user.key == album.owner:
             pass
@@ -190,6 +197,7 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/upload',UploadHandler),
         webapp2.Route('/api/login',LoginHandler),
         webapp2.Route('/api/claim',ClaimHandler),
+        webapp2.Route('/validate/<v>',ValidateHandler),
 
         RESTHandler('/api/invites', Invite, permissions=PERM_APPLY(PERMISSION_INVITE),after_post_callback=Invite.after_put_callback,after_put_callback=Invite.after_put_callback,allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/register',User,   permissions=REGISTER_PERMISSIONS,        before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),

@@ -10,6 +10,11 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: EmailLog
+  properties:
+  - name: email
+  - name: sent
+
 - kind: Photo
   properties:
   - name: album
