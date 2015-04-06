@@ -1,6 +1,13 @@
 import Em from 'ember';
 import DS from 'ember-data';
 
+
+if (typeof String.prototype.endsWith != 'function') {
+    String.prototype.endsWith = function (str){
+        return this.slice(-str.length) == str;
+    };
+}
+
 export default Em.Mixin.create({
     //define these
     save_delay: 5000,
@@ -13,7 +20,11 @@ export default Em.Mixin.create({
             _this = this;
 
         props.forEach(function(prop){
-            Em.addObserver(_this,prop,_this,'_keep_watch');
+            if (Em.isArray(_this.get(prop))){
+                Em.addObserver(_this,prop +'.length',_this,'_keep_watch');
+            } else {
+                Em.addObserver(_this,prop,_this,'_keep_watch');
+            }
         });
 
         this.set('_saving', false);
@@ -44,7 +55,12 @@ export default Em.Mixin.create({
     },
     _saving: true,
     _keep_watch: function () {
-        if (this.get('_saving') === true || this.get('isDirty') === false) {
+        if (this.get('_saving') === true){
+            return;
+        }
+
+        if (this.get('isDirty') === false && arguments[1].endsWith('.length') === false) {
+            console.log('NOT DIRTY')
             return;
         }
 

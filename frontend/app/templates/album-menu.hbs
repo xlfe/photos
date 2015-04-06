@@ -38,15 +38,12 @@
         </li>
 
         {{#each sp in controller.search_paths}}
-
-        <li class="menu-link">
-            <a title="Remove search param" {{action 'remove_search_path' sp}} href="#">
-
-                <i class="fa fa-search fa-lg"></i>
-                {{sp.name}}
-            </a>
-
-        </li>
+            <li {{bind-attr class=":menu-link sp.disabled:disabled"}}>
+                <a title="Set search param" {{action 'toggle_search_path' sp}} href="#">
+                    <i class="fa fa-search fa-lg"></i>
+                    {{sp.name}}
+                </a>
+            </li>
         {{/each}}
 
     {{/unless}}
@@ -63,6 +60,14 @@
             </a>
         </li>
 
+        {{#if controller.permissions.edit}}
+
+            <li class="menu-link">
+                <a href="#" title="Add tags to the selected photos" {{action 'add_tags'}} tabindex="-1">
+                    <i class="fa fa-lg fa-tags"></i>
+                </a>
+            </li>
+        {{/if}}
         {{#if controller.permissions.move}}
 
 

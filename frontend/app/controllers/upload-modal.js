@@ -71,7 +71,6 @@ export default Em.Controller.extend({
     add_file: function(file,_id) {
         var _this = this;
         this.store.find('photo',_id).then(function(photo){
-            //_this.get('model.photos').pushObject(photo);
             file.set('status','Complete');
             file.set('_status',6);
             _this.set('model.photo_count',_this.get('model.photos.length'));
@@ -308,19 +307,22 @@ export default Em.Controller.extend({
         this.set('close_caption','Cancel');
         this.set('cancel',false);
     },
-    save_disabled: function() {
+    save_disabled: true,
+    _save_disabled: function() {
 
-        if (Em.isNone(this.get('files'))){
-            return true;
+        if (Em.isEmpty(this.get('files'))){
+            this.set('save_disabled',true);
+            return;
         }
+
         if (this.get('files').filter(function(_){
-                return _.get('_status') !== -1 && _.get('_status') !== 6;
+                return _.get('_status') === 0;
             }).length > 0){
-            return false;
+            this.set('save_disabled',false);
+            return;
         }
 
-        return true;
-    }.property('files.@each._status','files.length'),
+    }.observes('files.@each._status','files.length'),
     save_caption: 'Upload',
     close_caption: 'Cancel',
     cancel: false,

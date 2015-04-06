@@ -12,7 +12,7 @@ var _flight = {};
 
 export default DS.Model.extend(autosave,{
 
-    autosave_properties: ['title','caption'],
+    autosave_properties: ['title','caption','tags'],
     autosave_properties_immediate: ['pos','path'],
 
     //ReadOnly
@@ -33,7 +33,6 @@ export default DS.Model.extend(autosave,{
     pos:        attr('string'),
     path:       attr('string'),
     tags:       attr('list'),
-
 
     _filename: function(){
         var i = this.get('filename') ||'';

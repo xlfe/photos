@@ -8,6 +8,7 @@ export var channel_id;
 
 var channel,
     store,
+    last_album,
     subscriptions = [],
     socket;
 
@@ -49,7 +50,15 @@ function onMessage(data) {
     }
 }
 
-function onError(data) {
+var error_count = 0;
+function onError() {
+    channel_id = undefined;
+    Em.run.later(function(){
+        if (Em.isNone(last_album) === false && Em.isNone(channel_id) === true){
+            modChannel({'add':last_album});
+        }
+    },Math.pow(2,error_count)*1000);
+    error_count += 1;
 }
 
 function onClose(data) {
@@ -79,17 +88,18 @@ function modChannel(data){
                 socket.onmessage = onMessage;
                 socket.onerror = onError;
                 socket.onclose = onClose;
-
             }
         },
         error: function(error){
             console.log("Error",error);
+            onError();
         }
     });
 }
 
 export function subscribe(album,_store) {
     store=_store;
+    last_album = album;
     subscriptions.pushObject(album);
     modChannel({'add':album});
 }
@@ -101,6 +111,9 @@ export function unsubscribe_except(album) {
         }
         subscriptions.removeObject(album);
         modChannel({'rem':sub});
+        if (last_album === album){
+            last_album = undefined;
+        }
     });
 }
 

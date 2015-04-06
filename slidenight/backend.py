@@ -32,7 +32,8 @@ class CrosssiteAllowed(webapp2.RequestHandler):
         allow_crosssite(self.response,self.request.host)
         return self.response
 
-class PrepareUpload(BaseRESTHandler,CrosssiteAllowed):
+class PrepareUpload(BaseRESTHandler):
+    """Client posts here to get a google storage endpoint to upload to"""
 
     permissions = {'OPTIONS':None,'POST':None}
 
@@ -102,7 +103,8 @@ class PrepareUpload(BaseRESTHandler,CrosssiteAllowed):
 
         return
 
-class GCSFinalizeHandler(webapp2.RequestHandler):
+class GCSFinalizeHandler(BaseRESTHandler):
+    """Client posts here to tell us that the upload has finished"""
 
     def post(self):
 
@@ -121,9 +123,12 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         meta = img.get_original_metadata()
         meta['UploadFileModified']=params['lastModifiedDate']
         meta['UploadOriginalPath']=params['path']
-        user = ndb.Key('User',params['user']).get()
-        assert user is not None
-        self.request.user = user
+        assert self.request.user is not None
+
+        if self.request.user.key != _album.owner:
+            applied = Permissions.get_permission(_album,self.request.user)
+            if applied.upload is not True:
+                return self.unauthorized()
 
         first,last = Photo.allocate_ids(1,parent=album)
 

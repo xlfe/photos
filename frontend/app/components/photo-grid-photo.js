@@ -227,6 +227,24 @@ export default Em.Component.extend({
         },
         selection: function() {
             this.toggleProperty('photo.selected');
+        },
+        add_tag: function(){
+
+            //var selected=this.get('selected'),
+            //    len = selected.length || 1,
+            var new_tag = prompt("Enter the (comma/space seperated) tags you'd like to add to this photo");
+
+            if (Em.$.trim(new_tag).length > 0){
+
+                var nt = Em.$.trim(new_tag).toLowerCase().split(/[,\ ]+/);
+
+                if (this.get('photo.tags').contains(nt) === false){
+                    this.get('photo.tags').pushObjects(nt);
+                }
+            }
+        },
+        remove_tag: function(tag){
+            this.get('photo.tags').removeObject(tag);
         }
     }
 });

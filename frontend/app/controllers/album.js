@@ -17,11 +17,18 @@ RegExp.quote = function(str) {
 var search_paths = [
     {
         name: 'Title',
-        path: 'title'
+        path: 'title',
+        disabled: false
     },
     {
         name: 'Filename',
-        path: '_filename'
+        path: '_filename',
+        disabled: false
+    },
+    {
+        name: 'Tags',
+        path: 'tags',
+        disabled: false
     }
 ];
 
@@ -34,11 +41,22 @@ function search_photo(_paths,term,_){
         matched = 0;
 
     _paths.forEach(function(sp) {
-        match = 0;
+        //match = 0;
         search = _.get(sp);
 
-        if (Em.$.trim(search).length === 0){
-            return;
+        if (Em.isArray(search)){
+            if (search.get('length')===0){
+                return;
+            }
+
+            search = search.join(' ');
+
+        } else {
+
+            if (Em.$.trim(search).length === 0){
+                return;
+            }
+
         }
 
         words.forEach(function (w) {
@@ -47,12 +65,13 @@ function search_photo(_paths,term,_){
             }
         });
 
-        if (match === words.length){
-           matched +=1;
-        }
     });
+    //if (match === words.length) {
+    //        matched += 1;
+    //    }
 
-        return matched > 0;
+    return match > 0;
+    return matched > 0;
 }
 
 function below_folder(path, folder) {
@@ -130,7 +149,7 @@ export default Em.Controller.extend({
                 return [];
             }
 
-            var sp = this.get('search_paths').map(function(s){return s.path;});
+            var sp = this.get('search_paths').filter(function(s){return s.disabled === false;}).map(function(s){return s.path;});
 
             return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
                 sortProperties: ['path','pos'],
@@ -161,7 +180,7 @@ export default Em.Controller.extend({
                 })
             });
         }
-    }.property('path','_search','search','search_paths.length','model.id'),
+    }.property('path','_search','search','search_paths.@each.disabled','model.id'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
             return _.get('selected') === true;
@@ -319,6 +338,7 @@ export default Em.Controller.extend({
 
     }.property('model.permissions.@each','session.isAuthenticated'),
     _search: false,
+    search_paths: search_paths,
     actions: {
         transition: function(photo){
             this.transitionToRoute('album.show',photo);
@@ -348,14 +368,12 @@ export default Em.Controller.extend({
         },
         search: function(){
             this.set('search','');
-            this.set('search_paths',search_paths);
             this.toggleProperty('_search');
         },
-        remove_search_path: function(sp){
-            if (this.get('search_paths.length') === 1){
-                return;
-            }
-            this.get('search_paths').removeObject(sp);
+        toggle_search_path: function(sp){
+
+            Em.set(sp,'disabled',!Em.get(sp,'disabled'));
+
         },
         move_selection: function() {
 
@@ -397,6 +415,31 @@ export default Em.Controller.extend({
             } else {
                 this.set('confirm_delete', true);
             }
+        },
+        add_tags: function() {
+
+            var new_tag = prompt("Enter the (comma/space seperated) tags you'd like to add to these photos");
+
+            if (Em.$.trim(new_tag).length === 0) {
+                return
+            }
+
+            var nt = Em.$.trim(new_tag).toLowerCase().split(/[,\ ]+/),
+                i=0,
+                selection = this.get('selected');
+
+            selection.forEach(function (photo) {
+                Em.run.later(function () {
+                    if (photo.get('tags').contains(nt) === false) {
+                        photo.set('_saving',true);
+                        photo.get('tags').pushObjects(nt);
+                        photo.save().then(function(p){
+                            p.set('_saving',false);
+                        });
+                    }
+                }, i * 20);
+                i += 1;
+            })
         }
     }
 });
