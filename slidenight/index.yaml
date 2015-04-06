@@ -10,6 +10,17 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: ChannelSubscription
+  properties:
+  - name: Album
+  - name: channel_id
+
+- kind: ChannelSubscription
+  properties:
+  - name: Album
+  - name: connected
+  - name: channel_id
+
 - kind: EmailLog
   properties:
   - name: email

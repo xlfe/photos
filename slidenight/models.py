@@ -238,8 +238,8 @@ class Photo(ndb.Model):
 
     class RESTMeta:
 
-        excluded_properties = ['blob','gs']
-        excluded_input_properties = ['filename','md5','uploaded','modified','width','height','metadata']
+        excluded_properties = ['blob','gs','uploaded_by']
+        excluded_input_properties = ['filename','md5','uploaded','modified','width','height','metadata','uploaded_by']
 
 
     title = ndb.StringProperty(indexed=False)
@@ -264,6 +264,7 @@ class Photo(ndb.Model):
     blob = ndb.BlobKeyProperty(indexed=False)
     gs = ndb.StringProperty(indexed=False)
     album = ndb.KeyProperty(Album)
+    uploaded_by = ndb.KeyProperty(User)
 
     serving_url = ndb.StringProperty(indexed=False)
 
@@ -286,12 +287,12 @@ class Photo(ndb.Model):
 
     @staticmethod
     def after_put(created_keys, model):
-        SendUpdate('UPDATE',model)
+        SendUpdate('UPD',model)
         return model
 
     @staticmethod
     def before_delete(models):
         for model in models:
-            SendUpdate('DELETE',model)
+            SendUpdate('DEL',model)
         return models
 

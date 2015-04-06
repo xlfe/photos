@@ -60,7 +60,9 @@ class PrepareUpload(BaseRESTHandler,CrosssiteAllowed):
             if applied.upload is not True:
                 return self.unauthorized()
 
-        params['name'] = params['album'] + '/' + uuid.uuid4().hex,
+        params['name'] = params['album'] + '/' + uuid.uuid4().hex
+        params['user'] = self.user.key.id()
+
 
         if not DEBUG:
             credentials = AppAssertionCredentials(scope='https://www.googleapis.com/auth/devstorage.read_write')
@@ -119,6 +121,9 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         meta = img.get_original_metadata()
         meta['UploadFileModified']=params['lastModifiedDate']
         meta['UploadOriginalPath']=params['path']
+        user = ndb.Key('User',params['user']).get()
+        assert user is not None
+        self.request.user = user
 
         first,last = Photo.allocate_ids(1,parent=album)
 
@@ -132,7 +137,8 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
                       album=album,
                       width=img.width,
                       height= img.height,
-                      metadata=meta
+                      metadata=meta,
+                      uploaded_by = self.request.user.key
                       )
 
         photo.serving_url = photo._serving_url
@@ -161,6 +167,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         meta = img.get_original_metadata()
         meta['UploadFileModified']=self.request.get('lastModifiedDate')
         meta['UploadOriginalPath']=self.request.get('path')
+        user = ndb.Key(urlsafe=self.request.get('user')).get()
+        assert user is not None
+        self.request.user = user
+
 
         first,last = Photo.allocate_ids(1,parent=album)
         photo = Photo(parent=album,
@@ -173,7 +183,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             md5=self.request.get('md5'),
             width=img.width,
             height= img.height,
-            metadata=meta
+            metadata=meta,
+            uploaded_by = user.key
         )
 
         photo.serving_url = photo._serving_url

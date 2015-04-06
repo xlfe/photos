@@ -55,7 +55,7 @@ export default DS.Model.extend(autosave,{
     subscribe: function() {
 
         if (this.get('more_results') === false){
-            Channel.subscribe(this.get('id'));
+            Channel.subscribe(this.get('id'),this.get('store'));
         }
 
     }.observes('more_results')

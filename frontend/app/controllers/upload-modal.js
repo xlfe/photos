@@ -81,7 +81,7 @@ export default Em.Controller.extend({
 
         if (cancel_file(this,file)){return;}
 
-        var prod = location.hostname !== 'localhost',
+        var prod = config.environment !== 'development',
             _this = this,
             method = prod === true ? 'PUT' : 'POST',
             size = file.get('chunk_size'),
@@ -100,6 +100,7 @@ export default Em.Controller.extend({
             form.append('lastModifiedDate', file.get('file').lastModifiedDate);
             form.append('file', data, file.get('name'));
             form.append('md5', file.get('md5'));
+            form.append('user', this.get('session.id'));
             data = form;
         }
 

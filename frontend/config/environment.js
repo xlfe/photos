@@ -35,10 +35,11 @@ module.exports = function (environment) {
         // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
         ENV.contentSecurityPolicy = {
-            'connect-src': "'self' http://iolggr.appspot.com http://localhost:8080"
+            'connect-src': "'self' http://iolggr.appspot.com http://192.168.5.5:8080"
         }
+        ENV.development = true;
 
-        ENV.api_host = 'http://localhost:8080';
+        ENV.api_host = 'http://192.168.5.5:8080';
     }
 
     if (environment === 'test') {

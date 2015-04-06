@@ -154,8 +154,10 @@ class BaseRESTHandler(webapp2.RequestHandler):
 
             #See if we know the user
             self.user = None
+            self.request.user = None
             if 'user' in self.session:
                 self.user = ndb.Key('User', self.session['user']).get()
+                self.request.user = self.user
 
             # Dispatch the request.
             response = webapp2.RequestHandler.dispatch(self)
@@ -360,8 +362,6 @@ class BaseRESTHandler(webapp2.RequestHandler):
                 if getattr(model,ip) != input_properties[ip]:
                     modified.append(ip)
 
-            if check_permissions.update_field_check(model,modified,self.user) is not True:
-                raise self.unauthorized()
 
             model.populate(**input_properties)
 

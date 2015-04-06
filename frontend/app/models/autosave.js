@@ -34,7 +34,7 @@ export default Em.Mixin.create({
     _save_me: function () {
         var _this = this;
         this.set('_saving', true);
-        console.log(this.changedAttributes());
+
         this.save().then(function () {
             //To allow the transition to take effect
             setTimeout(function(){

@@ -6,6 +6,8 @@ from google.appengine.api import channel
 from rest_gae.rest_gae import RESTException,BaseRESTHandler
 import webapp2
 from webapp2_extras.security import generate_random_string
+from rest_gae.rest_gae import NDBEncoder, model_ember_key
+from webapp2 import get_request
 
 # When a client opens an album they subscribe to updates to the album and the photos in the album
 # When a client logs in they also subscribe to updates to their user
@@ -32,15 +34,8 @@ class ChannelHandler(BaseRESTHandler):
         subscription = None
         result = {}
 
-        if 'channel_id' in self.session:
-            channel_id = self.session['channel_id']
-
         if 'channel_id' in json_data:
-            _channel_id = json_data['channel_id']
-            if channel_id is not None:
-                if _channel_id != channel_id:
-                    self.session['channel_id'] = _channel_id
-            channel_id = _channel_id
+            channel_id = json_data['channel_id']
 
         if channel_id is not None:
             subscription = ChannelSubscription.query(ChannelSubscription.channel_id == channel_id).get()
@@ -55,7 +50,6 @@ class ChannelHandler(BaseRESTHandler):
                 'token':token,
                 'channel_id':channel_id
             }
-            self.session['channel_id'] = channel_id
 
         if 'add' in json_data:
             album = ndb.Key(urlsafe=json_data['add']).get()
@@ -95,17 +89,50 @@ class ChannelDisconnectHandler(webapp2.RequestHandler):
             subscription.key.delete()
 
 
-from webapp2 import get_request
 
 
 def SendUpdate(type, model):
 
-    request = get_request()
-    for d in request.registry:
-        logging.info("UPDATE FROM {}".format(d))
+    req = get_request()
+    channel_id = None
+    user = req.user
 
-    subscriptions = ChannelSubscription.query(model.album in ChannelSubscription.album)\
-        .filter(ChannelSubscription.connected == True).fetch(100)
+    if 'X-Channel-ID' in req.headers:
+        channel_id = req.headers['X-Channel-ID']
+
+    subscriptions = ChannelSubscription.query(ChannelSubscription.albums == model.album) #.filter(ChannelSubscription.connected == True)
+
+    if channel_id is not None:
+        subscriptions = subscriptions.filter(ChannelSubscription.channel_id != channel_id)
+
+    subscriptions = subscriptions.fetch(100)
+
+    if len(subscriptions) == 0:
+        return
+
+    details = {
+        'user': user.key.urlsafe() if user is not None else None,
+        'type': type,
+        'model': model_ember_key(model),
+    }
+
+    if type == 'DEL':
+        details['data'] = model.key.urlsafe()
+    else:
+        details['data'] = model
+
+    details = json.dumps(details,cls=NDBEncoder)
 
     for s in subscriptions:
-        logging.info('{} {}'.format(type, model.key))
+        channel.send_message(s.channel_id,details)
+
+
+
+
+
+
+
+
+
+
+
