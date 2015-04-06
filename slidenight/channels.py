@@ -32,12 +32,18 @@ class ChannelHandler(BaseRESTHandler):
         subscription = None
         result = {}
 
+        if 'channel_id' in self.session:
+            channel_id = self.session['channel_id']
+
         if 'channel_id' in json_data:
-            channel_id = json_data['channel_id']
+            _channel_id = json_data['channel_id']
+            if channel_id is not None:
+                if _channel_id != channel_id:
+                    self.session['channel_id'] = _channel_id
+            channel_id = _channel_id
 
         if channel_id is not None:
-            subscription = ChannelSubscription().query(ChannelSubscription.channel_id == channel_id).get()
-
+            subscription = ChannelSubscription.query(ChannelSubscription.channel_id == channel_id).get()
 
         if subscription is None:
             #Generate a new channel
@@ -49,6 +55,7 @@ class ChannelHandler(BaseRESTHandler):
                 'token':token,
                 'channel_id':channel_id
             }
+            self.session['channel_id'] = channel_id
 
         if 'add' in json_data:
             album = ndb.Key(urlsafe=json_data['add']).get()
@@ -75,7 +82,7 @@ class ChannelConnectHandler(webapp2.RequestHandler):
         client_id = self.request.get('from')
         logging.info('{} has connected'.format(client_id))
 
-        subscription = ChannelSubscription().query(ChannelSubscription.channel_id == client_id).get()
+        subscription = ChannelSubscription.query(ChannelSubscription.channel_id == client_id).get()
         subscription.connected = True
         subscription.put()
 
@@ -83,7 +90,22 @@ class ChannelDisconnectHandler(webapp2.RequestHandler):
     def post(self):
         client_id = self.request.get('from')
 
-        subscription = ChannelSubscription().query(ChannelSubscription.channel_id == client_id).get()
+        subscription = ChannelSubscription.query(ChannelSubscription.channel_id == client_id).get()
         if subscription is not None:
             subscription.key.delete()
 
+
+from webapp2 import get_request
+
+
+def SendUpdate(type, model):
+
+    request = get_request()
+    for d in request.registry:
+        logging.info("UPDATE FROM {}".format(d))
+
+    subscriptions = ChannelSubscription.query(model.album in ChannelSubscription.album)\
+        .filter(ChannelSubscription.connected == True).fetch(100)
+
+    for s in subscriptions:
+        logging.info('{} {}'.format(type, model.key))

@@ -381,6 +381,7 @@ export default Em.Controller.extend({
                 i = 0;
 
             if (Em.isPresent(this.get('confirm_delete'))) {
+                this.set('confirm_delete', false);
                 _this.get('selected').map(function (_) {
                     Em.run.later(function () {
                         _.destroyRecord();

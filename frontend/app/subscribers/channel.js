@@ -3,15 +3,29 @@ import config from '../config/environment';
 var endpoint = [config.api_host, config.api_endpoint, 'channel'].join('/');
 /* global goog */
 
-var channel_id,
-    channel,
+export var channel_id;
+
+var channel,
     subscriptions = [],
     socket;
 
-//    socket.onopen = onOpened;
-//    socket.onmessage = onMessage;
-//    socket.onerror = onError;
-//    socket.onclose = onClose;
+function onOpen(data) {
+    console.log('channel open',data);
+}
+
+function onMessage(data) {
+    console.log('channel message',data);
+}
+
+function onError(data) {
+    console.log('channel error',data);
+}
+
+function onClose(data) {
+    console.log('channel close',data);
+    channel_id = undefined;
+    subscriptions=[];
+}
 
 function modChannel(data){
 
@@ -30,6 +44,10 @@ function modChannel(data){
             if (Em.isPresent(data['token']) === true){
                 channel = new goog.appengine.Channel(data.token);
                 socket = channel.open();
+                socket.onopen = onOpen;
+                socket.onmessage = onMessage;
+                socket.onerror = onError;
+                socket.onclose = onClose;
                 channel_id = data['channel_id'];
 
             }

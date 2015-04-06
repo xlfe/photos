@@ -8,6 +8,7 @@ import json
 from rest_gae.rest_gae import RESTException,BaseRESTHandler
 from rest_gae.permissions import Permissions
 from deferred_tasks import send_email
+from channels import SendUpdate
 
 from webapp2_extras import security
 
@@ -231,6 +232,8 @@ class ClaimHandler(BaseRESTHandler):
 
 
 
+
+
 class Photo(ndb.Model):
 
     class RESTMeta:
@@ -277,12 +280,18 @@ class Photo(ndb.Model):
 
     @staticmethod
     def after_delete(deleted_keys,models):
-
         for m in models:
             blobstore.delete(m._blobinfo)
 
 
+    @staticmethod
+    def after_put(created_keys, model):
+        SendUpdate('UPDATE',model)
+        return model
 
-
-
+    @staticmethod
+    def before_delete(models):
+        for model in models:
+            SendUpdate('DELETE',model)
+        return models
 

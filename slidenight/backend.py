@@ -6,7 +6,7 @@ import uuid
 from rest_gae.rest_gae import RESTHandler,BaseRESTHandler
 from rest_gae.permissions import *
 from models import *
-from channels import ChannelHandler, ChannelConnectHandler, ChannelDisconnectHandler
+from channels import ChannelHandler, ChannelConnectHandler, ChannelDisconnectHandler, SendUpdate
 from google.appengine.ext import blobstore, ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
@@ -138,6 +138,8 @@ class GCSFinalizeHandler(webapp2.RequestHandler):
         photo.serving_url = photo._serving_url
         photo.put()
 
+        SendUpdate('NEW',photo)
+
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(photo.key.urlsafe()))
 
@@ -177,6 +179,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         photo.serving_url = photo._serving_url
         photo.put()
 
+        SendUpdate('NEW',photo)
+
         self.response.headers['Content-Type'] = 'application/json'
         allow_crosssite(self.response)
         self.response.out.write(json.dumps(photo.key.urlsafe()))
@@ -201,7 +205,11 @@ app = webapp2.WSGIApplication([
         RESTHandler('/api/invites', Invite, permissions=PERM_APPLY(PERMISSION_INVITE),after_post_callback=Invite.after_put_callback,after_put_callback=Invite.after_put_callback,allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/register',User,   permissions=REGISTER_PERMISSIONS,        before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/users',   User,   permissions=ANON_VIEWER,                 allowed_origin=ALLOWED_ORIGIN),
-        RESTHandler('/api/photos',  Photo,  permissions=PERM_APPLY(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,after_delete_callback=Photo.after_delete),
+        RESTHandler('/api/photos',  Photo,  permissions=PERM_APPLY(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,
+                    after_delete_callback=Photo.after_delete,
+                    before_delete_callback=Photo.before_delete,
+                    after_put_callback=Photo.after_put
+        ),
         RESTHandler('/api/albums',  Album,  permissions=PERM_APPLY(PERMISSION_ALBUM),allowed_origin=ALLOWED_ORIGIN),
       ],
     debug=True,
