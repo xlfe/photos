@@ -313,6 +313,7 @@ export default Em.Controller.extend({
                     return;
                 }
 
+                __.set('visible', false);
                 __.set('display_w', _width);
                 __.set('display_h', _height);
 
