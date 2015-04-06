@@ -63,17 +63,24 @@ export default Em.Component.extend({
             return;
         }
 
+        this.$().css({
+            height: h + 'px',
+            width: w + 'px',
+        });
+
+        if (this.get('photo.visible') === false){
+            return;
+        }
+
         var
             img = this.$(),
             url = this.get('photo').get_image(Math.max(w,h),img);
 
-        this.$().css({
-            height: h + 'px',
-            width: w + 'px',
+        img.css({
             'background-image': 'url(' + url + ')'
-        });
+        })
 
-    }.observes('photo.display_h','photo.display_w').on('didInsertElement'),
+    }.observes('photo.display_h','photo.display_w','photo.visible').on('didInsertElement'),
     dragStart: function () {
         this.get('album').set('drag.photo',this.get('photo'));
     },

@@ -23,14 +23,27 @@ export default Em.View.extend({
     size_photos: function(){
         this.get('controller').size_photos();
     },
+    willDestroyElement: function() {
+
+        Em.$(window).on('DOMContentLoaded load resize scroll', undefined);
+        Em.$(window).resize(undefined);
+    },
     didInsertElement: function () {
         var _this = this,
+            controller = this.get('controller'),
             initialX, initialY;
 
         Em.$(window).resize(function () {
             Em.run.debounce(_this, _this.size_photos, 100);
         });
         this.size_photos();
+
+        //track visibility of photos
+        var handler = function(){
+            controller.vis_check();
+        };
+        Em.$(window).on('DOMContentLoaded load resize scroll', handler);
+
 
         if (this.get('controller.permissions.move') !== true && this.get('controller.permissions.sort') !== true){
             return;

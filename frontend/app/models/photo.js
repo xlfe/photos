@@ -90,5 +90,6 @@ export default DS.Model.extend(autosave,{
     },
 
     //Local properties
-    selected: false
+    selected: false,
+    visible: false
 });
