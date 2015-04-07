@@ -12,7 +12,7 @@ from channels import SendUpdate
 
 from webapp2_extras import security
 
-DOMAIN = "https://slide-night.appspot.com"
+DOMAIN = "https://app.slidenight.co"
 HASHING_PW_PEPPER = 'jM3n/Ddp)&QY)R/kcDqzG[4?"C80v8SPSM#We}_x*V[JsQ>$C)7#6WN=XqUZ=RiYeGJ$})nj(B#x$e/K-I>o'
 PW_SALT_LENGTH = 30
 
