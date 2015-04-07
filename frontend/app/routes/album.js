@@ -18,7 +18,7 @@ export default Em.Route.extend({
             query_params = {
                 'limit':100,
                 'order': 'path,pos',
-                'q': "album=KEY('" + params.album_id + "')"
+                'q': "album=KEY('Album', " + params.album_id + ")"
             };
 
         var get_more = function(album,photos) {
@@ -50,7 +50,7 @@ export default Em.Route.extend({
                 Channel.unsubscribe_except(params.album_id);
 
                 album.set('photos', store.filter('photo',function(p){
-                    if(p.get('album') === params.album_id) {
+                    if(p.get('album') === +params.album_id) {
                         if (p.get('currentState.isLoading') === true || p.get('currentState.isDeleted') === true) {
                             return false;
                         }

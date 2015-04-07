@@ -101,7 +101,7 @@ export function subscribe(album,_store) {
     store=_store;
     last_album = album;
     subscriptions.pushObject(album);
-    //modChannel({'add':album});
+    modChannel({'add':album});
 }
 
 export function unsubscribe_except(album) {

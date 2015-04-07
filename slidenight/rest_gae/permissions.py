@@ -93,7 +93,7 @@ class PermissionAlbum(PermissionObjectOwner):
 
         #Only logged in users can search for albums
         if user is None:
-            return False
+            return None
 
         #Only albums that the user has been invited to view or owns
         owner_property = getattr(model, self._get_owner_property(model))

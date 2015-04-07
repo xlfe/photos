@@ -29,6 +29,7 @@ export default DS.Model.extend(autosave,{
     resolved_permissions: function() {
         var owner = this.get('owner');
 
+
         return [perm.create().load({
             view: true,
             edit: true,
@@ -39,7 +40,7 @@ export default DS.Model.extend(autosave,{
             delete: true,
             owner: true,
 
-            user: this.get('owner.id'),
+            user: +this.get('owner.id'),
             _user: owner
         })].concat(this.get('_resolved_permissions'));
 

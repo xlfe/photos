@@ -52,7 +52,7 @@ class ChannelHandler(BaseRESTHandler):
             }
 
         if 'add' in json_data:
-            album = ndb.Key(urlsafe=json_data['add']).get()
+            album = ndb.Key('Album',int(json_data['add'])).get()
             assert album is not None
             assert album._get_kind() == 'Album'
 
@@ -65,7 +65,7 @@ class ChannelHandler(BaseRESTHandler):
                 subscription.albums.append(album.key)
 
         if 'rem' in json_data:
-            to_rem = ndb.Key(urlsafe=json_data['rem'])
+            to_rem = ndb.Key('Album',int(json_data['rem']))
             subscription.albums = filter(lambda x: x != to_rem,subscription.albums)
 
         subscription.put()
@@ -111,13 +111,13 @@ def SendUpdate(type, model):
         return
 
     details = {
-        'user': user.key.urlsafe() if user is not None else None,
+        'user': user.key.id() if user is not None else None,
         'type': type,
         'model': model_ember_key(model),
     }
 
     if type == 'DEL':
-        details['data'] = model.key.urlsafe()
+        details['data'] = model.key.id()
     else:
         details['data'] = model
 

@@ -158,7 +158,7 @@ export default Em.Controller.extend({
     },
     arrangedContent: function() {
         var path = this.get('path') || '',
-            album = this.get('model.id'),
+            album = +this.get('model.id'),
             _search = this.get('_search'),
             search = this.get('search');
 
@@ -343,7 +343,7 @@ export default Em.Controller.extend({
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
         var anon = this.get('session.isAuthenticated') === false,
-            my_id = this.get('session.id'),
+            my_id = +this.get('session.id'),
             perms = this.get('model.resolved_permissions').filter(function(_){
 
                 if (anon === true){
