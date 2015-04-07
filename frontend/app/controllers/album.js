@@ -100,7 +100,7 @@ function sort_pos(a,b){
 function isElementInViewport (el) {
 
     //special bonus for those using jQuery
-    if (typeof jQuery === "function" && el instanceof jQuery) {
+    if (typeof Em.$ === "function" && el instanceof Em.$) {
         el = el[0];
     }
 
@@ -169,7 +169,7 @@ export default Em.Controller.extend({
 
             var sp = this.get('search_paths').filter(function(s){return s.disabled === false;}).map(function(s){return s.path;});
 
-            return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+            return Em.ArrayProxy.createWithMixins(Em.SortableMixin, {
                 sortProperties: ['path','pos'],
                 content: this.get('store').filter('photo',function(_){
 
@@ -184,7 +184,7 @@ export default Em.Controller.extend({
             });
 
         } else {
-            return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+            return Em.ArrayProxy.createWithMixins(Em.SortableMixin, {
                 sortProperties: ['pos'],
                 content: this.get('store').filter('photo',function(_){
 
