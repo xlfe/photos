@@ -17,7 +17,7 @@ export default Em.Route.extend({
                 data: JSON.stringify({invite: params.invite_id}),
                 dataType: 'json',
                 success: function (_data) {
-                    _this.transitionTo('albums');
+                    _this.transitionTo('album',_data.album);
                 },
                 error: function (error) {
                     alert("Something wen't wrong. Please try again!");

@@ -226,7 +226,7 @@ class ClaimHandler(BaseRESTHandler):
         album.put()
         invite.key.delete()
 
-        return self.success({'message':'success'})
+        return self.success({'album':int(album.key.id())})
 
 
 

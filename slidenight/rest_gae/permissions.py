@@ -9,7 +9,7 @@ class Permissions(ndb.Model):
     move = ndb.BooleanProperty()
     upload = ndb.BooleanProperty()
     delete = ndb.BooleanProperty()
-    user = ndb.KeyProperty()
+    user = ndb.KeyProperty('User')
 
 
     @classmethod

@@ -72,7 +72,6 @@ export default Em.Controller.extend({
             _this.get('store').find('invite', {
                 'q': "album=KEY('Album', " + id + ")"
             }).then(function () {
-                "use strict";
                 _this.set('view_only', false);
                 resolve();
 
