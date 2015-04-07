@@ -1,12 +1,36 @@
-{{reactive-text type="text" tabindex=idx photo=photo disabled=album.permissions.no_edit readonly=album.permissions.no_edit value=photo.title classNames="title"}}
-{{#if album.permissions.move}}
-    <i class="icon fa fa-check-circle fa-2x" {{action 'selection'}}></i>
-{{else if album.permissions.sort}}
-    <i class="icon fa fa-check-circle fa-2x" {{action 'selection'}}></i>
-{{/if}}
+<div class="sheet">
+    <div {{bind-attr class="photo.comments.length:has-comments :comments :icon"}} {{action 'show_comments'}}>
+         <span class="fa-stack fa">
+            <i class="fa fa-comment fa-stack-2x"></i>
+            <strong class="fa-stack-1x fa-stack-text fa-inverse">
+                {{photo.comments.length}}
+            </strong>
+        </span>
+    </div>
+
+    {{reactive-text type="text" tabindex=idx photo=photo disabled=album.permissions.no_edit readonly=album.permissions.no_edit value=photo.title classNames="title"}}
+    {{#if album.permissions.move}}
+        <i class="icon fa fa-check-circle fa-2x" {{action 'selection'}}></i>
+        {{else-if album.permissions.sort}}
+        <i class="icon fa fa-check-circle fa-2x" {{action 'selection'}}></i>
+    {{/if}}
 
 
-    <span {{action 'add_tag'}} class="icon tag add"><i class="fa fa-lg fa-plus-circle"></i></span>
+    <span {{action 'add_tag'}} class="icon tag add"><i class="fa fa-lg fa-plus"></i></span>
     {{#each tag in photo.tags}}
         <span class="icon tag">{{tag}} <i class="fa fa-remove" {{action 'remove_tag' tag}}></i></span>
     {{/each}}
+
+</div>
+
+{{#if photo.show_comments}}
+    <div class="expanded-details">
+
+        this<br>
+        this<br>
+        this<br>
+        {{input type="text"}}
+        this<br>
+        this<br>
+    </div>
+{{/if}}

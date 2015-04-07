@@ -26,6 +26,7 @@ export default DS.Model.extend(autosave,{
     height:     attr('number',      ro),
     metadata:   attr('object',      ro),
     serving_url: attr('string',     ro),
+    comments: DS.hasMany('comments',{async:true}),
 
     //Mutable
     title:      attr('string'),

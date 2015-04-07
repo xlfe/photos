@@ -16,7 +16,8 @@ export default Em.Component.extend({
         'highlight-right:',
         'highlight-left:',
         'photo.selected:selected',
-        'photo.hasFocus:hasFocus'
+        'photo.hasFocus:hasFocus',
+        'photo.show_comments:show_comments'
     ],
     attributeBindings: ['draggable','photo_id:data-photo'],
     idx: function(){
@@ -39,6 +40,32 @@ export default Em.Component.extend({
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),
+    display_details: function() {
+        var display = this.get('photo.show_comments'),
+            photo = this.get('photo');
+
+
+        if (display === true){
+            this.get('album.arrangedContent').forEach(function(_){
+                if (_ !== photo){
+                    _.set('show_comments',false);
+                }
+            });
+            Em.run.later(this,function(){
+                this.$().animate({
+                    'margin-bottom': this.$('.expanded-details').outerHeight(true) + 'px'
+                },300);
+                this.$('.expanded-details').animate({
+                    opacity: 1
+                },550)
+            })
+        } else {
+            this.$().animate({
+                'margin-bottom': '0px'
+            },500)
+        }
+
+    }.observes('photo.show_comments'),
     click: function(e){
         var selection = this.get('selection_mode') > 0;
         if (Em.$(e.target).hasClass('photo') === true) {
@@ -234,6 +261,9 @@ export default Em.Component.extend({
         },
         selection: function() {
             this.toggleProperty('photo.selected');
+        },
+        show_comments: function() {
+            this.toggleProperty('photo.show_comments');
         },
         add_tag: function(){
 

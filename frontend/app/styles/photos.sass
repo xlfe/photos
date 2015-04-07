@@ -56,17 +56,19 @@ $o-hover-item: 0.5
       margin: 3px
       margin-left: 10px
 
-    .tag
-      min-width: 10px
-      background-color: rgba(0, 0, 128, 0.95)
-      color: white
-      border-radius: 30px
+    .tag, .comments
       margin-top: 3px
       margin-bottom: 3px
       margin-left: 1px
+
+    .tag
       padding: 3px
       padding-left: 10px
       padding-right: 10px
+      border-radius: 30px
+      min-width: 10px
+      background-color: black
+      color: white
       i
         display: inline-block
         color: white
@@ -75,9 +77,26 @@ $o-hover-item: 0.5
     .tag.add
       border-radius: 20px
       i
-        margin-left: -5px
-        margin-right: -5px
+        margin-left: -4px
+        margin-right: -4px
 
+    .sheet
+      pointer-events: none
+      position: relative
+      height: 100%
+      width: 100%
+      *
+        pointer-events: all
+
+    .comments
+      position: absolute
+      bottom: 1px
+      right: 1px
+      opacity: 0
+      *
+        opacity: 1
+    .comments.has-comments
+      opacity: 0.55
 
     .fa-check-circle
       color: #1dd200
@@ -96,25 +115,20 @@ $o-hover-item: 0.5
         @include transition(opacity, 0.25s, ease-out)
 
     &:hover, &.hasFocus
+
       .icon
-        //margin-top: 0
         opacity: $o-hover-photo
         &:hover
           opacity: $o-hover-item
 
-      .ember-text-field
+      .ember-text-field, .comments
         opacity: 0.8
         &:hover
           opacity: 1
 
 
   .photo.selected
-    //&:hover
-      .ember-text-field
-        display: block
-
-    .ember-text-field
-      //display: none
+    .ember-text-field, .comments
       opacity: $o-active
 
     .icon
@@ -130,6 +144,18 @@ $o-hover-item: 0.5
 .albums
   @extend .your-photos
 
+.show_comments
+  box-shadow: 0 0 5px black
+
+.expanded-details
+  opacity: 0
+  margin-top: 5px
+  padding-left: 1%
+  padding-right: 1%
+  position: absolute
+  left: 1.5%
+  right: 1.5%
+  border: 2px solid rgba(0, 0, 0, 0.51)
 
 $highlight-border: 5px solid rgba(255, 249, 0, 0.84) !important
 

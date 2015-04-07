@@ -299,8 +299,9 @@ class Photo(ndb.Model):
 
 class Comment(ndb.Model):
     album = ndb.KeyProperty(Album, required=True)
-    photo = ndb.KeyProperty(Photo)
-    user  = ndb.KeyProperty(User)
+    photo = ndb.KeyProperty(Photo,required=True)
+    user  = ndb.KeyProperty(User,required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
+    text = ndb.StringProperty(indexed=False)
 
 

@@ -303,7 +303,7 @@ export default Em.Controller.extend({
             var scale = (w - row.length * 2) / row_width;
 
             row.forEach(function (__) {
-                var _width = calc_width(__) * scale,
+                var _width = (calc_width(__) * scale) +2 ,
                     _height = __.get('height') / __.get('width') * _width,
                     existing_h = __.get('display_w'),
                     existing_w = __.get('display_w');
@@ -371,7 +371,6 @@ export default Em.Controller.extend({
                     return;
                 }
                 if (isElementInViewport(el)) {
-                    console.log("in viewport")
                     photo.set('visible', true);
                 }
             });
