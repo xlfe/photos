@@ -298,9 +298,12 @@ class Photo(ndb.Model):
 
 
 class Comment(ndb.Model):
+    class RESTMeta:
+        user_owner_property = 'user'
+
     album = ndb.KeyProperty(Album, required=True)
     photo = ndb.KeyProperty(Photo,required=True)
-    user  = ndb.KeyProperty(User,required=True)
+    user  = ndb.KeyProperty(User)
     created = ndb.DateTimeProperty(auto_now_add=True)
     text = ndb.StringProperty(indexed=False)
 

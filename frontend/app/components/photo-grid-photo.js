@@ -72,10 +72,8 @@ export default Em.Component.extend({
             owner = +this.get('album.model.owner.id'),
             sid = this.get('session.id');
         comments.forEach(function(c){
-            console.log(owner,sid,owner===sid)
             if (+c.get('user.id') === +sid || owner === +sid) {
                 c.set('owner',true);
-                console.log('trie')
             }
         });
 
@@ -277,7 +275,11 @@ export default Em.Component.extend({
             this.toggleProperty('photo.selected');
         },
         show_comments: function() {
-            this.toggleProperty('photo.show_comments');
+            if (this.get('photo.comments.length') === 0 && this.get('album.permissions.comment') === false){
+               this.set('photo.show_comments',false);
+            } else {
+                this.toggleProperty('photo.show_comments');
+            }
         },
         add_tag: function(){
 

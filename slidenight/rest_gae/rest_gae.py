@@ -382,9 +382,15 @@ class BaseRESTHandler(webapp2.RequestHandler):
             if value is None:
                 return None
 
+
             try:
-                return ndb.Key(prop._kind,int(value))
+                model_id = int(value)
+                assert prop._kind is not None,'You must specify the kind for your KeyProperty {}'.format(prop.__dict__)
+                return ndb.Key(prop._kind,model_id)
+            except ValueError:
+                return ndb.Key(urlsafe=value)
             except:
+                # raise
                 raise RESTException('invalid key: {}'.format(value) )
         elif isinstance(prop, ndb.TimeProperty):
             if dateutil is None:
