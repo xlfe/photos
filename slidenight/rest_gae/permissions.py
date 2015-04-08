@@ -9,7 +9,7 @@ class Permissions(ndb.Model):
     move = ndb.BooleanProperty()
     upload = ndb.BooleanProperty()
     delete = ndb.BooleanProperty()
-    user = ndb.KeyProperty()
+    user = ndb.KeyProperty('User')
 
 
     @classmethod
@@ -93,7 +93,7 @@ class PermissionAlbum(PermissionObjectOwner):
 
         #Only logged in users can search for albums
         if user is None:
-            return False
+            return None
 
         #Only albums that the user has been invited to view or owns
         owner_property = getattr(model, self._get_owner_property(model))
@@ -234,6 +234,83 @@ class PermissionPhoto(Permission,AlbumQuery):
 
 
 
+class PermissionComment(Permission,AlbumQuery):
+    method_reqs ={
+        'QUERY': lambda x: x.view is True,
+        'GET': lambda x: x.view is True,
+        'POST': lambda x: x.upload is True,
+        'PUT': lambda x: x.edit is True or x.sort is True or x.move is True,
+        'DELETE':lambda x:x.delete is True
+    }
+
+    change_reqs ={
+        'title': lambda x: x.edit is True,
+        'tags': lambda x: x.edit is True,
+        'pos': lambda x:x.sort is True,
+        'path': lambda x:x.move is True
+    }
+
+    def apply_permissions_filter(self, query, model, user):
+
+        #Only allow searching for photos where we have an album specified
+        try:
+            album = self.album_from_query(query)
+        except AssertionError:
+            return None
+
+        #Album owner is allowed
+        if user is not None and album.owner == user.key:
+            return query
+
+        applied = Permissions.get_permission(album, user)
+        if self.method_reqs['QUERY'](applied) is True:
+            return query
+
+        return None
+
+    def post_validate(self, method, model, user):
+
+        album = model.album.get()
+        assert album is not None
+
+        #Album owner can do anything
+        if user is not None and album.owner == user.key:
+            return True
+
+        applied = Permissions.get_permission(album,user)
+        if method not in self.method_reqs:
+            return False
+
+        if self.method_reqs[method](applied) is True:
+            return True
+
+        return False
+
+
+    def update_field_check(self, model, fields, user):
+
+        album = model.album.get()
+        assert album is not None
+
+        #Album owner can do anything
+        if user is not None and album.owner == user.key:
+            return True
+
+        applied = Permissions.get_permission(album,user)
+
+        for field in fields:
+            if field not in self.change_reqs:
+                return False
+
+            if self.change_reqs[field](applied) is not True:
+                return False
+
+        logging.info('CHANGED '+str(fields))
+        return True
+
+
+
+
 class PermissionInvite(PermissionUser,AlbumQuery):
 
     #only the album owner can query for the invites in an album
@@ -263,6 +340,7 @@ PERMISSION_ANYONE = [PermissionAnyone()]
 PERMISSION_LOGGED_IN_USER = [PermissionUser()]
 PERMISSION_ALBUM = [PermissionAlbum()]
 PERMISSION_PHOTO = [PermissionPhoto()]
+PERMISSION_COMMENT = [PermissionComment()]
 PERMISSION_INVITE = [PermissionInvite()]
 
 REGISTER_PERMISSIONS = {

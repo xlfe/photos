@@ -17,7 +17,7 @@ export default DS.Model.extend(autosave,{
 
     //ReadOnly
 
-    album:      attr('string',      ro),
+    album:      attr('number',      ro),
     filename:   attr('string',      ro),
     md5:        attr('string',      ro),
     uploaded:   attr('isodatetime', ro),
@@ -26,7 +26,12 @@ export default DS.Model.extend(autosave,{
     height:     attr('number',      ro),
     metadata:   attr('object',      ro),
     serving_url: attr('string',     ro),
+    comments: DS.hasMany('comments',{async:true}),
+    sorted_comments: function() {
 
+        return this.get('comments').sortBy('created').reverseObjects();
+
+    }.property('comments.length'),
     //Mutable
     title:      attr('string'),
     caption:    attr('string'),

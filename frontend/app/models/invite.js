@@ -5,7 +5,7 @@ var attr = DS.attr;
 
 export default DS.Model.extend({
     email: attr('string'),
-    album: attr('string'),
+    album: attr('number'),
     permissions: attr('object'),
     last_emailed: attr('isodatetime')
 });

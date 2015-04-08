@@ -60,7 +60,7 @@ export default Em.Controller.extend({
     }.property('invites'),
     view_only: true,
     saved_invites: function () {
-        var id = this.get('model.id'),
+        var id = +this.get('model.id'),
             _this = this,
             invites = this.get('store').filter('invite', function (i) {
                 return i.get('album') === id;
@@ -70,9 +70,8 @@ export default Em.Controller.extend({
         new Em.RSVP.Promise(function(resolve,reject){
 
             _this.get('store').find('invite', {
-                'q': "album=KEY('" + id + "')"
+                'q': "album=KEY('Album', " + id + ")"
             }).then(function () {
-                "use strict";
                 _this.set('view_only', false);
                 resolve();
 
@@ -97,7 +96,7 @@ export default Em.Controller.extend({
             var invites = this.get('invite_list'),
                 store = this.get('store'),
                 _this = this,
-                album = this.get('model.id'),
+                album = +this.get('model.id'),
                 tosave = invites.map(function(i){
 
                     return store.createRecord('invite',{

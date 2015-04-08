@@ -48,7 +48,7 @@ class PrepareUpload(BaseRESTHandler):
             assert p in required
 
 
-        album = ndb.Key(urlsafe=params['album']).get()
+        album = ndb.Key('Album',int(params['album'])).get()
         assert album is not None
         assert album._get_kind() == 'Album'
 
@@ -61,7 +61,7 @@ class PrepareUpload(BaseRESTHandler):
             if applied.upload is not True:
                 return self.unauthorized()
 
-        params['name'] = params['album'] + '/' + uuid.uuid4().hex
+        params['name'] = str(params['album']) + '/' + uuid.uuid4().hex
         params['user'] = self.user.key.id()
 
 
@@ -111,7 +111,7 @@ class GCSFinalizeHandler(BaseRESTHandler):
         params = json.loads(self.request.body)
 
         blobstore_filename = '/gs/' + params['id']
-        album = ndb.Key(urlsafe=params['album'])
+        album = ndb.Key('Album',int(params['album']))
         _album = album.get()
         assert _album is not None
 
@@ -133,6 +133,7 @@ class GCSFinalizeHandler(BaseRESTHandler):
         first,last = Photo.allocate_ids(1,parent=album)
 
         photo = Photo(parent=album,
+                      id=first,
                       gs = blobstore_filename,
                       title='.'.join(params['name'].split('.')[:-1]),
                       path=params['path'],
@@ -162,7 +163,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         blob_info = upload_files[0]
 
         name = blob_info.filename
-        album = ndb.Key(urlsafe=self.request.get('album'))
+        album = ndb.Key('Album',int(self.request.get('album')))
         _album = album.get()
 
         img = images.Image(blob_key=blob_info.key())
@@ -172,13 +173,14 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         meta = img.get_original_metadata()
         meta['UploadFileModified']=self.request.get('lastModifiedDate')
         meta['UploadOriginalPath']=self.request.get('path')
-        user = ndb.Key(urlsafe=self.request.get('user')).get()
+        user = ndb.Key('User',int(self.request.get('user'))).get()
         assert user is not None
         self.request.user = user
 
 
         first,last = Photo.allocate_ids(1,parent=album)
         photo = Photo(parent=album,
+            id=first,
             blob=blob_info.key(),
             title='.'.join(name.split('.')[:-1]),
             path=self.request.get('path'),
@@ -221,6 +223,7 @@ app = webapp2.WSGIApplication([
         RESTHandler('/api/invites', Invite, permissions=PERM_APPLY(PERMISSION_INVITE),after_post_callback=Invite.after_put_callback,after_put_callback=Invite.after_put_callback,allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/register',User,   permissions=REGISTER_PERMISSIONS,        before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/users',   User,   permissions=ANON_VIEWER,                 allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/comments',Comment,permissions=PERM_APPLY(PERMISSION_COMMENT),allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/photos',  Photo,  permissions=PERM_APPLY(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,
                     after_delete_callback=Photo.after_delete,
                     before_delete_callback=Photo.before_delete,

@@ -19,6 +19,12 @@ import logging
 
 model_ember_key = lambda (model):model._get_kind().lower()[0] + model._get_kind()[1:]
 
+def key_encoder(key):
+    if len(key.pairs()) > 1:
+        return key.urlsafe()
+    else:
+        return int(key.id())
+
 class NDBEncoder(json.JSONEncoder):
     """JSON encoding for NDB models and properties"""
 
@@ -30,7 +36,7 @@ class NDBEncoder(json.JSONEncoder):
             included_properties = get_included_properties(obj, 'output')
 
             obj_dict = dict((k,v) for k,v in obj_dict.iteritems() if k in included_properties)
-            obj_dict['id'] = obj.key.urlsafe()
+            obj_dict['id'] = key_encoder(obj.key)
 
             return obj_dict
 
@@ -38,7 +44,7 @@ class NDBEncoder(json.JSONEncoder):
             return obj.isoformat()
 
         elif isinstance(obj, ndb.Key) or isinstance(obj,ndb.KeyProperty):
-            return obj.urlsafe()
+            return key_encoder(obj)
 
         else:
             return super(NDBEncoder,self).default(obj)
@@ -227,11 +233,12 @@ class BaseRESTHandler(webapp2.RequestHandler):
             return None
 
         try:
+            model_id = int(model_id)
+            model = ndb.Key(self.model._get_kind(),model_id).get()
+        except ValueError:
             model = ndb.Key(urlsafe=model_id).get()
-            if not model:
-                raise Exception()
-        except Exception, exc:
-            # Invalid key name
+
+        if model is None:
             raise RESTException('Invalid model id - %s' % model_id)
 
         return model
@@ -375,9 +382,15 @@ class BaseRESTHandler(webapp2.RequestHandler):
             if value is None:
                 return None
 
+
             try:
+                model_id = int(value)
+                assert prop._kind is not None,'You must specify the kind for your KeyProperty {}'.format(prop.__dict__)
+                return ndb.Key(prop._kind,model_id)
+            except ValueError:
                 return ndb.Key(urlsafe=value)
             except:
+                # raise
                 raise RESTException('invalid key: {}'.format(value) )
         elif isinstance(prop, ndb.TimeProperty):
             if dateutil is None:

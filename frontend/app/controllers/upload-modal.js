@@ -21,7 +21,7 @@ export default Em.Controller.extend({
     concurrent_uploads: 3,
     prepare_upload: function (file) {
         var self = this,
-            album = this.get('model.id');
+            album = +this.get('model.id');
 
         if (cancel_file(this,file)){return;}
 
@@ -99,7 +99,7 @@ export default Em.Controller.extend({
             form.append('lastModifiedDate', file.get('file').lastModifiedDate);
             form.append('file', data, file.get('name'));
             form.append('md5', file.get('md5'));
-            form.append('user', this.get('session.id'));
+            form.append('user', +this.get('session.id'));
             data = form;
         }
 

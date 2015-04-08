@@ -39,9 +39,7 @@ function add_file(file, folders, files,album) {
 
             if (!Em.isEmpty(album.get('photos'))){
 
-                if (album.get('photos').filter(function(photo){
-                        return photo.get('md5') === md5;
-                }).length > 0) {
+                if (Em.isPresent(album.get('photos').findBy('md5',md5))){
                     new_file.setProperties({
                         dupe: true,
                         status: 'Duplicate',

@@ -12,7 +12,7 @@ from channels import SendUpdate
 
 from webapp2_extras import security
 
-DOMAIN = "https://slide-night.appspot.com"
+DOMAIN = "https://app.slidenight.co"
 HASHING_PW_PEPPER = 'jM3n/Ddp)&QY)R/kcDqzG[4?"C80v8SPSM#We}_x*V[JsQ>$C)7#6WN=XqUZ=RiYeGJ$})nj(B#x$e/K-I>o'
 PW_SALT_LENGTH = 30
 
@@ -113,7 +113,7 @@ class LoginHandler(BaseRESTHandler):
         if security.check_password_hash(password, user.password_hash, pepper=HASHING_PW_PEPPER) is True:
             self.session['user'] = user.key.id()
             return self.success({
-                'id':user.key.urlsafe(),
+                'id':user.key.id(),
                 'validated': user.validated,
                 'full_name': user.full_name
             })
@@ -145,7 +145,7 @@ class LoginHandler(BaseRESTHandler):
 
         if self.user is not None:
             return self.success({
-                'id':self.user.key.urlsafe(),
+                'id':self.user.key.id(),
                 'validated':self.user.validated,
                 'full_name':self.user.full_name
             })
@@ -191,7 +191,7 @@ class Invite(ndb.Model):
         data = {
             'from':owner.full_name,
             'album':album.name,
-            'invite':model.key.urlsafe()
+            'invite':model.key.id()
         }
         _template = template.format(**data)
 
@@ -212,7 +212,7 @@ class ClaimHandler(BaseRESTHandler):
         if self.user is None:
             return self.unauthorized()
 
-        invite = ndb.Key(urlsafe=json_data['invite']).get()
+        invite = ndb.Key('Invite',int(json_data['invite'])).get()
         assert invite is not None
         assert invite._get_kind() == 'Invite'
 
@@ -226,7 +226,7 @@ class ClaimHandler(BaseRESTHandler):
         album.put()
         invite.key.delete()
 
-        return self.success({'message':'success'})
+        return self.success({'album':int(album.key.id())})
 
 
 
@@ -295,4 +295,16 @@ class Photo(ndb.Model):
         for model in models:
             SendUpdate('DEL',model)
         return models
+
+
+class Comment(ndb.Model):
+    class RESTMeta:
+        user_owner_property = 'user'
+
+    album = ndb.KeyProperty(Album, required=True)
+    photo = ndb.KeyProperty(Photo,required=True)
+    user  = ndb.KeyProperty(User)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    text = ndb.StringProperty(indexed=False)
+
 

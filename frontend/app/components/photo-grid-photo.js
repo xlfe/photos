@@ -16,7 +16,8 @@ export default Em.Component.extend({
         'highlight-right:',
         'highlight-left:',
         'photo.selected:selected',
-        'photo.hasFocus:hasFocus'
+        'photo.hasFocus:hasFocus',
+        'photo.show_comments:show_comments'
     ],
     attributeBindings: ['draggable','photo_id:data-photo'],
     idx: function(){
@@ -39,6 +40,44 @@ export default Em.Component.extend({
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),
+    display_details: function() {
+        var display = this.get('photo.show_comments'),
+            photo = this.get('photo');
+
+
+        if (display === true){
+            this.get('album.arrangedContent').forEach(function(_){
+                if (_ !== photo){
+                    _.set('show_comments',false);
+                }
+            });
+            Em.run.later(this,function(){
+                this.$().animate({
+                    'margin-bottom': this.$('.expanded-details').outerHeight(true) + 'px'
+                },50);
+                this.$('.expanded-details').animate({
+                    opacity: 1
+                },50)
+            })
+        } else {
+            this.$().animate({
+                'margin-bottom': '0px'
+            },500)
+        }
+
+    }.observes('photo.show_comments'),
+    setup_comment_ownership: function() {
+        "use strict";
+        var comments  = this.get('photo.comments'),
+            owner = +this.get('album.model.owner.id'),
+            sid = this.get('session.id');
+        comments.forEach(function(c){
+            if (+c.get('user.id') === +sid || owner === +sid) {
+                c.set('owner',true);
+            }
+        });
+
+    }.observes('photo.comments.@each.user'),
     click: function(e){
         var selection = this.get('selection_mode') > 0;
         if (Em.$(e.target).hasClass('photo') === true) {
@@ -235,6 +274,13 @@ export default Em.Component.extend({
         selection: function() {
             this.toggleProperty('photo.selected');
         },
+        show_comments: function() {
+            if (this.get('photo.comments.length') === 0 && this.get('album.permissions.comment') === false){
+               this.set('photo.show_comments',false);
+            } else {
+                this.toggleProperty('photo.show_comments');
+            }
+        },
         add_tag: function(){
 
             //var selected=this.get('selected'),
@@ -252,6 +298,16 @@ export default Em.Component.extend({
         },
         remove_tag: function(tag){
             this.get('photo.tags').removeObject(tag);
+        },
+        add_comment: function(comment){
+            this.sendAction('add_comment',comment);
+        },
+        resize_details: function(){
+            this.display_details();
+        },
+        remove_comment: function(comment){
+            comment.destroyRecord();
+            this.display_details();
         }
     }
 });

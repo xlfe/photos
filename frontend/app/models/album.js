@@ -29,6 +29,7 @@ export default DS.Model.extend(autosave,{
     resolved_permissions: function() {
         var owner = this.get('owner');
 
+
         return [perm.create().load({
             view: true,
             edit: true,
@@ -39,7 +40,7 @@ export default DS.Model.extend(autosave,{
             delete: true,
             owner: true,
 
-            user: this.get('owner.id'),
+            user: +this.get('owner.id'),
             _user: owner
         })].concat(this.get('_resolved_permissions'));
 
@@ -55,7 +56,11 @@ export default DS.Model.extend(autosave,{
     subscribe: function() {
 
         if (this.get('more_results') === false){
+
+            this.get('store').find('comment', {'q': "album=KEY('Album', " + this.get('id') + ")"});
+
             Channel.subscribe(this.get('id'),this.get('store'));
+
         }
 
     }.observes('more_results')

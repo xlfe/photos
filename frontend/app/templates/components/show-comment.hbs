@@ -1,0 +1,21 @@
+<td>
+
+    {{comment.text}}
+</td>
+<td>
+
+    {{from-now comment.created}}
+</td>
+<td>
+    {{#if comment.user}}
+
+        {{comment.user.full_name}}
+
+    {{else}}
+        Anonymous
+    {{/if}}
+    {{#if comment.owner}}
+        <i class="delete-comment fa fa-trash" {{action 'remove_comment' comment}}></i>
+    {{/if}}
+
+</td>

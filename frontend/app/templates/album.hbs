@@ -1,5 +1,7 @@
 <div class="container-fluid edge-to-edge">
-    <div {{bind-attr class=controller.album_class}}>
+
+    <div id="photos" {{bind-attr class=controller.album_class}}>
+
         <div class="photo-select"><span></span></div>
 
         {{#each folder in folders}}
@@ -13,6 +15,7 @@
             selection_mode=controller.selected.length
             album=controller
             transition="transition"
+            add_comment="add_comment"
             save="save"}}
         {{/each}}
 

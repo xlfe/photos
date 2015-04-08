@@ -100,7 +100,7 @@ function sort_pos(a,b){
 function isElementInViewport (el) {
 
     //special bonus for those using jQuery
-    if (typeof jQuery === "function" && el instanceof jQuery) {
+    if (typeof Em.$ === "function" && el instanceof Em.$) {
         el = el[0];
     }
 
@@ -118,21 +118,11 @@ export default Em.Controller.extend({
     drag: {},
     minHeight: 200,
     set_minHeight: function() {
-        var h = Em.$(window).height(),
-            d = 200;
+        var h = Em.$(window).height() - 130,
+            d = h/5;
 
-        if (h > 1600){
-            d = 400;
-        } else if (h>1000) {
-            d = 300;
-        } else if (h >640) {
-            d=200;
-        } else {
-            d=150;
-        }
-
-        this.set('minHeight',d);
-
+        console.log(d);
+        this.set('minHeight',Math.max(100,d));
     }.on('init'),
     needs: ['application'],
     _arrangedContent: function (path, include_below) {
@@ -156,7 +146,7 @@ export default Em.Controller.extend({
     },
     arrangedContent: function() {
         var path = this.get('path') || '',
-            album = this.get('model.id'),
+            album = +this.get('model.id'),
             _search = this.get('_search'),
             search = this.get('search');
 
@@ -167,7 +157,7 @@ export default Em.Controller.extend({
 
             var sp = this.get('search_paths').filter(function(s){return s.disabled === false;}).map(function(s){return s.path;});
 
-            return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+            return Em.ArrayProxy.createWithMixins(Em.SortableMixin, {
                 sortProperties: ['path','pos'],
                 content: this.get('store').filter('photo',function(_){
 
@@ -182,7 +172,7 @@ export default Em.Controller.extend({
             });
 
         } else {
-            return Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+            return Em.ArrayProxy.createWithMixins(Em.SortableMixin, {
                 sortProperties: ['pos'],
                 content: this.get('store').filter('photo',function(_){
 
@@ -203,7 +193,7 @@ export default Em.Controller.extend({
         });
     }.property('arrangedContent.@each.selected'),
     album_class: function() {
-        var base_class='your-photos';
+        var base_class='your-photos photo-wall';
 
         if (this.get('selected').length > 0 && (this.get('permissions.sort') === true || this.get('permissions.move') === true)){
             return base_class + ' selection';
@@ -274,7 +264,7 @@ export default Em.Controller.extend({
             return;
         }
 
-        var w = Em.$('.your-photos').width(),
+        var w = Em.$('#photos').width(),
             cw = 0,
             i=0,
             cr = [],
@@ -301,7 +291,7 @@ export default Em.Controller.extend({
             var scale = (w - row.length * 2) / row_width;
 
             row.forEach(function (__) {
-                var _width = calc_width(__) * scale,
+                var _width = (calc_width(__) * scale) +2 ,
                     _height = __.get('height') / __.get('width') * _width,
                     existing_h = __.get('display_w'),
                     existing_w = __.get('display_w');
@@ -341,7 +331,7 @@ export default Em.Controller.extend({
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
         var anon = this.get('session.isAuthenticated') === false,
-            my_id = this.get('session.id'),
+            my_id = +this.get('session.id'),
             perms = this.get('model.resolved_permissions').filter(function(_){
 
                 if (anon === true){
@@ -351,6 +341,9 @@ export default Em.Controller.extend({
                 }
             });
 
+        if (perms[0].move === true || perms[0].sort === true) {
+            perms[0].allow_select = true;
+        }
 
         return perms[0];
 
@@ -369,7 +362,6 @@ export default Em.Controller.extend({
                     return;
                 }
                 if (isElementInViewport(el)) {
-                    console.log("in viewport")
                     photo.set('visible', true);
                 }
             });
@@ -385,10 +377,10 @@ export default Em.Controller.extend({
             this.set('path',path);
         },
         larger: function() {
-            this.set('minHeight',Math.min(this.get('minHeight')+150,800));
+            this.set('minHeight',Math.min(this.get('minHeight')+50,800));
         },
         smaller: function(){
-            this.set('minHeight',Math.max(this.get('minHeight')-150,150));
+            this.set('minHeight',Math.max(this.get('minHeight')-50,150));
         },
         cancel_selection: function() {
             this.get('selected').forEach(function(_){
@@ -478,6 +470,13 @@ export default Em.Controller.extend({
                 }, i * 20);
                 i += 1;
             })
+        },
+        add_comment: function(comment){
+            this.get('store').createRecord('comment',{
+                photo:comment.photo,
+                album: +this.get('model.id'),
+                text:comment.text
+            }).save();
         }
     }
 });
