@@ -1,5 +1,8 @@
 import Em from 'ember';
 import Channel from '../subscribers/channel';
+import config from '../config/environment';
+
+export var endpoint = [config.api_host, config.api_endpoint,'photos'].join('/');
 
 export default Em.Route.extend({
     renderTemplate: function () {
@@ -23,7 +26,7 @@ export default Em.Route.extend({
 
         var get_more = function(album,photos) {
 
-            var more_results = photos.get('meta.next_results_url');
+            var more_results = Em.get(photos,'meta.next_results_url');
 
             if (Em.isPresent(more_results)) {
                 album.set('more_results',true);
@@ -31,10 +34,23 @@ export default Em.Route.extend({
                 query_params['cursor'] = more_results;
                 //query_params['limit'] = query_params['limit'] * 2;
 
-                store.find('photo',query_params).then(function(more){
-                    Em.run.later(function(){
-                        get_more(album,more);
-                    });
+                Em.$.ajax({
+
+                    url: endpoint,
+                    method: 'GET',
+                    data: query_params,
+                    dataType: 'json',
+                    success: function (data) {
+                        Em.run.schedule('render', function () {
+                            data.Photo.forEach(function (p) {
+                                store.push('photo', p);
+                            })
+                        });
+                        get_more(album, data);
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    }
                 });
             } else {
                 album.set('more_results',false);

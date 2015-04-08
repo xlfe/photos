@@ -352,3 +352,5 @@ ANON_VIEWER = {
 }
 
 PERM_APPLY = lambda x: {'GET': x, 'POST': x, 'PUT': x, 'DELETE': x}
+PERM_PHOTO = lambda x: {'GET': x, 'PUT': x, 'DELETE': x}
+PERM_COMMENT = lambda x: {'GET': x, 'POST': x, 'DELETE': x}

@@ -223,8 +223,8 @@ app = webapp2.WSGIApplication([
         RESTHandler('/api/invites', Invite, permissions=PERM_APPLY(PERMISSION_INVITE),after_post_callback=Invite.after_put_callback,after_put_callback=Invite.after_put_callback,allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/register',User,   permissions=REGISTER_PERMISSIONS,        before_post_callback=User.new_user, allowed_origin=ALLOWED_ORIGIN),
         RESTHandler('/api/users',   User,   permissions=ANON_VIEWER,                 allowed_origin=ALLOWED_ORIGIN),
-        RESTHandler('/api/comments',Comment,permissions=PERM_APPLY(PERMISSION_COMMENT),allowed_origin=ALLOWED_ORIGIN),
-        RESTHandler('/api/photos',  Photo,  permissions=PERM_APPLY(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,
+        RESTHandler('/api/comments',Comment,permissions=PERM_COMMENT(PERMISSION_COMMENT),allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/photos',  Photo,  permissions=PERM_PHOTO(PERMISSION_PHOTO),allowed_origin=ALLOWED_ORIGIN,
                     after_delete_callback=Photo.after_delete,
                     before_delete_callback=Photo.before_delete,
                     after_put_callback=Photo.after_put

@@ -9,6 +9,8 @@ var Folder = Em.Object.extend({
     is_folder: true
 });
 
+var Folders = {};
+
 RegExp.quote = function(str) {
     //return (str+'').replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
     return (str+'').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -209,7 +211,8 @@ export default Em.Controller.extend({
             return [];
         }
 
-        var photos = this.get('model.photos');
+        var photos = this.get('model.photos'),
+            aid = this.get('model.id');
 
         if (Em.isEmpty(photos)) {
             return [];
@@ -234,13 +237,26 @@ export default Em.Controller.extend({
         });
 
         return Object.keys(folder_list).sort().map(function (k) {
-            return Folder.create({
-                name: k,
-                path: cp.length > 0 ? cp + '/' + k : k,
+
+            var fpath = aid + k,
+                folder;
+
+            if (fpath in Folders){
+                folder = Folders[fpath];
+            } else {
+                folder = Folder.create({
+                    name: k,
+                    path: cp.length > 0 ? cp + '/' + k : k,
+                    background: []
+                });
+            }
+            folder.setProperties({
                 images: photos.filter(function (_) {
                     return below_folder(_.get('path'), cp.length>0? cp + '/' +k:k);
                 })
             });
+            Folders[fpath] = folder;
+            return folder;
         });
     }.property('path', 'model.photos.@each.path','_search'),
     breadcrumbs: function () {
@@ -260,7 +276,12 @@ export default Em.Controller.extend({
     }.property('path'),
     size_photos: function () {
 
-        if (Em.$('.edge-to-edge').width() === null || Em.isEmpty(this.get('arrangedContent'))) {
+        if (
+            Em.$('.edge-to-edge').width() === null ||
+            (
+                Em.isEmpty(this.get('arrangedContent')) && Em.isEmpty(this.get('folders'))
+            ))
+        {
             return;
         }
 
@@ -340,6 +361,9 @@ export default Em.Controller.extend({
                     return _.get('user') === my_id;
                 }
             });
+        if (Em.isEmpty(perms)){
+            return {};
+        }
 
         if (perms[0].move === true || perms[0].sort === true) {
             perms[0].allow_select = true;
