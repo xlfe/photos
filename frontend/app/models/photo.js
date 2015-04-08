@@ -27,7 +27,11 @@ export default DS.Model.extend(autosave,{
     metadata:   attr('object',      ro),
     serving_url: attr('string',     ro),
     comments: DS.hasMany('comments',{async:true}),
+    sorted_comments: function() {
 
+        return this.get('comments').sortBy('created').reverseObjects();
+
+    }.property('comments.length'),
     //Mutable
     title:      attr('string'),
     caption:    attr('string'),

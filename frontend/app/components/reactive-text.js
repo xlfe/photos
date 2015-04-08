@@ -5,7 +5,7 @@ export default Em.TextField.extend({
 
         var me = Em.$(evt.target),
             footerHeight = Em.$('.app-footer').outerHeight(),
-            ypTop = Em.$('.your-photos').position().top,
+            ypTop = Em.$('#photos').position().top,
             ypHeight = Em.$(window).innerHeight() - footerHeight - ypTop,
             photoTop = me.position().top,
             additional = 0,

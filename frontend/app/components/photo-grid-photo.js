@@ -54,10 +54,10 @@ export default Em.Component.extend({
             Em.run.later(this,function(){
                 this.$().animate({
                     'margin-bottom': this.$('.expanded-details').outerHeight(true) + 'px'
-                },300);
+                },50);
                 this.$('.expanded-details').animate({
                     opacity: 1
-                },550)
+                },50)
             })
         } else {
             this.$().animate({
@@ -66,6 +66,20 @@ export default Em.Component.extend({
         }
 
     }.observes('photo.show_comments'),
+    setup_comment_ownership: function() {
+        "use strict";
+        var comments  = this.get('photo.comments'),
+            owner = +this.get('album.model.owner.id'),
+            sid = this.get('session.id');
+        comments.forEach(function(c){
+            console.log(owner,sid,owner===sid)
+            if (+c.get('user.id') === +sid || owner === +sid) {
+                c.set('owner',true);
+                console.log('trie')
+            }
+        });
+
+    }.observes('photo.comments.@each.user'),
     click: function(e){
         var selection = this.get('selection_mode') > 0;
         if (Em.$(e.target).hasClass('photo') === true) {
@@ -282,6 +296,16 @@ export default Em.Component.extend({
         },
         remove_tag: function(tag){
             this.get('photo.tags').removeObject(tag);
+        },
+        add_comment: function(comment){
+            this.sendAction('add_comment',comment);
+        },
+        resize_details: function(){
+            this.display_details();
+        },
+        remove_comment: function(comment){
+            comment.destroyRecord();
+            this.display_details();
         }
     }
 });

@@ -6,3 +6,10 @@
   -o-transition: $transition-property $transition-time $method
   transition: $transition-property $transition-time $method
 
+@mixin box-shadow($params...)
+  -webkit-box-shadow: $params
+  -moz-box-shadow: $params
+  box-shadow: $params
+
+
+

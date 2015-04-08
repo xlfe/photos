@@ -49,7 +49,7 @@ export default Em.View.extend({
             return;
         }
 
-        Em.$(".your-photos").mousedown(function (e) {
+        Em.$("#photos").mousedown(function (e) {
 
             if (Em.$(e.target).hasClass('photo')) {
 
@@ -58,11 +58,11 @@ export default Em.View.extend({
                     photo = photos.findBy('id', id);
                 if (photo.get('selected') === true){
                     return;
-                } else if (Em.$('.your-photos').hasClass('selection') === false){
+                } else if (Em.$('#photos').hasClass('selection') === false){
                     return;
                 }
 
-            } else if (Em.$(e.target).hasClass('your-photos') !== true){
+            } else if (Em.$(e.target).attr('id') !== "photos"){
                 return;
             }
 
@@ -121,7 +121,7 @@ export default Em.View.extend({
                 ps = Em.$('.photo-select'),
                 w = Math.abs(initialX - x),
                 h = Math.abs(initialY - y),
-                yp = Em.$('.your-photos'),
+                yp = Em.$('#photos'),
                 max_w = yp.outerWidth() - initialX - 10,
                 max_h = yp.outerHeight() + yp.position().top - initialY;
 

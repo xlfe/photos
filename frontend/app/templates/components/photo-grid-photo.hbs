@@ -1,5 +1,38 @@
 <div class="sheet">
-    <div {{bind-attr class="photo.comments.length:has-comments :comments :icon"}} {{action 'show_comments'}}>
+
+    {{reactive-text
+    type="text"
+    tabindex=idx
+    photo=photo
+    disabled=album.permissions.no_edit
+    readonly=album.permissions.no_edit
+    value=photo.title
+    classNames="photo-title"
+    }}
+
+    {{#if album.permissions.allow_select}}
+        <span title="Select this photo" class="select-icon" {{action 'selection'}}>
+            <i class="fa fa-check-circle fa-2x"></i>
+        </span>
+    {{/if}}
+
+
+    {{#if album.permissions.edit}}
+        <span title="Add a new tag to this photo" class="add-tag-icon" {{action 'add_tag'}}>
+            <i class="fa fa-plus-circle fa-2x"></i>
+        </span>
+    {{/if}}
+
+    {{#each tag in photo.tags}}
+        <div class="tag">
+            {{tag}}
+            {{#if album.permissions.edit}}
+                <i class="fa fa-remove" {{action 'remove_tag' tag}}></i>
+            {{/if}}
+        </div>
+    {{/each}}
+
+    <div {{bind-attr class="photo.comments.length:always-visible :comments-icon"}} {{action 'show_comments'}}>
          <span class="fa-stack fa">
             <i class="fa fa-comment fa-stack-2x"></i>
             <strong class="fa-stack-1x fa-stack-text fa-inverse">
@@ -7,30 +40,36 @@
             </strong>
         </span>
     </div>
-
-    {{reactive-text type="text" tabindex=idx photo=photo disabled=album.permissions.no_edit readonly=album.permissions.no_edit value=photo.title classNames="title"}}
-    {{#if album.permissions.move}}
-        <i class="icon fa fa-check-circle fa-2x" {{action 'selection'}}></i>
-        {{else-if album.permissions.sort}}
-        <i class="icon fa fa-check-circle fa-2x" {{action 'selection'}}></i>
-    {{/if}}
-
-
-    <span {{action 'add_tag'}} class="icon tag add"><i class="fa fa-lg fa-plus"></i></span>
-    {{#each tag in photo.tags}}
-        <span class="icon tag">{{tag}} <i class="fa fa-remove" {{action 'remove_tag' tag}}></i></span>
-    {{/each}}
-
 </div>
 
 {{#if photo.show_comments}}
     <div class="expanded-details">
 
-        this<br>
-        this<br>
-        this<br>
-        {{input type="text"}}
-        this<br>
-        this<br>
+        {{#if album.permissions.comment}}
+            {{new-comment photo=photo resize_details="resize_details" add_comment="add_comment"}}
+        {{/if}}
+
+        {{#if photo.comments}}
+
+            <div class="table-responsive">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th class="small">
+                        </th>
+                        <th class="small">
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {{#each comment in photo.sorted_comments}}
+                            {{show-comment comment=comment remove_comment="remove_comment"}}
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{/if}}
     </div>
 {{/if}}
