@@ -134,11 +134,11 @@ export default Em.Controller.extend({
 
         var photos = this.get('model.photos').filter(function (_) {
             var photo_path = _.get('path') || '';
-            if (path.length === 0 && photo_path.length===0){ return true;}
             if (include_below ===true){
                return below_folder(photo_path,path);
             } else {
-                return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
+                if (path.length === 0 && photo_path.length===0){ return true;}
+                return photo_path === path;
             }
 
         }).sort(sort_pos);
@@ -178,13 +178,19 @@ export default Em.Controller.extend({
                 sortProperties: ['pos'],
                 content: this.get('store').filter('photo',function(_){
 
-                    if (_.get('currentState.isLoading') === true || _.get('currentState.isDeleted') === true) {
+                    //if (_.get('currentState.isLoading') === true || _.get('currentState.isDeleted') === true) {
+                    //    return false;
+                    //}
+                    if (_.get('album')!== album){
                         return false;
                     }
-                    if (_.get('album')!== album){ return false;}
                     var photo_path = _.get('path') || '';
-                    if (path.length === 0 && photo_path.length===0){ return true;}
-                    return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
+                    if (path.length === 0 && photo_path.length===0){
+                        return true;
+                    }
+                    //return photo_path.match('^' + RegExp.quote(path) + '$') !== null;
+                    return path === photo_path;
+
                 })
             });
         }
@@ -287,6 +293,7 @@ export default Em.Controller.extend({
         var w = Em.$('#photos').width(),
             cw = 0,
             i = 0,
+            adjust = window.chrome? 2:0,
             cr = [],
             min_height = +this.get('minHeight'), //Minimum height of each row in pixels
             f = this.get('folders'),
@@ -310,9 +317,13 @@ export default Em.Controller.extend({
 
             var scale = (w - row.length * 2) / row_width;
 
+            if (row.length ===1){
+                scale = 1;
+            }
+
             row.forEach(function (__) {
-                var _width = (calc_width(__) * scale) + 2,
-                    _height = __.get('height') / __.get('width') * (_width-2),
+                var _width = (calc_width(__) * scale) + adjust,
+                    _height = __.get('height') / __.get('width') * (_width-adjust),
                     existing_h = __.get('display_w'),
                     existing_w = __.get('display_w');
 
@@ -347,10 +358,10 @@ export default Em.Controller.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
+        this.vis_check();
     },
     size_photos: function() {
-        Em.run.debounce(this, this._size_photos, 50);
-        Em.run.debounce(this, this.vis_check, 50);
+        Em.run.debounce(this, this._size_photos, 150);
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
         var anon = this.get('session.isAuthenticated') === false,
@@ -438,10 +449,7 @@ export default Em.Controller.extend({
             }
 
             selected.forEach(function (p) {
-                Em.run.later({p:p},function () {
                     this.p.set('path', new_path);
-                },i*50);
-                i+=1;
             });
 
         },
@@ -492,6 +500,9 @@ export default Em.Controller.extend({
                 }, i * 20);
                 i += 1;
             })
+        },
+        size_immediate:function(){
+            this._size_photos();
         },
         add_comment: function(comment){
             this.get('store').createRecord('comment',{

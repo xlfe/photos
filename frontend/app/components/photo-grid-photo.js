@@ -147,6 +147,7 @@ export default Em.Component.extend({
     drop: function () {
 
         var
+            _this = this,
             //album controller
             album = this.get('album.arrangedContent'),
 
@@ -246,12 +247,12 @@ export default Em.Component.extend({
             }
 
 
-            Em.run(function(){
-
+            Em.run.schedule('render',function(){
                 photos.forEach(function(p){
                     p.set('pos',lower.add(interval).toString());
                     lower = lower.add(interval);
                 });
+                _this.sendAction('size_immediate');
             });
 
 
@@ -264,6 +265,7 @@ export default Em.Component.extend({
             var new_pos = diff(lower, upper);
             //clog("moved one photo to",new_pos.toString());
             photo.set('pos',new_pos.toString());
+            this.sendAction('size_immediate');
         }
 
     },

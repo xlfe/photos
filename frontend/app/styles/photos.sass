@@ -14,22 +14,24 @@ $o-hover-item: 0.8
   @include align-content(space-between)
 
   width: 100%
-  padding-left: 1%
-  padding-right: 1%
+  padding-left: 10px
+  padding-right: 10px
   -webkit-user-select: none
   -moz-user-select: none
   -ms-user-select: none
   margin: auto
   padding-bottom: 40px
   padding-top: 10px
-
-
-  .photo
+  *
     box-sizing: border-box
     -moz-box-sizing: border-box
     -webkit-box-sizing: border-box
 
+
+  .photo
+
     @include transition(opacity, 0.5s, ease-in-out)
+    border-spacing: 0
     border: 1px solid white
     cursor: pointer
     background-size: cover

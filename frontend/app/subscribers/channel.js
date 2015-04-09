@@ -101,6 +101,9 @@ export function subscribe(album,_store) {
     store=_store;
     last_album = album;
     subscriptions.pushObject(album);
+    if (config.development){
+        return;
+    }
     modChannel({'add':album});
 }
 

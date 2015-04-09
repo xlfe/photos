@@ -36,14 +36,13 @@ export default Em.View.extend({
         Em.$(window).resize(function () {
             Em.run.debounce(_this, _this.size_photos, 100);
         });
-        this.size_photos();
+        //this.size_photos();
 
         //track visibility of photos
         var handler = function(){
             Em.run.debounce(controller,controller.vis_check,100);
         };
-        Em.$(window).on('DOMContentLoaded load resize scroll', handler);
-
+        Em.$(window).on('DOMContentLoaded load scroll', handler);
 
         if (this.get('controller.permissions.move') !== true && this.get('controller.permissions.sort') !== true){
             return;
