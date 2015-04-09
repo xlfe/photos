@@ -158,10 +158,10 @@ export default Em.Controller.extend({
     arrangedContent: function() {
         var path = this.get('path') || '',
             album = +this.get('model.id'),
-            _search = this.get('_search'),
-            search = this.get('search');
+            search_mode = this.get('search_mode'),
+            search = this.get('_search');
 
-        if (_search === true){
+        if (search_mode === true){
             if (Em.isNone(search) || Em.$.trim(search).length <3 ) {
                 return [];
             }
@@ -203,7 +203,7 @@ export default Em.Controller.extend({
                 })
             });
         }
-    }.property('path','_search','search','search_paths.@each.disabled','model.id'),
+    }.property('path','search_mode','_search','search_paths.@each.disabled','model.id'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
             return _.get('selected') === true;
@@ -222,7 +222,7 @@ export default Em.Controller.extend({
     folders: function () {
         // Show all folders that have this path or below
 
-        if (this.get('_search') === true){
+        if (this.get('search_mode') === true){
             return [];
         }
 
@@ -272,7 +272,7 @@ export default Em.Controller.extend({
             Folders[fpath] = folder;
             return folder;
         });
-    }.property('path', 'model.photos.@each.path','_search'),
+    }.property('path', 'model.photos.@each.path','search_mode'),
     breadcrumbs: function () {
         var cp = this.get('path'),
             paths = [];
@@ -326,7 +326,7 @@ export default Em.Controller.extend({
             var scale = (w - row.length * 2) / row_width;
 
             if (row.length ===1){
-                scale = 1;
+                scale = 2.5;
             }
 
             row.forEach(function (__) {
@@ -408,7 +408,13 @@ export default Em.Controller.extend({
             }
         });
     },
-    _search: false,
+    do_search: function () {
+        this.set('_search', this.get('search'));
+    },
+    search_observer: function () {
+        Em.run.debounce(this, this.do_search, 1000);
+    }.observes('search'),
+    search_mode: false,
     search_paths: search_paths,
     actions: {
         transition: function(photo){
@@ -439,25 +445,25 @@ export default Em.Controller.extend({
         },
         search: function(){
             this.set('search','');
-            this.toggleProperty('_search');
+            this.set('_search','');
+            this.toggleProperty('search_mode');
         },
+
         toggle_search_path: function(sp){
-
             Em.set(sp,'disabled',!Em.get(sp,'disabled'));
-
         },
         move_selection: function() {
 
             var selected=this.get('selected'),
                 i=0,
-                new_path = prompt('Please enter the new path for ' + selected.length + ' photos');
+                new_path = prompt('Please enter the new path for ' + selected.length + ' photos',selected[0].get('path'));
 
             if (Em.isNone(new_path)){
                 return;
             }
 
             selected.forEach(function (p) {
-                    this.p.set('path', new_path);
+                p.set('path', new_path);
             });
 
         },

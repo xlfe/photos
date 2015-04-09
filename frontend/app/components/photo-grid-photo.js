@@ -120,8 +120,10 @@ export default Em.Component.extend({
         })
 
     }.observes('photo.display_h','photo.display_w','photo.visible').on('didInsertElement'),
-    dragStart: function () {
+    dragStart: function (event) {
+        console.log("dragStart");
         this.get('album').set('drag.photo',this.get('photo'));
+        event.dataTransfer.setData(null,null);
     },
     dragOver: function (evt) {
         var left = evt.target.offsetLeft,

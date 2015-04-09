@@ -1,5 +1,5 @@
 <ul class="nav navbar-nav">
-    {{#unless controller._search}}
+    {{#unless controller.search_mode}}
 
         {{#link-to "album" model (query-params path=null) tagName="li" class="menu-link" tabindex="-1"}}
             <a>
