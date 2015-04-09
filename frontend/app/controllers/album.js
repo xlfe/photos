@@ -128,14 +128,23 @@ export default Em.Controller.extend({
     }.on('init'),
     needs: ['application'],
     _arrangedContent: function (path, include_below) {
+        //Note when include_below is true, we get a maximum of 20 photos
 
+        var done = 0;
         path = path || '';
         include_below = include_below || false;
 
         var photos = this.get('model.photos').filter(function (_) {
+            if (done > 20){
+                return;
+            }
             var photo_path = _.get('path') || '';
             if (include_below ===true){
-               return below_folder(photo_path,path);
+               if(below_folder(photo_path,path)===true){
+                   done +=1;
+                   return true;
+               }
+                return false;
             } else {
                 if (path.length === 0 && photo_path.length===0){ return true;}
                 return photo_path === path;
@@ -226,6 +235,7 @@ export default Em.Controller.extend({
 
         var folder_list = {},
             cp = this.get('path') || '',
+            fp,
             l = cp.length > 0 ? cp.length + 1 : 0;
 
         //   folder
@@ -237,7 +247,8 @@ export default Em.Controller.extend({
 
             if (Em.isPresent(p)) {
                 if (below_folder(p, cp) && (p.length > cp.length)) {
-                    folder_list[p.slice(l).split('/')[0]] = null;
+                    fp = p.slice(l).split('/')[0];
+                    folder_list[fp] = (folder_list[fp] || 0) + 1;
                 }
             }
         });
@@ -256,11 +267,8 @@ export default Em.Controller.extend({
                     background: []
                 });
             }
-            folder.setProperties({
-                images: photos.filter(function (_) {
-                    return below_folder(_.get('path'), cp.length>0? cp + '/' +k:k);
-                })
-            });
+            folder.set('images',folder_list[k]);
+            //return below_folder(_.get('path'), cp.length>0? cp + '/' +k:k);
             Folders[fpath] = folder;
             return folder;
         });
