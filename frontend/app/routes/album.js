@@ -41,12 +41,15 @@ export default Em.Route.extend({
                     data: query_params,
                     dataType: 'json',
                     success: function (data) {
+                        console.log("about to push")
                         Em.run.schedule('render', function () {
-                            data.Photo.forEach(function (p) {
-                                store.push('photo', p);
-                            })
+                            store.pushMany('photo',data.Photo);
+                            console.log("pushed")
                         });
-                        get_more(album, data);
+                        Em.run.later(function(){
+                            get_more(album, data);
+                        });
+
                     },
                     error: function (error) {
                         console.log(error)

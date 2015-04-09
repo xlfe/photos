@@ -32,12 +32,12 @@ function add_file(file, folders, files,album) {
 
     fileReader.onload = function (e) {
         if (file.size === e.target.result.byteLength) {
-            var md5 = SparkMD5.ArrayBuffer.hash(e.target.result),
-                dupe = false;
+
+            var md5 = SparkMD5.ArrayBuffer.hash(e.target.result);
+
             new_file.set('md5', md5);
 
-
-            if (!Em.isEmpty(album.get('photos'))){
+            //if (!Em.isEmpty(album.get('photos'))){
 
                 if (Em.isPresent(album.get('photos').findBy('md5',md5))){
                     new_file.setProperties({
@@ -45,7 +45,7 @@ function add_file(file, folders, files,album) {
                         status: 'Duplicate',
                         _status: 6
                     });
-                }
+                //}
             }
 
             files.pushObject(new_file);
@@ -58,7 +58,9 @@ function add_file(file, folders, files,album) {
         console.log("Couldn't read file");
     };
 
-    fileReader.readAsArrayBuffer(file);
+    Em.run.later(function(){
+        fileReader.readAsArrayBuffer(file);
+    })
 }
 
 
@@ -66,6 +68,9 @@ export default Em.View.extend({
 
     didInsertElement: function(){
         this.set('controller.modal',this.$('.modal'));
+
+        Em.$('.upload input[type=file]').off('hover');
+
     },
     change: function (e) {
 
@@ -73,6 +78,7 @@ export default Em.View.extend({
         e.preventDefault();
 
         var files = e.target.files || e.dataTransfer.files,
+            _this = this,
             folders = !this.get('accept_files');
 
         for (var i = 0; i < files.length; i++) {
@@ -86,23 +92,39 @@ export default Em.View.extend({
                             dupe: false,
                             status: 'Empty file',
                             _status: 6
-                        })
+                        });
                     this.get('controller.files').pushObject(empty_file);
                 } else {
                     add_file(files[i], folders, this.get('controller.files'), this.get('controller.model'));
                 }
             }
         }
+
+        //Reset the input element
+        Em.$('.upload input[type=file]').wrap('<form>').closest('form').get(0).reset();
+        Em.$('.upload input[type=file]').unwrap();
     },
     title: function () {
-        var files = this.get('controller.files'),
+        var files = this.get('controller.files').filter(function(f){
+                return f.get('_status') === 0 || f.get('_status') ===1;
+            }),
+            uploading = this.get('controller.uploading'),
+            total_size = 0,
             count = '';
         if (Em.isEmpty(files) === false) {
             count = files.length + ' ';
+            files.forEach(function(f){
+                total_size += f.get('bytes');
+            });
         }
 
-        return 'Upload ' + count + 'photos to album "' + this.get('context.model.name') + '"';
-    }.property('context.model.name', 'controller.files.[]')
+        if (uploading){
+            return 'Uploading to "' + this.get('context.model.name') + '" - ' + count + ' photos ('+fileSizeSI(total_size)+') remaining.';
+        } else {
+            return 'Upload ' + count + 'photos (' + fileSizeSI(total_size) + ') to album "' + this.get('context.model.name') + '"';
+        }
+
+    }.property('context.model.name', 'controller.files.@each.status')
 });
 
 

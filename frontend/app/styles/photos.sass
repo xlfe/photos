@@ -8,7 +8,7 @@ $o-hover-item: 0.8
 
 #photos
   font-size: 16px
-  @extend %flexbox
+  @extend %inline-flex
   @include flex-direction(row)
   @include flex-wrap(wrap)
   @include align-content(space-between)
@@ -25,6 +25,10 @@ $o-hover-item: 0.8
 
 
   .photo
+    box-sizing: border-box
+    -moz-box-sizing: border-box
+    -webkit-box-sizing: border-box
+
     @include transition(opacity, 0.5s, ease-in-out)
     border: 1px solid white
     cursor: pointer

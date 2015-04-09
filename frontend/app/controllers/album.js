@@ -274,20 +274,19 @@ export default Em.Controller.extend({
             });
         });
     }.property('path'),
-    size_photos: function () {
+    _size_photos: function () {
 
         if (
             Em.$('.edge-to-edge').width() === null ||
             (
-                Em.isEmpty(this.get('arrangedContent')) && Em.isEmpty(this.get('folders'))
-            ))
-        {
+            Em.isEmpty(this.get('arrangedContent')) && Em.isEmpty(this.get('folders'))
+            )) {
             return;
         }
 
         var w = Em.$('#photos').width(),
             cw = 0,
-            i=0,
+            i = 0,
             cr = [],
             min_height = +this.get('minHeight'), //Minimum height of each row in pixels
             f = this.get('folders'),
@@ -297,7 +296,7 @@ export default Em.Controller.extend({
         // adding an additional image would be wider than the width of the element
         // then scale the images so they take up the full width
 
-        var calc_width = function(_photo) {
+        var calc_width = function (_photo) {
             return min_height * (_photo.get('width') / _photo.get('height'));
         };
 
@@ -312,13 +311,13 @@ export default Em.Controller.extend({
             var scale = (w - row.length * 2) / row_width;
 
             row.forEach(function (__) {
-                var _width = (calc_width(__) * scale) +2 ,
-                    _height = __.get('height') / __.get('width') * _width,
+                var _width = (calc_width(__) * scale) + 2,
+                    _height = __.get('height') / __.get('width') * (_width-2),
                     existing_h = __.get('display_w'),
                     existing_w = __.get('display_w');
 
                 //Only update the size if it has changed
-                if (existing_w === _width && existing_h === _height){
+                if (existing_w === _width && existing_h === _height) {
                     return;
                 }
 
@@ -348,7 +347,10 @@ export default Em.Controller.extend({
         if (cr.length > 0) {
             scale_row(cr);
         }
-        this.vis_check();
+    },
+    size_photos: function() {
+        Em.run.debounce(this, this._size_photos, 50);
+        Em.run.debounce(this, this.vis_check, 50);
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
         var anon = this.get('session.isAuthenticated') === false,
@@ -373,24 +375,20 @@ export default Em.Controller.extend({
 
     }.property('model.permissions.@each','session.isAuthenticated'),
     vis_check: function () {
-        var _this = this;
-        Em.run.later(function(){
+        this.get('arrangedContent').forEach(function (photo) {
+            if (photo.get('visible')){
+                return;
+            }
 
-            _this.get('arrangedContent').forEach(function (photo) {
-                if (photo.get('visible')){
-                    return;
-                }
-
-                var el = Em.$('.photo[data-photo=' + photo.get('id') + ']');
-                if (Em.isEmpty(el)) {
-                    return;
-                }
-                if (isElementInViewport(el)) {
-                    photo.set('visible', true);
-                }
-            });
+            var el = Em.$('.photo[data-photo=' + photo.get('id') + ']');
+            if (Em.isEmpty(el)) {
+                return;
+            }
+            if (isElementInViewport(el)) {
+                photo.set('visible', true);
+            }
         });
-    }.observes('arrangedContent.@each.display_w'),
+    },
     _search: false,
     search_paths: search_paths,
     actions: {

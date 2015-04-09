@@ -8,6 +8,8 @@ body
   width: 100%
   overflow-y: scroll
 
+
+
 html,body
   @include transition(scrollTop, 1s, ease-out)
 
@@ -102,19 +104,26 @@ div.modal-body
 
 div.upload
   height: 360px !important
-  overflow-y: scroll !important
   position: relative
-  overflow: hidden
+  overflow-y: scroll
+  overflow-x: hidden
   padding: 0
   width: 100%
   border: 1px solid lightgrey
   text-align: center
   vertical-align: middle
 
-  .hint
-    font-weight: bold
-    font-size: larger
-    padding-top: 150px
+  .hint-pos
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+    border: 1px dashed rgba(128, 40, 0, 0.55)
+    .hint
+      font-weight: bold
+      font-size: larger
+      padding-top: 150px
 
   .file
     font-weight: normal

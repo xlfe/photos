@@ -271,16 +271,23 @@ export default Em.Controller.extend({
     },
     actions: {
         save: function () {
-            var _this = this;
+            var ready = this.get('files').filter(function(_) { return _.get('_status') === 0; });
 
-            this.get('files').filter(function(_) {
-                return _.get('_status') === 0;
-            }).forEach(function (file) {
-                file.set('_status', 1);
-                file.set('status', 'Queued');
-                _this.set('save_caption','Uploading...');
-                _this.set('save_disabled',true);
-            });
+            if (!Em.isEmpty(ready)) {
+
+                this.setProperties({
+                    save_caption: 'Uploading...',
+                    save_disabled: true,
+                    uploading: true
+                });
+
+                ready.forEach(function (file) {
+                    file.setProperties({
+                        _status: 1,
+                        status: 'Queued'
+                    });
+                });
+            }
 
             if (this.process_queue() === true){
                 this.reset();
@@ -299,14 +306,18 @@ export default Em.Controller.extend({
     },
     reset: function() {
         this.send('closeModal');
-        this.set('cancelling',false);
-        this.set('files',[]);
-        this.set('done',false);
-        this.set('save_disabled',true);
-        this.set('save_caption','Upload');
-        this.set('close_caption','Cancel');
-        this.set('cancel',false);
+        this.setProperties({
+            cancelling: false,
+            files: [],
+            done: false,
+            save_disabled: true,
+            save_caption: 'Upload',
+            close_caption: 'Cancel',
+            uploading: false,
+            cancel: false
+        });
     },
+    uploading: false,
     save_disabled: true,
     _save_disabled: function() {
 
@@ -328,6 +339,13 @@ export default Em.Controller.extend({
     cancel: false,
     can_accept_folders: window.chrome !== undefined,//true, //false - only for chrome - accept a folder
     accept_folders: false,
+    total_size: function(){
+        var r = 0;
+        this.get('files').forEach(function(f){
+            r += +f.get('bytes');
+        });
+        return r;
+    }.property('files.@each.bytes'),
     toggleValue: false,
     toggle: function() {
 

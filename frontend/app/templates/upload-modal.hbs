@@ -10,16 +10,6 @@
     closeModal='closeModal'
 }}
 
-    {{#if uploading}}
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" {{bind-attr aria-valuenow="progress"}} aria-valuemin="0"
-                 aria-valuemax="100">
-                <span class="">{{view.progress}}% complete</span>
-            </div>
-        </div>
-    {{/if}}
-
-
     <div class="upload">
 
         {{#each file in controller.files}}
@@ -41,24 +31,31 @@
             </div>
 
 
-        {{else}}
-
-            <label class="hint">Drop
-                {{#if accept_folders}}
-                    folders
-                {{else}}
-                    files
-                {{/if}}
-                here (or click to browse)
-            </label>
-
         {{/each}}
 
-        {{#if accept_folders}}
-            <input type="file" id="file_input" directory webkitdirectory/>
-        {{else}}
-            <input type="file" id="file_input" accept="image/*" multiple/>
-        {{/if}}
+        {{#unless controller.uploading}}
+
+            <div class="hint-pos">
+
+                {{#unless controller.files}}
+                    <label class="hint">Drop
+                        {{#if accept_folders}}
+                            folders
+                        {{else}}
+                            files
+                        {{/if}}
+                        here (or click to browse)
+                    </label>
+                {{/unless}}
+
+            </div>
+
+            {{#if accept_folders}}
+                <input type="file" id="file_input" directory webkitdirectory/>
+            {{else}}
+                <input type="file" id="file_input" accept="image/*" multiple/>
+            {{/if}}
+        {{/unless}}
     </div>
 
 {{/modal-base}}

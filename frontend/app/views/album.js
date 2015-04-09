@@ -40,7 +40,7 @@ export default Em.View.extend({
 
         //track visibility of photos
         var handler = function(){
-            controller.vis_check();
+            Em.run.debounce(controller,controller.vis_check,100);
         };
         Em.$(window).on('DOMContentLoaded load resize scroll', handler);
 
