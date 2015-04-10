@@ -100,6 +100,7 @@ export default Em.Route.extend({
     actions: {
         error: function(error,transition) {
 
+            console.log(error)
             alert('Sorry you do not have permission to view that album');
 
             transition.abort();

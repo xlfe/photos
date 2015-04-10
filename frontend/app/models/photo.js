@@ -2,7 +2,7 @@ import DS from 'ember-data';
 import Em from 'ember';
 import autosave from '../models/autosave';
 
-var attr = DS.attr,
+var
     ro = {readOnly:true};
 
 var _cached = {};
@@ -17,27 +17,30 @@ export default DS.Model.extend(autosave,{
 
     //ReadOnly
 
-    album:      attr('number',      ro),
-    filename:   attr('string',      ro),
-    md5:        attr('string',      ro),
-    uploaded:   attr('isodatetime', ro),
-    modified:   attr('isodatetime', ro),
-    width:      attr('number',      ro),
-    height:     attr('number',      ro),
-    metadata:   attr('object',      ro),
-    serving_url: attr('string',     ro),
+    album:      DS.attr('number',      ro),
+    filename:   DS.attr('string',      ro),
+    md5:        DS.attr('string',      ro),
+    uploaded:   DS.attr('isodatetime', ro),
+    modified:   DS.attr('isodatetime', ro),
+    width:      DS.attr('number',      ro),
+    height:     DS.attr('number',      ro),
+    metadata:   DS.attr('object',      ro),
+    serving_url: DS.attr('string',     ro),
     comments: DS.hasMany('comments',{async:true}),
     sorted_comments: function() {
 
-        return this.get('comments').sortBy('created').reverseObjects();
+        return Em.ArrayProxy.createWithMixins(Em.SortableMixin, {
+            sortProperties: ['created'],
+            content: this.get('comments')
+        });
 
-    }.property('comments.length'),
+    }.property('comments.@each.sorted'),
     //Mutable
-    title:      attr('string'),
-    caption:    attr('string'),
-    pos:        attr('string'),
-    path:       attr('string'),
-    tags:       attr('list'),
+    title:      DS.attr('string'),
+    caption:    DS.attr('string'),
+    pos:        DS.attr('string'),
+    path:       DS.attr('string'),
+    tags:       DS.attr('list'),
 
     _filename: function(){
         var i = this.get('filename') ||'';

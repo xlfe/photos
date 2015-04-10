@@ -47,6 +47,7 @@ export default Base.extend({
     invalidate: function (options) {
 
         return new Em.RSVP.Promise(function (resolve, reject) {
+            return reject(options);
             Em.$.ajax({
                 url: endpoint,
                 method: 'DELETE',

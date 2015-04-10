@@ -70,7 +70,11 @@ export default Em.Component.extend({
         "use strict";
         var comments  = this.get('photo.comments'),
             owner = +this.get('album.model.owner.id'),
+            comment = this.get('album.permissions.comment'),
             sid = this.get('session.id');
+        if (comment === false){
+            return;
+        }
         comments.forEach(function(c){
             if (+c.get('user.id') === +sid || owner === +sid) {
                 c.set('owner',true);

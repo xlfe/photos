@@ -159,7 +159,7 @@ class Album(ndb.Model):
 
     name = ndb.StringProperty()
     photo_count = ndb.IntegerProperty()
-    owner = ndb.KeyProperty(User)
+    owner = ndb.KeyProperty(kind=User)
     created = ndb.DateTimeProperty(auto_now_add=True)
     permissions = ndb.StructuredProperty(Permissions,repeated=True)
 
@@ -173,9 +173,9 @@ class Invite(ndb.Model):
 
     email = ndb.StringProperty()
     last_emailed = ndb.DateTimeProperty()
-    album = ndb.KeyProperty(Album)
+    album = ndb.KeyProperty(kind=Album)
     permissions = ndb.StructuredProperty(Permissions)
-    owner = ndb.KeyProperty(User)
+    owner = ndb.KeyProperty(kind=User)
 
 
     @staticmethod
@@ -263,8 +263,8 @@ class Photo(ndb.Model):
     #Other data
     blob = ndb.BlobKeyProperty(indexed=False)
     gs = ndb.StringProperty(indexed=False)
-    album = ndb.KeyProperty(Album)
-    uploaded_by = ndb.KeyProperty(User)
+    album = ndb.KeyProperty(kind=Album)
+    uploaded_by = ndb.KeyProperty(kind=User)
 
     serving_url = ndb.StringProperty(indexed=False)
 
@@ -301,9 +301,9 @@ class Comment(ndb.Model):
     class RESTMeta:
         user_owner_property = 'user'
 
-    album = ndb.KeyProperty(Album, required=True)
-    photo = ndb.KeyProperty(Photo,required=True)
-    user  = ndb.KeyProperty(User)
+    album = ndb.KeyProperty(kind=Album, required=True)
+    photo = ndb.KeyProperty(kind=Photo,required=True)
+    user  = ndb.KeyProperty(kind=User)
     created = ndb.DateTimeProperty(auto_now_add=True)
     text = ndb.StringProperty(indexed=False)
 

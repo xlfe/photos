@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 class Permissions(ndb.Model):
 
+    user = ndb.KeyProperty(kind='User')
     view = ndb.BooleanProperty()
     edit = ndb.BooleanProperty()
     comment = ndb.BooleanProperty()
@@ -9,7 +10,6 @@ class Permissions(ndb.Model):
     move = ndb.BooleanProperty()
     upload = ndb.BooleanProperty()
     delete = ndb.BooleanProperty()
-    user = ndb.KeyProperty('User')
 
 
     @classmethod
@@ -235,20 +235,7 @@ class PermissionPhoto(Permission,AlbumQuery):
 
 
 class PermissionComment(Permission,AlbumQuery):
-    method_reqs ={
-        'QUERY': lambda x: x.view is True,
-        'GET': lambda x: x.view is True,
-        'POST': lambda x: x.upload is True,
-        'PUT': lambda x: x.edit is True or x.sort is True or x.move is True,
-        'DELETE':lambda x:x.delete is True
-    }
-
-    change_reqs ={
-        'title': lambda x: x.edit is True,
-        'tags': lambda x: x.edit is True,
-        'pos': lambda x:x.sort is True,
-        'path': lambda x:x.move is True
-    }
+    #only allows GET POST DELETE
 
     def apply_permissions_filter(self, query, model, user):
 
@@ -263,7 +250,7 @@ class PermissionComment(Permission,AlbumQuery):
             return query
 
         applied = Permissions.get_permission(album, user)
-        if self.method_reqs['QUERY'](applied) is True:
+        if applied.view is True:
             return query
 
         return None
@@ -278,38 +265,28 @@ class PermissionComment(Permission,AlbumQuery):
             return True
 
         applied = Permissions.get_permission(album,user)
-        if method not in self.method_reqs:
-            return False
 
-        if self.method_reqs[method](applied) is True:
-            return True
+        if method == 'DELETE':
+
+            #Only the owner of the comment with comment permission can delete
+            if applied.comment ==True \
+                    and model.user is not None \
+                    and user is not None \
+                    and model.user == user.key:
+                return True
+
+        if method == 'GET':
+
+            #Any user with view permissions
+            if applied.view is True:
+                return True
+
+        if method == 'POST':
+
+            if applied.comment is True:
+                return True
 
         return False
-
-
-    def update_field_check(self, model, fields, user):
-
-        album = model.album.get()
-        assert album is not None
-
-        #Album owner can do anything
-        if user is not None and album.owner == user.key:
-            return True
-
-        applied = Permissions.get_permission(album,user)
-
-        for field in fields:
-            if field not in self.change_reqs:
-                return False
-
-            if self.change_reqs[field](applied) is not True:
-                return False
-
-        logging.info('CHANGED '+str(fields))
-        return True
-
-
-
 
 class PermissionInvite(PermissionUser,AlbumQuery):
 

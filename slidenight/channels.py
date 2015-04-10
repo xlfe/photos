@@ -14,8 +14,8 @@ from webapp2 import get_request
 
 class ChannelSubscription(ndb.Model):
 
-    albums = ndb.KeyProperty('Album', repeated=True)
-    user =   ndb.KeyProperty('User')
+    albums = ndb.KeyProperty(kind='Album', repeated=True)
+    user =   ndb.KeyProperty(kind='User')
     channel_id = ndb.StringProperty()
     connected = ndb.BooleanProperty()
     created = ndb.DateTimeProperty(auto_now_add=True)
