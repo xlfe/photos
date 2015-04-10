@@ -7,6 +7,32 @@ if (typeof String.prototype.endsWith != 'function') {
         return this.slice(-str.length) == str;
     };
 }
+// attach the .equals method to Array's prototype to call it on any array
+var compare_arrays = function (a,b) {
+    if (!a || !b) {
+        return false;
+    }
+
+    var l_a = Em.get(a,'length'),
+        l_b = Em.get(b,'length');
+
+    if (l_a !== l_b) {
+        return false;
+    }
+
+    //check b has all items in a and vice versa
+    for (var i=0; i< l_a; i++){
+        if (b.indexOf(a[i]) == -1){
+            return false;
+        }
+
+        if (a.indexOf(b[i]) == -1){
+            return false;
+        }
+    }
+
+    return true;
+}
 
 export default Em.Mixin.create({
     //define these
@@ -22,6 +48,7 @@ export default Em.Mixin.create({
         props.forEach(function(prop){
             if (Em.isArray(_this.get(prop))){
                 Em.addObserver(_this,prop +'.length',_this,'_keep_watch');
+                _this.set('__'+prop,JSON.parse(JSON.stringify(_this.get(prop).toArray())));
             } else {
                 Em.addObserver(_this,prop,_this,'_keep_watch');
             }
@@ -37,7 +64,11 @@ export default Em.Mixin.create({
             _this = this;
 
         props.forEach(function(prop){
-            Em.removeObserver(_this,prop,_this,'_keep_watch');
+            if (Em.isArray(_this.get(prop))){
+                Em.removeObserver(_this,prop +'.length',_this,'_keep_watch');
+            } else {
+                Em.removeObserver(_this,prop,_this,'_keep_watch');
+            }
         });
 
     }.on('becameInvalid'),
@@ -54,13 +85,25 @@ export default Em.Mixin.create({
         });
     },
     _saving: true,
-    _keep_watch: function () {
+    _keep_watch: function (sender,key,value) {
         if (this.get('_saving') === true){
             return;
         }
 
-        if (this.get('isDirty') === false && arguments[1].endsWith('.length') === false) {
-            console.log('NOT DIRTY')
+        //Need to check the list for changes
+        if (key.endsWith('.length') === true) {
+            var k = key.split('.')[0],
+                prev = this.get('__' + k),
+                now = this.get(k),
+                same = compare_arrays(prev,now);
+
+            this.set('__'+k,JSON.parse(JSON.stringify(now.toArray())));
+
+            if (same === true && this.get('isDirty') === false){
+                return;
+            }
+
+        }else if (this.get('isDirty') === false){
             return;
         }
 
