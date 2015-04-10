@@ -2,6 +2,8 @@
 
 import webapp2
 import json
+import base64
+import cloudstorage as gcs
 import uuid
 from rest_gae.rest_gae import RESTHandler,BaseRESTHandler
 from rest_gae.permissions import *
@@ -11,6 +13,7 @@ from google.appengine.ext import blobstore, ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 import httplib2
+import binascii
 from oauth2client.appengine import AppAssertionCredentials
 
 DEBUG = os.environ['SERVER_SOFTWARE'].startswith('Development')
@@ -61,10 +64,6 @@ class PrepareUpload(BaseRESTHandler):
             if applied.upload is not True:
                 return self.unauthorized()
 
-        params['name'] = str(params['album']) + '/' + uuid.uuid4().hex
-        params['user'] = self.user.key.id()
-
-
         if not DEBUG:
             credentials = AppAssertionCredentials(scope='https://www.googleapis.com/auth/devstorage.read_write')
             http = credentials.authorize(httplib2.Http())
@@ -77,7 +76,19 @@ class PrepareUpload(BaseRESTHandler):
                 'Content-Type': 'application/json; charset=UTF-8'
             }
 
-            (resp_headers,content) = http.request(uri=endpoint,method='POST',body=json.dumps(params),headers=headers)
+            b64_md5 = binascii.b2a_base64(binascii.unhexlify(params['md5']))
+            # b64_md5 = binascii.b2a_base64(binascii.unhexlify('0f90478725359cd1f3ca43f2e11a0ef1'))
+
+            body = {
+                'name':str(params['album']) + '/' + uuid.uuid4().hex,
+                'md5Hash' : b64_md5[:-1], #Trigger upload hash check
+                'metadata': {
+                    'album':params['album'],
+                    'uploaded_by':int(self.user.key.id())
+                }
+            }
+
+            (resp_headers,content) = http.request(uri=endpoint,method='POST',body=json.dumps(body),headers=headers)
 
             if resp_headers['status'] == '200':
 
@@ -85,6 +96,10 @@ class PrepareUpload(BaseRESTHandler):
                     'location':resp_headers['location'],
                     'chunk_size': (256 * 1024) * 4 * 2 #2mb chunks
                 }
+            else:
+                logging.info(resp_headers)
+                logging.info(content)
+                raise ValueError('Unable to create object for upload')
 
         else:
 
@@ -103,6 +118,47 @@ class PrepareUpload(BaseRESTHandler):
 
         return
 
+
+def update_sz(photo):
+    stats = gcs.stat(photo.gs[3:])
+    photo.md5 = stats.etag
+    photo.size = stats.st_size
+    return photo.put_async()
+
+
+# class FixSizes(BaseRESTHandler):
+#
+#     def get(self):
+#         for album in Album.query().fetch(100):
+#             UpdateSchema(album=album.key)
+#
+# BATCH_SIZE = 100
+# from google.appengine.ext.deferred import defer
+#
+# def UpdateSchema(album=None,cursor=None, num_updated=0):
+#     if cursor is not None:
+#         (results,cursor,more) = Photo.query(ancestor=album).fetch_page(BATCH_SIZE,start_cursor=cursor)
+#     else:
+#         (results,cursor,more) = Photo.query(ancestor=album).fetch_page(BATCH_SIZE)
+#
+#     to_put = []
+#     for p in results:
+#         to_put.append(update_sz(p))
+#
+#     if to_put:
+#
+#         ndb.Future.wait_all(to_put)
+#         num_updated += len(to_put)
+#         logging.debug(
+#             'Put %d entities to Datastore for a total of %d',
+#             len(to_put), num_updated)
+#         defer(
+#             UpdateSchema, album=album,cursor=cursor, num_updated=num_updated)
+#     else:
+#         logging.debug(
+#             'UpdateSchema complete with %d updates!', num_updated)
+#
+
 class GCSFinalizeHandler(BaseRESTHandler):
     """Client posts here to tell us that the upload has finished"""
 
@@ -115,6 +171,10 @@ class GCSFinalizeHandler(BaseRESTHandler):
         _album = album.get()
         assert _album is not None
 
+        stats = gcs.stat('/' + params['id'])
+
+        assert int(stats.metadata['x-goog-meta-album']) == int(params['album']) ,stats.metadata
+        assert int(stats.metadata['x-goog-meta-uploaded_by']) == int(self.request.user.key.id()) ,stats.metadata
 
         img = images.Image(filename=blobstore_filename)
         img.rotate(0)
@@ -122,7 +182,8 @@ class GCSFinalizeHandler(BaseRESTHandler):
 
         meta = img.get_original_metadata()
         meta['UploadFileModified']=params['lastModifiedDate']
-        meta['UploadOriginalPath']=params['path']
+        if len(params['path']) > 0:
+            meta['UploadOriginalPath']=params['path']
         assert self.request.user is not None
 
         if self.request.user.key != _album.owner:
@@ -138,7 +199,8 @@ class GCSFinalizeHandler(BaseRESTHandler):
                       title='.'.join(params['name'].split('.')[:-1]),
                       path=params['path'],
                       pos='{0:f}'.format(float(first)/150000),
-                      md5 = params['md5'],
+                      md5 = stats.etag,
+                      size = stats.st_size,
                       filename=params['name'],
                       album=album,
                       width=img.width,
@@ -185,9 +247,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             title='.'.join(name.split('.')[:-1]),
             path=self.request.get('path'),
             pos='{0:f}'.format(float(first)/150000),
+            size = blob_info.size,
             filename=name,
             album=album,
-            md5=self.request.get('md5'),
+            md5=blob_info.md5_hash,
             width=img.width,
             height= img.height,
             metadata=meta,
@@ -211,6 +274,7 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/upload',UploadHandler),
         webapp2.Route('/api/login',LoginHandler),
         webapp2.Route('/api/claim',ClaimHandler),
+        # webapp2.Route('/api/fix_sizes',FixSizes),
 
         #Channel management
         webapp2.Route('/api/channel', ChannelHandler),

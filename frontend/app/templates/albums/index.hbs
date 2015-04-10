@@ -11,6 +11,7 @@
         <tr>
             <th>Name</th>
             <th>Photos</th>
+            <th>Size</th>
             <th>Permissions</th>
             <th>Created</th>
         </tr>
@@ -25,6 +26,9 @@
                 </td>
                 <td>
                     {{album.photo_count}}
+                </td>
+                <td>
+                    {{human-size album.total_size}}
                 </td>
                 <td>
                     {{#link-to 'permissions' album.id}}

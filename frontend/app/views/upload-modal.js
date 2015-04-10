@@ -119,7 +119,7 @@ export default Em.View.extend({
         }
 
         if (uploading){
-            return 'Uploading to "' + this.get('context.model.name') + '" - ' + count + ' photos ('+fileSizeSI(total_size)+') remaining.';
+            return 'Uploading - ' + count + ' photos ('+fileSizeSI(total_size)+') remaining.';
         } else {
             return 'Upload ' + count + 'photos (' + fileSizeSI(total_size) + ') to album "' + this.get('context.model.name') + '"';
         }

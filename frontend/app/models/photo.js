@@ -24,6 +24,7 @@ export default DS.Model.extend(autosave,{
     modified:   DS.attr('isodatetime', ro),
     width:      DS.attr('number',      ro),
     height:     DS.attr('number',      ro),
+    size:       DS.attr('number',      ro),
     metadata:   DS.attr('object',      ro),
     serving_url: DS.attr('string',     ro),
     comments: DS.hasMany('comments',{async:true}),

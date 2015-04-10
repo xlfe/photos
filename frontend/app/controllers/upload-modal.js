@@ -98,6 +98,7 @@ export default Em.Controller.extend({
             form.append('path', file.get('path'));
             form.append('lastModifiedDate', file.get('file').lastModifiedDate);
             form.append('file', data, file.get('name'));
+            form.append('bytes', file.get('bytes'));
             form.append('md5', file.get('md5'));
             form.append('user', +this.get('session.id'));
             data = form;
@@ -137,7 +138,6 @@ export default Em.Controller.extend({
                 file.set('progress', 'width: 100%');
                 file.set('status', 'Processing...');
                 file.set('_status', 5);
-//                console.log('success', response);
 
                 if (prod) {
 
@@ -184,11 +184,20 @@ export default Em.Controller.extend({
 
                     var b = file.get('backoff');
                     file.set('backoff',b+1);
+                    file.set('status','Waiting to retry...');
 
                     setTimeout(function(){
                         console.log('Waiting... ',b);
                         _this.send_chunk(file,start);
                     },Math.pow(2,b)*1000);
+                } else if (err.status === 400){
+                    //bad upload
+
+                    file.set('status','Failed');
+                    file.set('_status',-1);
+
+                } else {
+                    console.log('error',err);
                 }
             }
         });

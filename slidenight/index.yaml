@@ -21,6 +21,11 @@ indexes:
   - name: connected
   - name: channel_id
 
+- kind: ChannelSubscription
+  properties:
+  - name: albums
+  - name: channel_id
+
 - kind: EmailLog
   properties:
   - name: email

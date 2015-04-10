@@ -34,26 +34,13 @@ export default Em.Route.extend({
                 query_params['cursor'] = more_results;
                 //query_params['limit'] = query_params['limit'] * 2;
 
-                Em.$.ajax({
-
-                    url: endpoint,
-                    method: 'GET',
-                    data: query_params,
-                    dataType: 'json',
-                    success: function (data) {
-                        Em.run.schedule('render', function () {
-                            store.pushMany('photo',data.Photo);
-                        });
-                        get_more(album, data);
-
-                    },
-                    error: function (error) {
-                        console.log(error)
-                    }
+                store.find('photo',query_params).then(function(more){
+                    Em.run.later(function(){
+                        get_more(album,more);
+                    });
                 });
             } else {
                 album.set('more_results',false);
-                album.set('photo_count',album.get('photos.length'));
             }
 
         };

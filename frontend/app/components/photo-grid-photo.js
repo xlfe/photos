@@ -269,7 +269,6 @@ export default Em.Component.extend({
             }
 
             var new_pos = diff(lower, upper);
-            //clog("moved one photo to",new_pos.toString());
             photo.set('pos',new_pos.toString());
             this.sendAction('size_immediate');
         }

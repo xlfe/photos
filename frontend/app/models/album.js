@@ -5,11 +5,12 @@ import perm from '../objects/permissions';
 import Channel from '../subscribers/channel';
 
 export default DS.Model.extend(autosave,{
-    autosave_properties: ['name','photo_count'],
+    autosave_properties: ['name','photo_count','total_size'],
 
     name: DS.attr('string'),
     created: DS.attr('isodatetime'),
     photo_count: DS.attr('number'),
+    total_size: DS.attr('number'),
     owner: DS.belongsTo('user', {async:true}),
     permissions: DS.attr('list'),
 

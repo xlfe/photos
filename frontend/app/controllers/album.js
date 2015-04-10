@@ -408,6 +408,31 @@ export default Em.Controller.extend({
             }
         });
     },
+    album_stats_gen: function() {
+        var mr = this.get('model.more_results'),
+            _this = this,
+            owner = this.get('permissions.owner');
+
+        if (mr === true || owner === false){
+            return;
+        }
+
+        Em.run.later(function(){
+
+            var total_size = 0,
+                total_count = 0;
+
+            _this.get('model.photos').forEach(function(p){
+                total_count+=1;
+                total_size += p.get('size') || 0;
+            });
+
+            console.log(total_count,total_size);
+            _this.set('model.total_size',total_size);
+            _this.set('model.photo_count',total_count);
+        },2000);
+
+    }.observes('model.more_results'),
     do_search: function () {
         this.set('_search', this.get('search'));
     },
@@ -480,12 +505,10 @@ export default Em.Controller.extend({
                     }, i * 20);
                     i += 1;
                 });
-                if (this.get('permissions.owner')){
-                    Em.run.later(function(){
-                        _this.set('model.photo_count',_this.get('model.photo_count') - del);
-                        _this.get('model').save();
-                    },i*20+100);
-                }
+
+                Em.run.later(function(){
+                    _this.album_stats_gen();
+                },i*20 + 1000);
             } else {
                 this.set('confirm_delete', true);
             }

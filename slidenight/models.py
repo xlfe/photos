@@ -157,9 +157,10 @@ class Album(ndb.Model):
     class RESTMeta:
         user_owner_property = 'owner'
 
-    name = ndb.StringProperty()
-    photo_count = ndb.IntegerProperty()
-    owner = ndb.KeyProperty(kind=User)
+    name = ndb.StringProperty(required=True)
+    photo_count = ndb.IntegerProperty(default=0)
+    total_size = ndb.IntegerProperty(default=0)
+    owner = ndb.KeyProperty(kind=User,required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     permissions = ndb.StructuredProperty(Permissions,repeated=True)
 
@@ -251,6 +252,7 @@ class Photo(ndb.Model):
     #Read only
     filename = ndb.StringProperty(required=True,indexed=False)
     md5 = ndb.StringProperty(required=True,indexed=False)
+    size = ndb.IntegerProperty()
 
     uploaded = ndb.DateTimeProperty(auto_now_add=True,indexed=False)
     modified = ndb.DateTimeProperty(auto_now=True,indexed=False)
