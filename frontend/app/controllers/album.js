@@ -121,7 +121,7 @@ export default Em.Controller.extend({
     minHeight: 200,
     set_minHeight: function() {
         var h = Em.$(window).height() - 130,
-            d = h/5;
+            d = h/3.5;
 
         console.log(d);
         this.set('minHeight',Math.max(100,d));
