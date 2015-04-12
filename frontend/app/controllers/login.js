@@ -21,10 +21,14 @@ export default Em.Controller.extend(LoginControllerMixin, {
             });
             this.set(what, true);
             this.set('do', what);
+
+            ga('send', 'pageview', { 'page': '/login/'+what});
         },
         authenticate: function () {
             var _this = this,
                 invite = this.get('session.invite');
+
+            ga('send', 'event', 'action', 'authenticate');
 
             this._super().then(function () {
 
@@ -33,12 +37,14 @@ export default Em.Controller.extend(LoginControllerMixin, {
                 }
 
             }, function (error) {
+                ga('send', 'event', 'action', 'authentication-error');
                 _this.set('error', error.error);
             });
         },
         register: function () {
             var _this = this;
 
+            ga('send', 'event', 'action', 'register');
             this.set('processing', true);
 
             var data = this.getProperties('name', 'email', 'password'),

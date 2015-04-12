@@ -284,6 +284,8 @@ export default Em.Controller.extend({
 
             if (!Em.isEmpty(ready)) {
 
+                ga('send', 'event', 'action', 'upload');
+
                 this.setProperties({
                     save_caption: 'Uploading...',
                     save_disabled: true,

@@ -22,30 +22,29 @@
 
         {{#unless folders}}
             {{#unless arrangedContent}}
-                {{#if controller._search}}
-                    <div class="box-middle-center">
-                        <span>
+                <div class="box-middle-center">
+                    <span>
+                        {{#if controller.search_mode}}
                             No photos found - enter search terms at the top of the screen.
-                        </span>
-                    </div>
-                {{else}}
+                        {{else}}
 
-                    {{#if controller.permissions.upload}}
-                        <div class="box-middle-center">
+                            {{#if controller.model.more_results}}
+                                Please wait - we're loading some photos...
 
-                            {{#if session.validated}}
-                                <span>
-                            No photos found - would you like to
-                            <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
-                                upload some photos</a>?
-                        </span>
-                            {{else}}
-                                {{validation-reminder}}
+                                {{else if controller.permissions.upload}}
+                                    No photos found - would you like to
+                                    <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+                                        upload some photos
+                                    </a>?
+
+                                {{#unless session.validated}}
+                                    {{validation-reminder}}
+                                {{/unless}}
                             {{/if}}
-                        </div>
-                    {{/if}}
 
-                {{/if}}
+                        {{/if}}
+                    </span>
+                </div>
 
             {{/unless}}
         {{/unless}}

@@ -84,6 +84,7 @@ export default Em.Controller.extend({
     }.property('controllers.album.arrangedContent.length'),
     actions: {
         save: function () {
+            ga('send', 'event', 'action', 'sort');
 
             if (Em.isNone(this.get('sort_by'))){
                 alert('Please select the photo property to sort by')

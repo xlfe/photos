@@ -450,9 +450,11 @@ export default Em.Controller.extend({
         },
         larger: function() {
             this.set('minHeight',Math.min(this.get('minHeight')+50,800));
+            ga('send', 'event', 'action', 'larger_photos');
         },
         smaller: function(){
             this.set('minHeight',Math.max(this.get('minHeight')-50,150));
+            ga('send', 'event', 'action', 'smaller_photos');
         },
         cancel_selection: function() {
             this.get('selected').forEach(function(_){
@@ -472,8 +474,8 @@ export default Em.Controller.extend({
             this.set('search','');
             this.set('_search','');
             this.toggleProperty('search_mode');
+            ga('send', 'event', 'action', 'search_mode',this.get('search_mode'));
         },
-
         toggle_search_path: function(sp){
             Em.set(sp,'disabled',!Em.get(sp,'disabled'));
         },
@@ -542,6 +544,7 @@ export default Em.Controller.extend({
             this._size_photos();
         },
         add_comment: function(comment){
+            ga('send', 'event', 'action', 'add_comment');
             this.get('store').createRecord('comment',{
                 photo:comment.photo,
                 album: +this.get('model.id'),

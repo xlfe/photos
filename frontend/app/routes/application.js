@@ -23,9 +23,12 @@ export default Em.Route.extend(ApplicationRouteMixin, {
         error: function(error,transition){
 
             if (error.status === 401) {
+                ga('send', 'exception', { 'exDescription': 'Authentication failed to ' + transition.targetName, 'exFatal': true});
                 transition.abort()
                 return this.transitionTo('login');
             } else {
+                ga('send', 'exception', { 'exDescription': 'Unknown exception ' + error.status + ' on ' + transition.targetName,
+                    'exFatal': true});
                 transition.abort();
                 alert("Sorry - something went wrong!");
             }

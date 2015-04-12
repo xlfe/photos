@@ -53,9 +53,9 @@ export default Em.Route.extend({
 
                 album.set('photos', store.filter('photo',function(p){
                     if(p.get('album') === +params.album_id) {
-                        if (p.get('currentState.isLoading') === true || p.get('currentState.isDeleted') === true) {
-                            return false;
-                        }
+                        //if (p.get('currentState.isLoading') === true || p.get('currentState.isDeleted') === true) {
+                        //    return false;
+                        //}
                         return true;
                     }
                     return false;
@@ -84,16 +84,24 @@ export default Em.Route.extend({
                 });
         });
     },
+    afterModel: function(resolved,transition) {
+        Em.$(document).attr('title', resolved.get('name') + ' | Slidenight');
+        ga('send', 'pageview', {
+            'page': '/album',
+            'title': 'Album view'
+        });
+    },
+    resetTitle: function() {
+        Em.$(document).attr('title', 'Slidenight');
+    }.on('deactivate'),
     actions: {
         error: function(error,transition) {
 
-            console.log(error)
             alert('Sorry you do not have permission to view that album');
-
+            ga('send', 'exception', { 'exDescription': 'Authentication failed to ' + transition.targetName, 'exFatal': true});
             transition.abort();
             this.transitionTo('login')
             return false;
-
         }
     }
 });

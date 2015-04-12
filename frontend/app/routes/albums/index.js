@@ -6,6 +6,9 @@ export default Em.Route.extend(AuthenticatedRouteMixin,{
     model: function () {
         return this.get('store').find('album');
     },
+    afterModel: function() {
+        ga('send', 'pageview', { 'page': '/albums', 'title': 'Album list' });
+    },
     actions: {
         new_album: function () {
             var name = prompt('New album name?'),

@@ -24,6 +24,7 @@ export default Em.View.extend({
         Em.$(document).off('keyup', this.keyUp);
         this.$('#lightbox-overlay').off('click', this.overlay_click);
         window.onscroll = undefined;
+        ga('send', 'pageview', { 'page': '/album', 'title': 'Album view' });
     },
     didInsertElement: function () {
         Em.$(document).on('keyup', {_this: this}, this.keyUp);
@@ -37,7 +38,9 @@ export default Em.View.extend({
         // lock scroll position, but retain settings for later
         window.onscroll = function() {
             window.scrollTo(scrollPosition[0], scrollPosition[1]);
-        }
+        };
+
+        ga('send', 'pageview', { 'page': '/album/show', 'title': 'Slideshow view' });
     },
     overlay_click: function (event) {
         event.data._this.get('controller').transitionToRoute('album');
