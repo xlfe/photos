@@ -528,13 +528,24 @@ export default Em.Controller.extend({
                 selection = this.get('selected');
 
             selection.forEach(function (photo) {
+                var count = 0;
                 Em.run.later(function () {
-                    if (photo.get('tags').contains(nt) === false) {
-                        photo.set('_saving',true);
-                        photo.get('tags').pushObjects(nt);
-                        photo.save().then(function(p){
-                            p.set('_saving',false);
-                        });
+                    photo.set('_saving',true);
+                    nt.forEach(function(t){
+                        if(photo.get('tags').contains(t)){
+                            return;
+                        }
+                        photo.get('tags').pushObject(t);
+                        count += 1;
+                    });
+
+                    if (count > 0){
+
+                    photo.save().then(function(p){
+                        p.set('_saving',false);
+                    });
+                    } else {
+                        photo.set('_saving',false);
                     }
                 }, i * 20);
                 i += 1;

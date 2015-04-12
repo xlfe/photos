@@ -289,18 +289,19 @@ export default Em.Component.extend({
             }
         },
         add_tag: function(){
-
-            //var selected=this.get('selected'),
-            //    len = selected.length || 1,
-            var new_tag = prompt("Enter the (comma/space seperated) tags you'd like to add to this photo");
+            var new_tag = prompt("Enter the (comma/space seperated) tags you'd like to add to this photo"),
+                _this = this;
 
             if (Em.$.trim(new_tag).length > 0){
 
                 var nt = Em.$.trim(new_tag).toLowerCase().split(/[,\ ]+/);
 
-                if (this.get('photo.tags').contains(nt) === false){
-                    this.get('photo.tags').pushObjects(nt);
-                }
+                nt.forEach(function(t){
+
+                    if (_this.get('photo.tags').contains(t) === false){
+                        _this.get('photo.tags').pushObject(t);
+                    }
+                })
             }
         },
         remove_tag: function(tag){
