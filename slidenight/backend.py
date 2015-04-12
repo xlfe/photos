@@ -119,46 +119,6 @@ class PrepareUpload(BaseRESTHandler):
         return
 
 
-def update_sz(photo):
-    stats = gcs.stat(photo.gs[3:])
-    photo.md5 = stats.etag
-    photo.size = stats.st_size
-    return photo.put_async()
-
-
-# class FixSizes(BaseRESTHandler):
-#
-#     def get(self):
-#         for album in Album.query().fetch(100):
-#             UpdateSchema(album=album.key)
-#
-# BATCH_SIZE = 100
-# from google.appengine.ext.deferred import defer
-#
-# def UpdateSchema(album=None,cursor=None, num_updated=0):
-#     if cursor is not None:
-#         (results,cursor,more) = Photo.query(ancestor=album).fetch_page(BATCH_SIZE,start_cursor=cursor)
-#     else:
-#         (results,cursor,more) = Photo.query(ancestor=album).fetch_page(BATCH_SIZE)
-#
-#     to_put = []
-#     for p in results:
-#         to_put.append(update_sz(p))
-#
-#     if to_put:
-#
-#         ndb.Future.wait_all(to_put)
-#         num_updated += len(to_put)
-#         logging.debug(
-#             'Put %d entities to Datastore for a total of %d',
-#             len(to_put), num_updated)
-#         defer(
-#             UpdateSchema, album=album,cursor=cursor, num_updated=num_updated)
-#     else:
-#         logging.debug(
-#             'UpdateSchema complete with %d updates!', num_updated)
-#
-
 class GCSFinalizeHandler(BaseRESTHandler):
     """Client posts here to tell us that the upload has finished"""
 
@@ -293,7 +253,8 @@ app = webapp2.WSGIApplication([
                     before_delete_callback=Photo.before_delete,
                     after_put_callback=Photo.after_put
         ),
-        RESTHandler('/api/albums',  Album,  permissions=PERM_APPLY(PERMISSION_ALBUM),allowed_origin=ALLOWED_ORIGIN),
+        RESTHandler('/api/albums',  Album,  permissions=PERM_APPLY(PERMISSION_ALBUM),before_delete_callback=Album.before_delete
+                    ,allowed_origin=ALLOWED_ORIGIN),
       ],
     debug=True,
     config=config

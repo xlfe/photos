@@ -1,7 +1,10 @@
 
+from google.appengine.ext.deferred import defer
 from google.appengine.ext import ndb
 from google.appengine.api import images
 from google.appengine.ext import blobstore
+from batch_jobs import DeleteAlbumPhotos
+from channels import ChannelSubscription
 import logging
 import os
 import json
@@ -163,6 +166,21 @@ class Album(ndb.Model):
     owner = ndb.KeyProperty(kind=User,required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     permissions = ndb.StructuredProperty(Permissions,repeated=True)
+
+
+    @staticmethod
+    def before_delete(models):
+        logging.info(models)
+        for model in models:
+            #Unsubscribe all channels
+            ndb.delete_multi(ChannelSubscription.query(model.key == ChannelSubscription.albums).iter(keys_only = True))
+            #Remove comments
+            ndb.delete_multi(Comment.query(Comment.album == model.key).iter(keys_only = True))
+            #Delete photos
+            defer(DeleteAlbumPhotos,model.key.id())
+
+
+        return models
 
 
 
