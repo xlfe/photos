@@ -4,6 +4,27 @@
 
         <div class="photo-select"><span></span></div>
 
+        <div class="view-options">
+
+
+            <div class="left-icons">
+                <span class="mouse-action" {{action 'toggle_tags'}}>
+
+                    {{#if controller.show_tags}}
+                        <i class="fa fa-check"></i>
+                    {{else}}
+                        <i class="fa fa-square-o"></i>
+                    {{/if}}
+                    Show tags
+                </span>
+            </div>
+
+            <div class="right-icons">
+                <i class="fa fa-bars"></i>
+            </div>
+
+        </div>
+
         {{#each folder in folders}}
             {{photo-grid-folder folder=folder path="path" canDrop=controller.permissions.move album=controller}}
         {{/each}}

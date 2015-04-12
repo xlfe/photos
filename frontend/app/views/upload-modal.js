@@ -106,7 +106,8 @@ export default Em.View.extend({
     },
     title: function () {
         var files = this.get('controller.files').filter(function(f){
-                return f.get('_status') === 0 || f.get('_status') ===1;
+                var s = f.get('status');
+                return s !== 6 && s !== -1 && s !== 0;
             }),
             uploading = this.get('controller.uploading'),
             total_size = 0,

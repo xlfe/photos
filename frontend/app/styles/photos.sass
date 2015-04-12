@@ -11,6 +11,7 @@ $o-hover-item: 0.8
   -khtml-user-drag: element
 
 #photos
+  background-color: rgba(127, 127, 127, 0.02)
   font-size: 16px
   @extend %inline-flex
   @include flex-direction(row)
@@ -154,7 +155,11 @@ $o-hover-item: 0.8
   bottom: 5%
   right: 3%
 
-
+#photos.no-tags
+  * > .tag
+    display: none
+  * > .add-tag-icon
+    display: none
 
 
 
@@ -207,3 +212,28 @@ $highlight-border: 5px solid rgba(255, 249, 0, 0.84) !important
 .photo-select.active
   display: block !important
 
+.mouse-action
+  &:hover
+    text-decoration: underline
+    cursor: pointer
+
+div.view-options
+  pointer-events: none
+  min-height: 80px
+  width: 100%
+  position: relative
+  font-size: smaller
+  
+  *
+    pointer-events: all
+
+
+  .left-icons
+    position: absolute
+    top: 20px
+    left: 20px
+
+  .right-icons
+    position: absolute
+    top: 20px
+    right: 20px

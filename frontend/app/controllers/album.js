@@ -162,7 +162,7 @@ export default Em.Controller.extend({
             search = this.get('_search');
 
         if (search_mode === true){
-            if (Em.isNone(search) || Em.$.trim(search).length <3 ) {
+            if (Em.isNone(search) || Em.$.trim(search).length <2 ) {
                 return [];
             }
 
@@ -213,11 +213,15 @@ export default Em.Controller.extend({
         var base_class='your-photos photo-wall';
 
         if (this.get('selected').length > 0 && (this.get('permissions.sort') === true || this.get('permissions.move') === true)){
-            return base_class + ' selection';
+            base_class  = base_class + ' selection';
+        }
+
+        if (this.get('show_tags') === false){
+            base_class  = base_class + ' no-tags';
         }
 
         return base_class;
-    }.property('selected.length','permissions.move','permissions.sort'),
+    }.property('selected.length','permissions.move','permissions.sort','show_tags'),
 
     folders: function () {
         // Show all folders that have this path or below
@@ -437,7 +441,7 @@ export default Em.Controller.extend({
         this.set('_search', this.get('search'));
     },
     search_observer: function () {
-        Em.run.debounce(this, this.do_search, 1000);
+        Em.run.debounce(this, this.do_search, 500);
     }.observes('search'),
     search_mode: false,
     search_paths: search_paths,
@@ -561,7 +565,11 @@ export default Em.Controller.extend({
                 album: +this.get('model.id'),
                 text:comment.text
             }).save();
+        },
+        toggle_tags:function(){
+            this.toggleProperty('show_tags')
         }
-    }
+    },
+    show_tags: true
 });
 
