@@ -17,6 +17,7 @@ function doObjectsCollide(s, p,margin) { // a and b are your objects
     );
 }
 
+var last_clicked_photo;
 
 
 export default Em.View.extend({
@@ -86,7 +87,7 @@ export default Em.View.extend({
 
             var min_move = 30,
                 click = (Math.abs(e.pageX - initialX) <= min_move && Math.abs(e.pageY - initialY) <= min_move),
-                photos = _this.get('controller.model.photos'),
+                photos = _this.get('controller.arrangedContent'),
                 selection = Em.$(".photo-select");
 
             Em.$(".photo").each(function () {
@@ -102,7 +103,45 @@ export default Em.View.extend({
                     photo = photos.findBy('id', id);
 
                 if (result === true && click === true){
-                    photo.toggleProperty('selected');
+                    console.log('click',e);
+                    if (e.shiftKey === true && photo.get('selected')===false){
+                        console.log('Shift select!')
+                        var last;
+
+                        if (!Em.isNone(last_clicked_photo)) {
+                            last = photos.indexOf(last_clicked_photo);
+                        }else {
+                            last = photos.filter(function(_){
+                                return _.get('selected') ===true && _ !== photo;
+                            });
+
+                            if (Em.isEmpty(last)) {
+                                last=undefined;
+                            } else {
+                                if (last.get('length')>1) {
+                                    console.log("Hmm")
+                                }
+                                last = photos.indexOf(last[0]);
+                            }
+
+                        }
+                        var current = photos.indexOf(photo);
+
+                        if (Em.isNone(last) || Em.isNone(current)){
+                            console.log(last,current,'NONE')
+                            return;
+                        }
+
+                        for (var i=Math.min(last,current); i <= Math.max(last,current); i++){
+                            photos.objectAt(i).set('selected',true);
+                        }
+                        photo.set('selected',true);
+
+                    } else {
+                        photo.toggleProperty('selected');
+                    }
+
+                    last_clicked_photo = photo;
                 } else {
                     if (photo.get('_selected') === true) {
                         photo.set('_selected', false);
