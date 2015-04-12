@@ -4,7 +4,14 @@ import AuthenticatedRouteMixin from 'simple-auth/mixins/authenticated-route-mixi
 
 export default Em.Route.extend(AuthenticatedRouteMixin,{
     model: function () {
-        return this.get('store').find('album');
+        var me = +this.get('session.id');
+        return this.get('store').find('album').then(function(albums){
+            albums.forEach(function(a){
+                //console.log(typeof me,me,typeof a.get('owner.id'),a.get('owner.id'));
+                a.set('am_i_owner',+a.get('owner.id') === me);
+            });
+            return albums;
+        });
     },
     afterModel: function() {
         ga('send', 'pageview', { 'page': '/albums', 'title': 'Album list' });
@@ -23,6 +30,16 @@ export default Em.Route.extend(AuthenticatedRouteMixin,{
             }).save().then(function (_) {
                 _this.transitionTo('album', _.get('id'));
             });
+        },
+        delete_album: function(album){
+
+            var confirmation = prompt('Deleting an album is permanent. Please type "I understand" in the box below ' +
+            'to continue deleting the album "' + album.get('name') + '"');
+
+            if (Em.$.trim(confirmation).toLowerCase() === 'i understand'){
+                album.destroyRecord();
+                this.transitionTo('albums');
+            }
         }
     }
 });
