@@ -1,5 +1,5 @@
 application: slide-night
-version: 155
+version: 156
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -15,6 +15,7 @@ handlers:
 
 - url: /_ah/channel/(connected|disconnected)/
   script: backend.app
+  secure: always
 
 - url: /
   static_files: static/index.html
@@ -24,10 +25,12 @@ handlers:
 - url: /(albums|login)
   static_files: static/index.html
   upload: static/index.html
+  secure: always
 
 - url: /(albums|invites)/(.*)
   static_files: static/index.html
   upload: static/index.html
+  secure: always
 
 - url: /
   static_dir: static
