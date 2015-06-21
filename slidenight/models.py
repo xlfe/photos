@@ -8,7 +8,7 @@ from channels import ChannelSubscription
 import logging
 import os
 import json
-from rest_gae.rest_gae import RESTException,BaseRESTHandler
+from rest_gae.rest_gae import RESTException,BaseRESTHandler, NDBEncoder, StaticRep
 from rest_gae.permissions import Permissions
 from deferred_tasks import send_email
 from channels import SendUpdate
@@ -251,9 +251,7 @@ class ClaimHandler(BaseRESTHandler):
 
 
 
-
-
-class Photo(ndb.Model):
+class Photo(StaticRep):
 
     class RESTMeta:
 
@@ -286,6 +284,7 @@ class Photo(ndb.Model):
     album = ndb.KeyProperty(kind=Album)
     uploaded_by = ndb.KeyProperty(kind=User)
 
+
     serving_url = ndb.StringProperty(indexed=False)
 
     @property
@@ -303,7 +302,6 @@ class Photo(ndb.Model):
     def after_delete(deleted_keys,models):
         for m in models:
             blobstore.delete(m._blobinfo)
-
 
     @staticmethod
     def after_put(created_keys, model):

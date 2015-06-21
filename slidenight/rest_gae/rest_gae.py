@@ -49,6 +49,16 @@ class NDBEncoder(json.JSONEncoder):
         else:
             return super(NDBEncoder,self).default(obj)
 
+
+class StaticRep(ndb.Model):
+    _use_static = True
+
+    def _pre_put_hook(self):
+        self.static_representation = json.dumps(self, cls=NDBEncoder)
+
+    static_representation = ndb.BlobProperty(indexed=False,default=None)
+
+
 class RESTException(Exception):
     """REST methods exception"""
     pass
@@ -123,8 +133,8 @@ class BaseRESTHandler(webapp2.RequestHandler):
     DEFAULT_MAX_QUERY_RESULTS = 1000
 
     # The names of properties that should be excluded from input/output
-    DEFAULT_EXCLUDED_INPUT_PROPERTIES = [ 'class_' ] # 'class_' is a PolyModel attribute
-    DEFAULT_EXCLUDED_OUTPUT_PROPERTIES = [ ]
+    DEFAULT_EXCLUDED_INPUT_PROPERTIES = [ 'class_' ,'static_representation'] # 'class_' is a PolyModel attribute
+    DEFAULT_EXCLUDED_OUTPUT_PROPERTIES = [ 'static_representation']
 
 
     #
@@ -573,6 +583,23 @@ def get_rest_class(ndb_model, base_url, **kwd):
 
                 # Fetch them (with a limit / specific page, if provided)
                 (results, cursor) = self._fetch_query(query)
+
+                if issubclass(self.model, StaticRep):
+                    logging.info("using static representations")
+
+                    _results = [r.static_representation for r in results]
+                    mname = self.model._get_kind()
+                    resp = webapp2.Response('{{ "{}": ['.format(mname) + ', '.join(_results) + "]}")
+                    resp.status = 200
+
+                    resp.headers['Content-Type'] = 'application/json'
+                    # response.headers['Access-Control-Allow-Methods'] = ', '.join(self.permissions.keys())
+                    # response.headers['Access-Control-Allow-Credentials'] = 'true'
+                    # response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept'
+
+                    return resp
+
+
 
                 response = {
                     self.model._get_kind(): results,
