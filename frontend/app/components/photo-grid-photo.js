@@ -42,25 +42,26 @@ export default Em.Component.extend({
     }.property('photo.id'),
     display_details: function() {
         var display = this.get('photo.show_comments'),
+            _this = this,
             photo = this.get('photo');
 
 
         if (display === true){
-            this.get('album.arrangedContent').forEach(function(_){
+            _this.get('album.arrangedContent').forEach(function(_){
                 if (_ !== photo){
                     _.set('show_comments',false);
                 }
             });
             Em.run.later(this,function(){
-                this.$().animate({
+                _this.get('me').animate({
                     'margin-bottom': this.$('.expanded-details').outerHeight(true) + 'px'
                 },50);
-                this.$('.expanded-details').animate({
+                _this.get('me').$('.expanded-details').animate({
                     opacity: 1
                 },50)
             })
         } else {
-            this.$().animate({
+            _this.get('me').animate({
                 'margin-bottom': '0px'
             },500)
         }
@@ -97,6 +98,10 @@ export default Em.Component.extend({
         return false;
 
     },
+    me: function() {
+        "use strict";
+        return Em.$('.photo[data-photo='+this.get('photo.id')+']');
+    }.property('photo.id'),
     setup: function () {
 
         var w = this.get('photo.display_w'),
@@ -106,7 +111,7 @@ export default Em.Component.extend({
             return;
         }
 
-        this.$().css({
+        this.get('me').css({
             height: h + 'px',
             width: w + 'px',
         });
@@ -116,7 +121,7 @@ export default Em.Component.extend({
         }
 
         var
-            img = this.$(),
+            img = this.get('me'),
             url = this.get('photo').get_image(Math.max(w,h),img);
 
         img.css({

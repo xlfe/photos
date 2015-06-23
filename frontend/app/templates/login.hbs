@@ -70,7 +70,7 @@
                 {{input type="email" id="inputEmail" class="form-control" required=true value=email placeholder='Enter your email address'}}
                 {{input id="inputPassword" class="form-control" required=true pattern=".{8,}" title="Your password must be at least 8 characters" value=password placeholder='Enter a password' type='password'}}
 
-                <button class="btn btn-lg btn-primary btn-block btn-signin" {{bind-attr disabled=processing}} type="submit">
+                <button class="btn btn-lg btn-primary btn-block btn-signin" disabled={{processing}} type="submit">
                     Register
                     {{#if processing}}
                         <i class="fa fa-spinner fa-spin"></i>

@@ -12,10 +12,10 @@
 
     <div class="upload">
 
-        {{#each file in controller.files}}
+        {{#each controller.files as |file|}}
 
             <div class="file">
-                <div class="progress" {{bind-attr style=file.progress}}></div>
+                <div class="progress" style={{file.progress}}></div>
 
                 <div class="name">
                     {{file.name}}

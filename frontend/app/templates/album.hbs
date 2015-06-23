@@ -1,6 +1,6 @@
 <div class="container-fluid edge-to-edge">
 
-    <div id="photos" {{bind-attr class=controller.album_class}}>
+    <div id="photos" class="{{controller.album_class}}">
 
         <div class="photo-select"><span></span></div>
 
@@ -25,7 +25,7 @@
 
         </div>
 
-        {{#each folder in folders}}
+        {{#each folders as |folder|}}
             {{photo-grid-folder folder=folder path="path" canDrop=controller.permissions.move album=controller}}
         {{/each}}
 

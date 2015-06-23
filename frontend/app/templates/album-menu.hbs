@@ -9,7 +9,7 @@
             </a>
         {{/link-to}}
 
-        {{#each p in breadcrumbs}}
+        {{#each breadcrumbs as |p|}}
             {{#link-to "album" model (query-params path=p.path) tagName="li" class="menu-link lbread" tabindex="-1"}}
                 <a>
                     {{p.name}}
@@ -37,8 +37,8 @@
             </a>
         </li>
 
-        {{#each sp in controller.search_paths}}
-            <li {{bind-attr class=":menu-link sp.disabled:disabled"}}>
+        {{#each controller.search_paths as |sp|}}
+            <li class="{{if sp.disabled 'disabled'}} menu-link">
                 <a title="Set search param" {{action 'toggle_search_path' sp}} href="#">
                     <i class="fa fa-search fa-lg"></i>
                     {{sp.name}}

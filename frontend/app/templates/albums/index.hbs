@@ -18,7 +18,7 @@
         </tr>
         </thead>
         <tbody>
-        {{#each album in controller.model}}
+        {{#each controller.model as |album|}}
             <tr>
                 <td>
                     {{#link-to 'album' album.id}}

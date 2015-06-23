@@ -29,7 +29,7 @@
                         Save changes
                     </button>
                     {{else}}
-                        <button type="button" {{bind-attr disabled=save_disabled}} class="btn btn-primary" {{action 'save'}}>
+                        <button type="button" disabled={{save_disabled}} class="btn btn-primary" {{action 'save'}}>
                             {{custom_save}}
                         </button>
                     {{/unless}}

@@ -23,7 +23,7 @@
         </span>
     {{/if}}
 
-    {{#each tag in photo.tags}}
+    {{#each photo.tags as |tag|}}
         <div class="tag">
             {{tag}}
             {{#if album.permissions.edit}}
@@ -32,7 +32,7 @@
         </div>
     {{/each}}
 
-    <div {{bind-attr class="photo.comments.length:always-visible :comments-icon"}} {{action 'show_comments'}}>
+    <div class="{{if photo.comments.length 'always-visible'}} comments-icon" {{action 'show_comments'}}>
          <span class="fa-stack fa">
             <i class="fa fa-comment fa-stack-2x"></i>
             <strong class="fa-stack-1x fa-stack-text fa-inverse">
@@ -65,7 +65,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                        {{#each comment in photo.sorted_comments}}
+                        {{#each photo.sorted_comments as |comment|}}
                             {{show-comment comment=comment remove_comment="remove_comment"}}
                         {{/each}}
                     </tbody>

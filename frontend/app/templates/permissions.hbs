@@ -42,7 +42,7 @@
                 <div class="col-sm-9">
                     <p class="form-control-static">
 
-                        <a {{bind-attr href=model.public_url}}>
+                        <a href={{model.public_url}}>
                             {{model.public_url}}
                         </a>
                     </p>
@@ -83,7 +83,7 @@
         </thead>
         <tbody>
 
-        {{#each perm in model.resolved_permissions}}
+        {{#each model.resolved_permissions as |perm|}}
             <tr>
                 {{#if perm.owner}}
                     <td>
@@ -150,7 +150,7 @@
             </thead>
             <tbody>
 
-            {{#each perm in controller.saved_invites}}
+            {{#each controller.saved_invites as |perm|}}
                 <tr>
                     <td>
                         {{perm.email}}
@@ -212,7 +212,7 @@
                 </thead>
                 <tbody>
 
-                {{#each perm in controller.invite_list}}
+                {{#each controller.invite_list as |perm|}}
                     <tr>
                         <td>
                             {{perm.email}}

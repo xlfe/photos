@@ -21,7 +21,7 @@ closeModal='closeModal'
 
                 <ul class="list-unstyled list-group">
 
-                    {{#each option in sortOptions}}
+                    {{#each sortOptions as |option|}}
                         <label class="col-sm-12" {{action 'sort_check' option on="mouseUp"}}>
                         <li class="list-group-item">
 
