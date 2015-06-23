@@ -7,8 +7,10 @@ import cloudstorage as gcs
 import uuid
 from rest_gae.rest_gae import RESTHandler,BaseRESTHandler
 from rest_gae.permissions import *
-from models import *
+from models import Photo, Album, LoginHandler, ClaimHandler, VerifyHandler, Invite, User, Comment
 from channels import ChannelHandler, ChannelConnectHandler, ChannelDisconnectHandler, SendUpdate
+from batch_jobs import UpdateSchemaHandler
+import os
 from google.appengine.ext import blobstore, ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
@@ -234,7 +236,7 @@ app = webapp2.WSGIApplication([
         webapp2.Route('/api/upload',UploadHandler),
         webapp2.Route('/api/login',LoginHandler),
         webapp2.Route('/api/claim',ClaimHandler),
-        # webapp2.Route('/api/fix_sizes',FixSizes),
+        webapp2.Route('/api/fix_sizes',UpdateSchemaHandler),
 
         #Channel management
         webapp2.Route('/api/channel', ChannelHandler),
