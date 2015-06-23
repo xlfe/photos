@@ -50,13 +50,25 @@ class NDBEncoder(json.JSONEncoder):
             return super(NDBEncoder,self).default(obj)
 
 
+class StaticStorage(ndb.Model):
+    album = ndb.KeyProperty(kind='Album')
+    path = ndb.StringProperty()
+    pos = ndb.StringProperty()
+    static_representation = ndb.BlobProperty(indexed=False,default=None)
+
 class StaticRep(ndb.Model):
     _use_static = True
 
-    def _pre_put_hook(self):
-        self.static_representation = json.dumps(self, cls=NDBEncoder)
-
     static_representation = ndb.BlobProperty(indexed=False,default=None)
+    def _pre_put_hook(self):
+        storage = StaticStorage(parent=self.album, id=self.key.id())
+        storage.album = self.album
+        storage.path = self.path
+        storage.pos = self.pos
+        storage.static_representation = json.dumps(self, cls=NDBEncoder)
+        del self.static_representation
+        storage.put_async()
+
 
 
 class RESTException(Exception):
@@ -262,7 +274,12 @@ class BaseRESTHandler(webapp2.RequestHandler):
             # No query given - return as-is
             return self.model.query()
 
-        return self.model.gql('WHERE ' + query)
+        if issubclass(self.model, StaticRep):
+            logging.info('static rep ahoy')
+            # return self.model.gql('WHERE ' + query)
+            return StaticStorage.gql('WHERE ' + query)
+        else:
+            return self.model.gql('WHERE ' + query)
 
     def _fetch_query(self, query):
         """Fetches the query results for a given limit (if provided by user) and for a specific results page (if given by user).
@@ -587,15 +604,20 @@ def get_rest_class(ndb_model, base_url, **kwd):
                 if issubclass(self.model, StaticRep):
                     logging.info("using static representations")
 
-                    _results = [r.static_representation for r in results]
-                    mname = self.model._get_kind()
-                    resp = webapp2.Response('{{ "{}": ['.format(mname) + ', '.join(_results) + "]}")
+                    resp = webapp2.Response()
                     resp.status = 200
-
                     resp.headers['Content-Type'] = 'application/json'
-                    # response.headers['Access-Control-Allow-Methods'] = ', '.join(self.permissions.keys())
-                    # response.headers['Access-Control-Allow-Credentials'] = 'true'
-                    # response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type, Accept'
+                    mname = self.model._get_kind()
+                    meta = '"meta":{"next_results_url":' + ('"' + cursor.urlsafe() + '"' if cursor else 'null') + '}'
+
+                    resp.out.write('{{ "{}": ['.format(mname))
+
+                    for i,r in enumerate(results):
+                        resp.out.write(r.static_representation)
+                        if i + 1< len(results):
+                            resp.out.write(', ')
+
+                    resp.out.write("],"+meta+"}")
 
                     return resp
 

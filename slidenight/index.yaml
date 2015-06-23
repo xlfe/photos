@@ -71,3 +71,15 @@ indexes:
   - name: pos
   - name: path
     direction: desc
+
+- kind: StaticStorage
+  properties:
+  - name: album
+  - name: path
+  - name: pos
+
+- kind: StaticStorage
+  properties:
+  - name: album
+  - name: pos
+  - name: path
