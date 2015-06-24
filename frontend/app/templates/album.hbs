@@ -29,7 +29,7 @@
             {{photo-grid-folder folder=folder path="path" canDrop=controller.permissions.move album=controller}}
         {{/each}}
 
-        {{#each arrangedContent as |photo index|}}
+        {{#each arrangedContent key="id" as |photo index|}}
             {{photo-grid-photo
             photo=photo
             _idx=index

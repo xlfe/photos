@@ -53,15 +53,15 @@ export default Em.Component.extend({
                 }
             });
             Em.run.later(this,function(){
-                _this.get('me').animate({
+                _this.me().animate({
                     'margin-bottom': this.$('.expanded-details').outerHeight(true) + 'px'
                 },50);
-                _this.get('me').$('.expanded-details').animate({
+                _this.me().$('.expanded-details').animate({
                     opacity: 1
                 },50)
             })
         } else {
-            _this.get('me').animate({
+            _this.me().animate({
                 'margin-bottom': '0px'
             },500)
         }
@@ -99,9 +99,9 @@ export default Em.Component.extend({
 
     },
     me: function() {
-        "use strict";
-        return Em.$('.photo[data-photo='+this.get('photo.id')+']');
-    }.property('photo.id'),
+        var selector = ".photo[data-photo="+this.get('photo.id')+"]";
+        return Em.$(selector);
+    },
     setup: function () {
 
         var w = this.get('photo.display_w'),
@@ -111,9 +111,9 @@ export default Em.Component.extend({
             return;
         }
 
-        this.get('me').css({
+        this.me().css({
             height: h + 'px',
-            width: w + 'px',
+            width: w + 'px'
         });
 
         if (this.get('photo.visible') === false){
@@ -121,7 +121,7 @@ export default Em.Component.extend({
         }
 
         var
-            img = this.get('me'),
+            img = this.me(),
             url = this.get('photo').get_image(Math.max(w,h),img);
 
         img.css({
