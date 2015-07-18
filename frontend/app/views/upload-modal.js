@@ -1,13 +1,6 @@
 import Em from 'ember';
+import { fileSizeSI } from '../controllers/upload-modal';
 /* global SparkMD5 */
-
-function fileSizeSI(a,b,c,d,e){
-    b=Math;
-    c=b.log;
-    d=1e3;
-    e=c(a)/c(d)|0;
-    return (a/b.pow(d,e)).toFixed(2) + ' '+(e?'kMGTPEZY'[--e]+'B':'Bytes');
-}
 
 
 function add_file(file, folders, files,album) {
@@ -106,29 +99,8 @@ export default Em.View.extend({
         //Reset the input element
         Em.$('.upload input[type=file]').wrap('<form>').closest('form').get(0).reset();
         Em.$('.upload input[type=file]').unwrap();
-    },
-    title: function () {
-        var files = this.get('controller.files').filter(function(f){
-                var s = f.get('status');
-                return s !== 6 && s !== -1 && s !== 0;
-            }),
-            uploading = this.get('controller.uploading'),
-            total_size = 0,
-            count = '';
-        if (Em.isEmpty(files) === false) {
-            count = files.length + ' ';
-            files.forEach(function(f){
-                total_size += f.get('bytes');
-            });
-        }
+    }
 
-        if (uploading){
-            return 'Uploading - ' + count + ' photos ('+fileSizeSI(total_size)+') remaining.';
-        } else {
-            return 'Upload ' + count + 'photos (' + fileSizeSI(total_size) + ') to album "' + this.get('context.model.name') + '"';
-        }
-
-    }.property('controller.model.name')// 'controller.files.@each.status')
 });
 
 

@@ -4,20 +4,20 @@
     type="text"
     tabindex=idx
     photo=photo
-    disabled=album.permissions.no_edit
-    readonly=album.permissions.no_edit
+    disabled=permissions.no_edit
+    readonly=permissions.no_edit
     value=photo.title
-    classNames="photo-title"
+    classNameBindings=":photo-title permissions.no_edit::can-edit"
     }}
 
-    {{#if album.permissions.allow_select}}
+    {{#if permissions.allow_select}}
         <span title="Select this photo" class="select-icon" {{action 'selection'}}>
             <i class="fa fa-check-circle fa-2x"></i>
         </span>
     {{/if}}
 
 
-    {{#if album.permissions.edit}}
+    {{#if permissions.edit}}
         <span title="Add a new tag to this photo" class="add-tag-icon" {{action 'add_tag'}}>
             <i class="fa fa-plus-circle fa-2x"></i>
         </span>
@@ -26,7 +26,7 @@
     {{#each photo.tags as |tag|}}
         <div class="tag">
             {{tag}}
-            {{#if album.permissions.edit}}
+            {{#if permissions.edit}}
                 <i class="fa fa-remove" {{action 'remove_tag' tag}}></i>
             {{/if}}
         </div>
@@ -45,7 +45,7 @@
 {{#if photo.show_comments}}
     <div class="expanded-details">
 
-        {{#if album.permissions.comment}}
+        {{#if permissions.comment}}
             {{new-comment photo=photo resize_details="resize_details" add_comment="add_comment"}}
         {{/if}}
 

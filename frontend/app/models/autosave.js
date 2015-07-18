@@ -99,11 +99,11 @@ export default Em.Mixin.create({
 
             this.set('__'+k,JSON.parse(JSON.stringify(now.toArray())));
 
-            if (same === true && this.get('isDirty') === false){
+            if (same === true && this.get('hasDirtyAttributes') === false){
                 return;
             }
 
-        }else if (this.get('isDirty') === false){
+        }else if (this.get('hasDirtyAttributes') === false){
             return;
         }
 
