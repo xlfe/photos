@@ -281,7 +281,8 @@ export default Em.Controller.extend({
         var cp = this.get('path'),
             paths = [];
 
-        if (Em.isNone(cp)) {
+        if (Em.$.trim(cp).length == 0) {
+            this.set('path',undefined);
             return [];
         }
         return cp.split('/').map(function (_) {

@@ -2,9 +2,9 @@
     model=model
     save='save'
     close='close'
-    custom_save=controller.save_caption
-    save_disabled=controller.save_disabled
-    custom_close=controller.close_caption
+    custom_save=save_caption
+    save_disabled=save_disabled
+    custom_close=close_caption
     toggle=toggle
     toggleVal='toggleVal'
     closeModal='closeModal'
@@ -12,7 +12,7 @@
 
     <div class="upload">
 
-        {{#each controller.files as |file|}}
+        {{#each files as |file|}}
 
             <div class="file">
                 <div class="progress" style={{file.progress}}></div>
@@ -33,11 +33,11 @@
 
         {{/each}}
 
-        {{#unless controller.uploading}}
+        {{#unless uploading}}
 
             <div class="hint-pos">
 
-                {{#unless controller.files}}
+                {{#unless files}}
                     <label class="hint">Drop
                         {{#if accept_folders}}
                             folders

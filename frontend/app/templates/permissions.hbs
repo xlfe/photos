@@ -1,6 +1,6 @@
 <div class="container">
     <h3>
-        {{#if controller.view_only}}
+        {{#if view_only}}
             View permissions for
         {{else}}
             Edit permissions for
@@ -15,7 +15,7 @@
 
     <form class="form-horizontal" role="form">
 
-        {{#unless controller.view_only}}
+        {{#unless view_only}}
             <div class="form-group">
 
                 <label class="col-sm-3 control-label">
@@ -58,7 +58,7 @@
     <hr>
 
     <h4>
-        {{#if controller.view_only}}
+        {{#if view_only}}
             View User Permissions
         {{else}}
             Manage User Permissions
@@ -102,16 +102,16 @@
                     <td>
                         {{perm._user.full_name}}
                     </td>
-                    {{check-box save="save" disabled=controller.view_only value=perm.view}}
-                    {{check-box save="save" disabled=controller.view_only value=perm.edit}}
-                    {{check-box save="save" disabled=controller.view_only value=perm.comment}}
-                    {{check-box save="save" disabled=controller.view_only value=perm.sort}}
-                    {{check-box save="save" disabled=controller.view_only value=perm.move}}
-                    {{check-box save="save" disabled=controller.view_only value=perm.upload}}
-                    {{check-box save="save" disabled=controller.view_only value=perm.delete}}
+                    {{check-box save="save" disabled=view_only value=perm.view}}
+                    {{check-box save="save" disabled=view_only value=perm.edit}}
+                    {{check-box save="save" disabled=view_only value=perm.comment}}
+                    {{check-box save="save" disabled=view_only value=perm.sort}}
+                    {{check-box save="save" disabled=view_only value=perm.move}}
+                    {{check-box save="save" disabled=view_only value=perm.upload}}
+                    {{check-box save="save" disabled=view_only value=perm.delete}}
                     <td></td>
 
-                    {{#if controller.view_only}}
+                    {{#if view_only}}
                         <td></td>
                     {{else}}
                         <td class="check-box" {{action 'remove' perm}}><i class="fa fa-trash"></i></td>
@@ -127,7 +127,7 @@
 
 
 
-    {{#if controller.saved_invites}}
+    {{#if saved_invites}}
         <hr>
         <h4>
             Invites awaiting responses
@@ -150,7 +150,7 @@
             </thead>
             <tbody>
 
-            {{#each controller.saved_invites as |perm|}}
+            {{#each saved_invites as |perm|}}
                 <tr>
                     <td>
                         {{perm.email}}
@@ -182,7 +182,7 @@
         </table>
     {{/if}}
 
-    {{#unless controller.view_only}}
+    {{#unless view_only}}
 
         <hr>
         <h4>
@@ -194,9 +194,9 @@
 
         </p>
 
-        {{textarea value=controller.invites class="email-input col-lg-5"}}
+        {{textarea value=invites class="email-input col-lg-5"}}
 
-        {{#if controller.invite_list}}
+        {{#if invite_list}}
             <table class="table table-hover">
                 <thead>
                 <tr>
@@ -212,7 +212,7 @@
                 </thead>
                 <tbody>
 
-                {{#each controller.invite_list as |perm|}}
+                {{#each invite_list as |perm|}}
                     <tr>
                         <td>
                             {{perm.email}}

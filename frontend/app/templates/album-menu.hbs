@@ -1,10 +1,10 @@
 <ul class="nav navbar-nav">
-    {{#unless controller.search_mode}}
+    {{#unless search_mode}}
 
-        {{#link-to "album" model (query-params path=null) tagName="li" class="menu-link" tabindex="-1"}}
+        {{#link-to "album" model (query-params path="") tagName="li" class="menu-link" tabindex="-1"}}
             <a>
                 <strong>
-                    {{controller.model.name}}
+                    {{model.name}}
                 </strong>
             </a>
         {{/link-to}}
@@ -33,11 +33,11 @@
 
         <li class="menu-link">
             <a tabindex="-1" class="head-input">
-                {{input class="form-control" type="text" value=controller.search}}
+                {{input class="form-control" type="text" value=search}}
             </a>
         </li>
 
-        {{#each controller.search_paths as |sp|}}
+        {{#each search_paths as |sp|}}
             <li class="{{if sp.disabled 'disabled'}} menu-link">
                 <a title="Set search param" {{action 'toggle_search_path' sp}} href="#">
                     <i class="fa fa-search fa-lg"></i>
@@ -50,17 +50,17 @@
 </ul>
 <ul class="nav navbar-nav navbar-right">
 
-    {{#unless controller.selected}}
+    {{#unless selected}}
     {{else}}
         <li class="menu-link">
             <a href="#" title="Clear the current selection" {{action 'cancel_selection'}} tabindex="-1">
 
-                {{controller.selected.length}} selected
+                {{selected.length}} selected
                 <i class="fa fa-close fa-lg"></i>
             </a>
         </li>
 
-        {{#if controller.permissions.edit}}
+        {{#if permissions.edit}}
 
             <li class="menu-link">
                 <a href="#" title="Add tags to the selected photos" {{action 'add_tags'}} tabindex="-1">
@@ -68,7 +68,7 @@
                 </a>
             </li>
         {{/if}}
-        {{#if controller.permissions.move}}
+        {{#if permissions.move}}
 
 
             <li class="menu-link">
@@ -78,14 +78,14 @@
             </li>
         {{/if}}
 
-        {{#if controller.permissions.delete}}
+        {{#if permissions.delete}}
             <li class="menu-link">
                 <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
                     <i class="fa fa-trash fa-lg"></i>
-                    {{#if controller.confirm_delete}}
+                    {{#if confirm_delete}}
 
                         <span class="alert-danger" role="alert">
-                        Please confirm deleting {{controller.selected.length}} photos?
+                        Please confirm deleting {{selected.length}} photos?
                         </span>
 
                     {{/if}}
@@ -105,12 +105,12 @@
                 <i class="fa fa-spin fa-spinner"></i>
             {{/if}}
             <span>
-                {{model.photos.length}} photos - ({{controller.arrangedContent.length}} in folder)
+                {{model.photos.length}} photos - ({{arrangedContent.length}} in folder)
             </span>
         </a>
     </li>
 
-    {{#if controller.permissions.sort}}
+    {{#if permissions.sort}}
 
         <li class="menu-link">
             <a href="#" title="Sort photos in this folder" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
@@ -119,7 +119,7 @@
         </li>
     {{/if}}
 
-    {{#if controller.permissions.upload}}
+    {{#if permissions.upload}}
 
         {{#if session.validated}}
             <li class="menu-link">
@@ -137,7 +137,7 @@
 
     {{/if}}
 
-    {{#if controller.permissions.owner}}
+    {{#if permissions.owner}}
 
         {{#link-to "permissions" model.id tagName="li" title="Album permissions" class="menu-link" tabindex="-1"}}
             <a>

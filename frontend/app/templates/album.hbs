@@ -1,6 +1,6 @@
 <div class="container-fluid edge-to-edge">
 
-    <div id="photos" class="{{controller.album_class}}">
+    <div id="photos" class="{{album_class}}">
 
         <div class="photo-select"><span></span></div>
 
@@ -10,7 +10,7 @@
             <div class="left-icons">
                 <span class="mouse-action" {{action 'toggle_tags'}}>
 
-                    {{#if controller.show_tags}}
+                    {{#if show_tags}}
                         <i class="fa fa-check"></i>
                     {{else}}
                         <i class="fa fa-square-o"></i>
@@ -26,15 +26,15 @@
         </div>
 
         {{#each folders as |folder|}}
-            {{photo-grid-folder folder=folder path="path" canDrop=controller.permissions.move album=controller}}
+            {{photo-grid-folder folder=folder path="path" canDrop=permissions.move album=controller}}
         {{/each}}
 
         {{#each arrangedContent key="id" as |photo index|}}
             {{photo-grid-photo
             photo=photo
             _idx=index
-            selection_mode=controller.selected.length
-            album=controller
+            selection_mode=selected.length
+            album=model
             transition="transition"
             add_comment="add_comment"
             size_immediate="size_immediate"
@@ -45,14 +45,14 @@
             {{#unless arrangedContent}}
                 <div class="box-middle-center">
                     <span>
-                        {{#if controller.search_mode}}
+                        {{#if search_mode}}
                             No photos found - enter search terms at the top of the screen.
                         {{else}}
 
-                            {{#if controller.model.more_results}}
+                            {{#if model.more_results}}
                                 Please wait - we're loading some photos...
 
-                                {{else if controller.permissions.upload}}
+                                {{else if permissions.upload}}
                                     No photos found - would you like to
                                     <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
                                         upload some photos

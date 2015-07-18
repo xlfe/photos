@@ -1,5 +1,5 @@
 application: slide-night
-version: 157
+version: 158
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -36,8 +36,14 @@ handlers:
   static_dir: static
   secure: always
 
-#skip_files:
-#- .*/lxml/.*$
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*\.map$
+- ^(.*/)?test-.*$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
 
 libraries:
 - name: webapp2

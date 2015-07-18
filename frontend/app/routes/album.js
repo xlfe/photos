@@ -34,7 +34,7 @@ export default Em.Route.extend({
                 query_params['cursor'] = more_results;
                 //query_params['limit'] = query_params['limit'] * 2;
 
-                store.find('photo',query_params).then(function(more){
+                store.query('photo',query_params).then(function(more){
                     Em.run.later(function(){
                         get_more(album,more);
                     });
@@ -63,7 +63,7 @@ export default Em.Route.extend({
 
                 //Only reload photos if we need to...
                 if (Em.isEmpty(album.get('photos'))) {
-                    store.find('photo', query_params).then(function (photos) {
+                    store.query('photo', query_params).then(function (photos) {
                         if (Em.isEmpty(photos)){
                             album.set('more_results',false);
                             album.set('photo_count',0);

@@ -5,7 +5,7 @@ import AuthenticatedRouteMixin from 'simple-auth/mixins/authenticated-route-mixi
 export default Em.Route.extend(AuthenticatedRouteMixin,{
     model: function () {
         var me = +this.get('session.id');
-        return this.get('store').find('album').then(function(albums){
+        return this.get('store').findAll('album').then(function(albums){
             albums.forEach(function(a){
                 //console.log(typeof me,me,typeof a.get('owner.id'),a.get('owner.id'));
                 a.set('am_i_owner',+a.get('owner.id') === me);
