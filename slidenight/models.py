@@ -130,7 +130,7 @@ class LoginHandler(BaseRESTHandler):
             return self.unauthorized()
 
         if self.user.validated is True:
-            return self.error()
+            return self.error({'error':'Already validated'})
 
         if self.user.send_validation_email():
             return self.success(({'sent':'sent'}))

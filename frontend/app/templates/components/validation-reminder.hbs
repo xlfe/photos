@@ -1,6 +1,5 @@
 {{#if session.isAuthenticated}}
-    {{#unless session.validated}}
-
+    {{#unless session.secure.validated}}
         <div class="alert alert-info">
             <strong>Note:</strong> You have not validated your email address.
             You will not be able to upload photos until you have done so.
@@ -16,6 +15,5 @@
                 {{/unless}}
             {{/if}}
         </div>
-
     {{/unless}}
 {{/if}}

@@ -26,7 +26,7 @@
         </div>
 
         {{#each folders as |folder|}}
-            {{photo-grid-folder folder=folder path="path" canDrop=permissions.move album=controller}}
+            {{photo-grid-folder folder=folder path="path" canDrop=permissions.move album=album}}
         {{/each}}
 
         {{#each arrangedContent key="id" as |photo index|}}
@@ -58,7 +58,7 @@
                                         upload some photos
                                     </a>?
 
-                                {{#unless session.validated}}
+                                {{#unless session.secure.validated}}
                                     {{validation-reminder}}
                                 {{/unless}}
                             {{/if}}

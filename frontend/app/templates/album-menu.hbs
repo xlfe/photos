@@ -121,7 +121,7 @@
 
     {{#if permissions.upload}}
 
-        {{#if session.validated}}
+        {{#if session.secure.validated}}
             <li class="menu-link">
                 <a href="#" title="Upload" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
                     <i class="fa fa-lg fa-upload"></i>

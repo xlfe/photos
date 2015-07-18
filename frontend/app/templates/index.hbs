@@ -5,7 +5,7 @@
     </h1>
 
     {{#if session.isAuthenticated}}
-        You're logged in as {{session.full_name}}
+        You're logged in as {{session.secure.full_name}}
     {{else}}
         {{#link-to 'login'}}
             Please login or register

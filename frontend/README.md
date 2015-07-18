@@ -1,3 +1,12 @@
+# Slidenight
+
+### Features
+
+- Google App Engine (Python) Backend
+- EmberJS frontend
+- Photos stored and served from Google Cloud Storage
+
+
 # Frontend
 
 This README outlines the details of collaborating on this Ember application.
