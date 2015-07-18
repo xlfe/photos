@@ -77,6 +77,7 @@ export default Em.Controller.extend({
         });
     },
     send_chunk: function (file, start) {
+        console.log(file)
 
         if (cancel_file(this,file)){return;}
 
@@ -100,7 +101,7 @@ export default Em.Controller.extend({
             form.append('file', data, file.get('name'));
             form.append('bytes', file.get('bytes'));
             form.append('md5', file.get('md5'));
-            form.append('user', +this.get('session.id'));
+            form.append('user', +this.get('session.secure.id'));
             data = form;
         }
 

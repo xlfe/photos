@@ -72,7 +72,7 @@ export default Em.Component.extend({
         var comments  = this.get('photo.comments'),
             owner = +this.get('album.model.owner.id'),
             comment = this.get('album.permissions.comment'),
-            sid = this.get('session.id');
+            sid = this.get('session.secure.id');
         if (comment === false){
             return;
         }

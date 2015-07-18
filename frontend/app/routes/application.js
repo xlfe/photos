@@ -3,11 +3,11 @@ import ApplicationRouteMixin from 'simple-auth/mixins/application-route-mixin';
 
 export default Em.Route.extend(ApplicationRouteMixin, {
     actions: {
-        openModalModel: function (modalName,controller) {
+        openModalModel: function (modalName, model) {
+            this.controllerFor(modalName).set('model', model);
             return this.render(modalName, {
                 into: 'application',
-                outlet: 'modal',
-                model: controller
+                outlet: 'modal'
             });
         },
         closeModal: function () {

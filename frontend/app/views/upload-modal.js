@@ -71,6 +71,9 @@ export default Em.View.extend({
 
         Em.$('.upload input[type=file]').off('hover');
 
+        //console.log(this.get('controller.model.name'))
+        //console.log(this.get('context.model.name'))
+
     },
     change: function (e) {
 
@@ -125,7 +128,7 @@ export default Em.View.extend({
             return 'Upload ' + count + 'photos (' + fileSizeSI(total_size) + ') to album "' + this.get('context.model.name') + '"';
         }
 
-    }.property('context.model.name', 'controller.files.@each.status')
+    }.property('controller.model.name')// 'controller.files.@each.status')
 });
 
 

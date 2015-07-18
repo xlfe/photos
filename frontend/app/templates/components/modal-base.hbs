@@ -5,7 +5,9 @@
                 <button type="button" class="close" {{action 'close'}}>
                     <span aria-hidden="true">&times;</span>
                     <span class="sr-only">Close</span></button>
-                <h4 class="modal-title">{{title}} {{_parentView.title}}</h4>
+                <h4 class="modal-title">
+                    {{title}}
+                </h4>
             </div>
             <div class="modal-body">
                 {{yield}}
@@ -23,16 +25,20 @@
                         Close
                     {{else}}
                         {{custom_close}}
-                    {{/unless}}</button>
-                    {{#unless custom_save}}
+                    {{/unless}}
+                </button>
+
+                {{#unless custom_save}}
                     <button type="button" class="btn btn-primary" {{action 'save'}}>
                         Save changes
                     </button>
-                    {{else}}
-                        <button type="button" disabled={{save_disabled}} class="btn btn-primary" {{action 'save'}}>
-                            {{custom_save}}
-                        </button>
-                    {{/unless}}
+                {{else}}
+                    <button type="button" disabled={{save_disabled}} class="btn btn-primary" {{action 'save'}}>
+
+                    {{custom_save}}
+
+                    </button>
+                {{/unless}}
 
             </div>
         </div>
