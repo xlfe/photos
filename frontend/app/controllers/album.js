@@ -378,7 +378,7 @@ export default Em.Controller.extend({
     }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
     permissions: function(){
         var anon = this.get('session.isAuthenticated') === false,
-            my_id = +this.get('session.id'),
+            my_id = +this.get('session.secure.id'),
             perms = this.get('model.resolved_permissions').filter(function(_){
 
                 if (anon === true){
@@ -387,6 +387,7 @@ export default Em.Controller.extend({
                     return _.get('user') === my_id;
                 }
             });
+
         if (Em.isEmpty(perms)){
             return {};
         }

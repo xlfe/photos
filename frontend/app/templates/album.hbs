@@ -52,17 +52,19 @@
                             {{#if model.more_results}}
                                 Please wait - we're loading some photos...
 
-                                {{else if permissions.upload}}
-                                    No photos found - would you like to
-                                    <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
-                                        upload some photos
-                                    </a>?
+                            {{else}}
+                                {{validation-reminder}}
+                                No photos found ...<br>
+                                {{#if permissions.upload}}
+                                    Would you like to
+                                                <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+                                                    upload some photos
+                                                </a>?
 
-                                {{#unless session.secure.validated}}
-                                    {{validation-reminder}}
-                                {{/unless}}
+                                {{else}}
+                                    (you don't have upload permissions to this album)
+                                {{/if}}
                             {{/if}}
-
                         {{/if}}
                     </span>
                 </div>
@@ -71,4 +73,5 @@
         {{/unless}}
     </div>
 </div>
+
 {{outlet}}
