@@ -1,6 +1,18 @@
 import Em from 'ember';
 import config from '../config/environment';
 
+
+
+//    error -1
+//    Added 0
+//    queued  1
+//    preparing 2
+//    ready 3
+//    uploading 4
+//    finalising 5
+//    done or duplicate 6
+//
+
 var select = function (f, i) {
     return f.filter(function (_) {
         return _.get('_status') === i;
@@ -27,27 +39,31 @@ var cancel_file = function(c,file){
 
 export default Em.Controller.extend({
     title: function () {
-        var files = this.get('files').filter(function(f){
-                var s = f.get('status');
-                return s !== 6 && s !== -1 && s !== 0;
+        var files = this.get('files').filter(function (_) {
+                return [6, -1].indexOf(_.get('_status')) == -1;
             }),
-            uploading = this.get('uploading'),
-            total_size = 0,
-            count = '';
-        if (Em.isEmpty(files) === false) {
-            count = files.length + ' ';
-            files.forEach(function(f){
-                total_size += f.get('bytes');
-            });
-        }
+            total_size = 0;
 
-        if (uploading){
-            return 'Uploading - ' + count + ' photos ('+fileSizeSI(total_size)+') remaining.';
+        files.forEach(function (_) {
+            total_size += +_.get('bytes')
+        });
+
+
+        if (this.get('uploading')) {
+            if (Em.isEmpty(files)) {
+                return 'Done';
+            } else {
+                return 'Uploading: ' + files.length + ' photos ('+fileSizeSI(total_size)+') remain.';
+            }
         } else {
-            return 'Upload ' + count + 'photos (' + fileSizeSI(total_size) + ') to album "' + this.get('model.name') + '"';
+            if (Em.isEmpty(files)){
+                return 'Select some files to upload to ' + this.get('model.name')
+            } else {
+                return 'Upload ' + files.length + ' photos (' + fileSizeSI(total_size) + ') to album "' + this.get('model.name') + '"';
+            }
         }
 
-    }.property('model.name', 'files.@each.status'),
+    }.property('model.name', 'files.@each._status', 'uploading'),
     files: [],
     concurrent_uploads: 3,
     prepare_upload: function (file) {

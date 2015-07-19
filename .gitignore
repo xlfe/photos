@@ -4,6 +4,7 @@ frontend/node_modules
 __pycache__/
 *.py[cod]
 .idea/
+data
 
 app.slidenight.com/
 .DS_Store

@@ -58,7 +58,9 @@ export default Em.Controller.extend(LoginControllerMixin, {
                 success: function (_data) {
                     _this.set('identification', data['email'].toLowerCase());
 
-                    _this.send('authenticate');
+                    setTimeout(function(){
+                        _this.send('authenticate');
+                    },1000);
                 },
                 error: function (error) {
                     _this.set('error', error.responseJSON.error);
