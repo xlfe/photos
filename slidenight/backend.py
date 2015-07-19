@@ -138,10 +138,12 @@ class GCSFinalizeHandler(BaseRESTHandler):
         assert int(stats.metadata['x-goog-meta-album']) == int(params['album']) ,stats.metadata
         assert int(stats.metadata['x-goog-meta-uploaded_by']) == int(self.request.user.key.id()) ,stats.metadata
 
+
         img = images.Image(filename=blobstore_filename)
-        img.crop(0.0, 0.0, 0.1, 0.1)
+        img.crop(0.0, 0.0, 0.01, 0.01)
         img.execute_transforms(parse_source_metadata=True)
         meta = img.get_original_metadata().copy()
+        del img
 
         meta['UploadFileModified']=params['lastModifiedDate']
         if len(params['path']) > 0:
@@ -165,15 +167,14 @@ class GCSFinalizeHandler(BaseRESTHandler):
                       size = stats.st_size,
                       filename=params['name'],
                       album=album,
-                      width=img.width,
-                      height= img.height,
+                      width=meta['ImageWidth'],
+                      height= meta['ImageLength'],
                       metadata=meta,
                       uploaded_by = self.request.user.key
                       )
 
         photo.serving_url = photo._serving_url
         photo.put()
-        del img
 
         SendUpdate('NEW',photo)
 

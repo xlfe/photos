@@ -67,6 +67,7 @@ def UpdateSchema(album=None,cursor=None, num_updated=0):
 class UpdateSchemaHandler(webapp2.RequestHandler):
     def get(self):
         for album in ndb.Query(kind='Album').fetch(100):
-            UpdateSchema(album=album.key)
+            if album.name == 'Wedding Photos':
+                UpdateSchema(album=album.key)
 
 
