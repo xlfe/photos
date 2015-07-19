@@ -27,7 +27,7 @@ export default Em.Component.extend({
 
         if (Em.isEmpty(background) === true) {
 
-            var photos = this.get('album')._arrangedContent(path, true),
+            var photos = this.get('album').apply_path(path, true),
                 available = photos.get('length'),
                 count = available >= 4 ? 4 : 1;
 
@@ -103,7 +103,7 @@ export default Em.Component.extend({
             pos = album.get('drag.position'),
 
         //multiple photos?
-            multi = !Em.isEmpty(this.get('album.selected')),
+            multi = !Em.isEmpty(this.get('selected')),
 
         //Where we've dropped the photo
             folder = this.get('folder');
@@ -112,8 +112,8 @@ export default Em.Component.extend({
 
         if (multi) {
 
-            var photos = this.get('album.selected'),
-                dest = this.get('album')._arrangedContent(folder.get('path')),
+            var photos = this.get('selected'),
+                dest = this.get('album').apply_path(folder.get('path')),
                 interval = new Big(0.1),
                 max = new Big(0);
 

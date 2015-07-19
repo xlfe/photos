@@ -141,7 +141,6 @@ export default Em.Controller.extend({
         if (end > file.get('bytes')) {
             end = file.get('bytes');
         }
-        console.log('Upload in ', prod)
 
         var data = file.get('file').slice(start, end, file.get('type'));
 

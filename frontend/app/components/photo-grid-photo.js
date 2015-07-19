@@ -26,7 +26,7 @@ export default Em.Component.extend({
     }.property('_idx'),
     draggable: function() {
 
-        if (this.get('album.permissions.sort') !== true){
+        if (this.get('permissions.sort') !== true){
             return false;
         }
 
@@ -36,7 +36,7 @@ export default Em.Component.extend({
 
         return false;
 
-    }.property('photo.selected','selection_mode','album.permissions.sort'),
+    }.property('photo.selected','selection_mode','permissions.sort'),
     photo_id: function() {
         return this.get('photo.id');
     }.property('photo.id'),
@@ -45,9 +45,8 @@ export default Em.Component.extend({
             _this = this,
             photo = this.get('photo');
 
-
         if (display === true){
-            _this.get('album.arrangedContent').forEach(function(_){
+            _this.get('arrangedContent').forEach(function(_){
                 if (_ !== photo){
                     _.set('show_comments',false);
                 }
@@ -70,8 +69,8 @@ export default Em.Component.extend({
     setup_comment_ownership: function() {
         "use strict";
         var comments  = this.get('photo.comments'),
-            owner = +this.get('album.model.owner.id'),
-            comment = this.get('album.permissions.comment'),
+            owner = +this.get('album.owner.id'),
+            comment = this.get('permissions.comment'),
             sid = this.get('session.secure.id');
         if (comment === false){
             return;
@@ -130,8 +129,7 @@ export default Em.Component.extend({
 
     }.observes('photo.display_h','photo.display_w','photo.visible').on('didInsertElement'),
     dragStart: function (event) {
-        console.log("dragStart");
-        this.get('album').set('drag.photo',this.get('photo'));
+        this.get('album').set('drag',Em.Object.create({photo:this.get('photo')}));
         event.dataTransfer.setData(null,null);
     },
     dragOver: function (evt) {
@@ -160,7 +158,7 @@ export default Em.Component.extend({
         var
             _this = this,
             //album controller
-            album = this.get('album.arrangedContent'),
+            album = this.get('arrangedContent'),
 
             //The item we're draggin
             photo = this.get('album.drag.photo'),
@@ -176,17 +174,18 @@ export default Em.Component.extend({
             return;
         }
 
-
         var idx_p = album.indexOf(photo),
             idx_t = album.indexOf(target),
 
             lower = null,
             upper = null,
 
-            multi = !Em.isEmpty(this.get('album.selected'));
+            multi = !Em.isEmpty(this.get('selected'));
 
         this.set('highlight-left', false);
         this.set('highlight-right', false);
+
+        console.log('Photo grid photo ',multi)
 
         if (photo === target && multi === false){
             return;
@@ -216,7 +215,7 @@ export default Em.Component.extend({
             }
 
             lower = new Big(target.get('pos'));
-            if (idx_t === album.length -1) {
+            if (idx_t === album.get('length') -1) {
                 //at the end
                 upper = lower.add(new Big("1"));
             } else {
@@ -226,15 +225,15 @@ export default Em.Component.extend({
 
         if (multi){
 
-            var photos = this.get('album.selected'),
-                interval = upper.minus(lower).div(2).div(photos.length),
+            var photos = this.get('selected'),
+                interval = upper.minus(lower).div(2).div(photos.get('length')),
 
                 //Have we selected a continuous block of photos?
                 first = new Big(photos.get('firstObject.pos')),
                 last = new Big(photos.get('lastObject.pos')),
                 first_idx = album.indexOf(photos.get('firstObject')),
                 last_idx = album.indexOf(photos.get('lastObject')),
-                continuous = last_idx-first_idx === photos.length-1,
+                continuous = last_idx-first_idx === photos.get('length')-1,
                 nomove = false;
 
 
@@ -287,7 +286,7 @@ export default Em.Component.extend({
             this.toggleProperty('photo.selected');
         },
         show_comments: function() {
-            if (this.get('photo.comments.length') === 0 && this.get('album.permissions.comment') === false){
+            if (this.get('photo.comments.length') === 0 && this.get('permissions.comment') === false){
                this.set('photo.show_comments',false);
             } else {
                 this.toggleProperty('photo.show_comments');

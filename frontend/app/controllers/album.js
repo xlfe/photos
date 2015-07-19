@@ -76,7 +76,7 @@ function search_photo(_paths,term,_){
     return matched > 0;
 }
 
-function below_folder(path, folder) {
+export function below_folder(path, folder) {
     if (folder.length === 0){
         return true;
     }
@@ -92,7 +92,7 @@ if (typeof String.prototype.startsWith !== 'function') {
   };
 }
 
-function sort_pos(a,b){
+export function sort_pos(a,b){
     var aa = a.get('pos') || 0,
         bb = b.get('pos') || 0;
 
@@ -127,34 +127,6 @@ export default Em.Controller.extend({
         this.set('minHeight',Math.max(100,d));
     }.on('init'),
     needs: ['application'],
-    _arrangedContent: function (path, include_below) {
-        //Note when include_below is true, we get a maximum of 20 photos
-
-        var done = 0;
-        path = path || '';
-        include_below = include_below || false;
-
-        var photos = this.get('model.photos').filter(function (_) {
-            if (done > 20){
-                return;
-            }
-            var photo_path = _.get('path') || '';
-            if (include_below ===true){
-               if(below_folder(photo_path,path)===true){
-                   done +=1;
-                   return true;
-               }
-                return false;
-            } else {
-                if (path.length === 0 && photo_path.length===0){ return true;}
-                return photo_path === path;
-            }
-
-        }).sort(sort_pos);
-
-        return photos;
-
-    },
     arrangedContent: function() {
         var path = this.get('path') || '',
             album = +this.get('model.id'),

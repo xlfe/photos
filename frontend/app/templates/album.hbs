@@ -26,7 +26,13 @@
         </div>
 
         {{#each folders as |folder|}}
-            {{photo-grid-folder folder=folder path="path" canDrop=permissions.move album=album}}
+            {{photo-grid-folder
+            folder=folder
+            path="path"
+            canDrop=permissions.move
+            selected=selected
+            album=model
+            }}
         {{/each}}
 
         {{#each arrangedContent key="id" as |photo index|}}
@@ -34,7 +40,9 @@
             photo=photo
             _idx=index
             selection_mode=selected.length
+            selected=selected
             album=model
+            arrangedContent=arrangedContent
             permissions=permissions
             transition="transition"
             add_comment="add_comment"

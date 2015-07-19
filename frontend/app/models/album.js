@@ -3,6 +3,7 @@ import DS from 'ember-data';
 import autosave from '../models/autosave';
 import perm from '../objects/permissions';
 import Channel from '../subscribers/channel';
+import { below_folder, sort_pos } from '../controllers/album';
 
 export default DS.Model.extend(autosave,{
     autosave_properties: ['name','photo_count','total_size'],
@@ -54,6 +55,34 @@ export default DS.Model.extend(autosave,{
         return location.protocol + '//' + location.host + '/albums/'+this.get('id');
     }.property(),
 
+    apply_path: function (path, include_below) {
+        //Note when include_below is true, we get a maximum of 20 photos
+
+        var done = 0;
+        path = path || '';
+        include_below = include_below || false;
+
+        var photos = this.get('photos').filter(function (_) {
+            if (done > 20){
+                return;
+            }
+            var photo_path = _.get('path') || '';
+            if (include_below ===true){
+               if(below_folder(photo_path,path)===true){
+                   done +=1;
+                   return true;
+               }
+                return false;
+            } else {
+                if (path.length === 0 && photo_path.length===0){ return true;}
+                return photo_path === path;
+            }
+
+        }).sort(sort_pos);
+
+        return photos;
+
+    },
     subscribe: function() {
 
         if (this.get('more_results') === false){
