@@ -1,6 +1,6 @@
 import Em from 'ember';
 import config from '../config/environment';
-
+/* global SparkMD5 */
 
 
 //    error -1
@@ -75,6 +75,11 @@ export default Em.Controller.extend({
         file.set('status', 'Preparing...');
         file.set('_status', 2);
 
+        if (Em.isNone(file.get('md5'))){
+            var md5 = SparkMD5.ArrayBuffer.hash(file.get('fileobject'));
+            file.set('md5', md5);
+        }
+
         Em.$.ajax({
             url: [config.api_host, config.api_endpoint, 'prepare-upload'].join('/'),
             type: 'POST',
@@ -124,7 +129,6 @@ export default Em.Controller.extend({
         });
     },
     send_chunk: function (file, start) {
-        console.log(file)
 
         if (cancel_file(this,file)){return;}
 
@@ -137,6 +141,7 @@ export default Em.Controller.extend({
         if (end > file.get('bytes')) {
             end = file.get('bytes');
         }
+        console.log('Upload in ', prod)
 
         var data = file.get('file').slice(start, end, file.get('type'));
 

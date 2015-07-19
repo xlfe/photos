@@ -26,24 +26,24 @@ function add_file(file, folders, files,album) {
     fileReader.onload = function (e) {
         if (file.size === e.target.result.byteLength) {
 
-            var md5 = SparkMD5.ArrayBuffer.hash(e.target.result);
+            if (Em.isPresent(album.get('photos').findBy('size', file.size))) {
+                var md5 = SparkMD5.ArrayBuffer.hash(e.target.result);
+                new_file.set('md5', md5);
 
-            new_file.set('md5', md5);
-
-            //if (!Em.isEmpty(album.get('photos'))){
-
-                if (Em.isPresent(album.get('photos').findBy('md5',md5))){
+                if (Em.isPresent(album.get('photos').findBy('md5', md5))) {
                     new_file.setProperties({
                         dupe: true,
                         status: 'Duplicate',
                         _status: 6
                     });
-                //}
+                }
+            } else {
+                new_file.set('fileobject', e.target.result);
             }
 
             files.pushObject(new_file);
         } else {
-            console.log('Unable to read file',e.target.result.bytelength);
+            console.log('Unable to read file', e.target.result.bytelength);
         }
     };
 
@@ -90,8 +90,11 @@ export default Em.View.extend({
                             _status: 6
                         });
                     this.get('controller.files').pushObject(empty_file);
+
                 } else {
-                    add_file(files[i], folders, this.get('controller.files'), this.get('controller.model'));
+
+                    add_file(files[i], folders, _this.get('controller.files'), _this.get('controller.model'));
+
                 }
             }
         }
