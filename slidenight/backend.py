@@ -139,10 +139,11 @@ class GCSFinalizeHandler(BaseRESTHandler):
         assert int(stats.metadata['x-goog-meta-uploaded_by']) == int(self.request.user.key.id()) ,stats.metadata
 
         img = images.Image(filename=blobstore_filename)
-        img.rotate(0)
+        img.crop(0.0,0.0,0.1,0.1)
         img.execute_transforms(parse_source_metadata=True)
+        meta = img.get_original_metadata().copy()
+        del img
 
-        meta = img.get_original_metadata()
         meta['UploadFileModified']=params['lastModifiedDate']
         if len(params['path']) > 0:
             meta['UploadOriginalPath']=params['path']
