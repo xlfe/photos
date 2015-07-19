@@ -50,25 +50,26 @@ class NDBEncoder(json.JSONEncoder):
             return super(NDBEncoder,self).default(obj)
 
 
-class StaticStorage(ndb.Model):
-    album = ndb.KeyProperty(kind='Album')
-    path = ndb.StringProperty()
-    pos = ndb.StringProperty()
+class StaticStorage(ndb.Expando):
     static_representation = ndb.BlobProperty(indexed=False,default=None)
 
 class StaticRep(ndb.Model):
     _use_static = True
 
-    static_representation = ndb.BlobProperty(indexed=False,default=None)
     def _pre_put_hook(self):
-        storage = StaticStorage(parent=self.album, id=self.key.id())
-        storage.album = self.album
-        storage.path = self.path
-        storage.pos = self.pos
+        storage = StaticStorage(parent=self.key.parent(), id=self.key.id())
         storage.static_representation = json.dumps(self, cls=NDBEncoder)
-        del self.static_representation
+        self.set_sortables(storage)
         storage.put_async()
 
+    def set_sortables(self, object):
+        raise NotImplemented()
+
+    @classmethod
+    def _pre_delete_hook(cls, key):
+        parent = key.parent()
+        static = ndb.Key(parent.kind(), parent.id(), StaticStorage, key.id())
+        static.delete_async()
 
 
 class RESTException(Exception):

@@ -287,6 +287,13 @@ class Photo(StaticRep):
 
     serving_url = ndb.StringProperty(indexed=False)
 
+    #StaticRep
+
+    def set_sortables(self, object):
+        object.album = self.album
+        object.path = self.path
+        object.pos = self.pos
+
     @property
     def _blobinfo(self):
         if self.blob:
