@@ -19,7 +19,7 @@ export default Em.Component.extend({
         'photo.hasFocus:hasFocus',
         'photo.show_comments:show_comments'
     ],
-    attributeBindings: ['draggable','photo_id:data-photo'],
+    attributeBindings: ['draggable','photo.id:data-photo'],
     idx: function(){
         "use strict";
         return +this.get('_idx')+1;
@@ -37,9 +37,6 @@ export default Em.Component.extend({
         return false;
 
     }.property('photo.selected','selection_mode','permissions.sort'),
-    photo_id: function() {
-        return this.get('photo.id');
-    }.property('photo.id'),
     display_details: function() {
         var display = this.get('photo.show_comments'),
             _this = this,
@@ -85,12 +82,12 @@ export default Em.Component.extend({
     click: function(e){
         var selection = this.get('selection_mode') > 0;
         if (Em.$(e.target).hasClass('photo') === true) {
+            this.set('last_clicked_photo',this.get('photo'));
 
             if (selection === true) {
                 this.toggleProperty('photo.selected');
             } else {
                 this.sendAction('transition',this.get('photo'));
-
             }
 
         }
@@ -184,8 +181,6 @@ export default Em.Component.extend({
 
         this.set('highlight-left', false);
         this.set('highlight-right', false);
-
-        console.log('Photo grid photo ',multi)
 
         if (photo === target && multi === false){
             return;
@@ -283,6 +278,7 @@ export default Em.Component.extend({
             this.set('photo.hasFocus',true);
         },
         selection: function() {
+            this.set('last_clicked_photo',this.get('photo'));
             this.toggleProperty('photo.selected');
         },
         show_comments: function() {

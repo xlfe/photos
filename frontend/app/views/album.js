@@ -17,10 +17,10 @@ function doObjectsCollide(s, p,margin) { // a and b are your objects
     );
 }
 
-var last_clicked_photo;
 
 
 export default Em.View.extend({
+    last_clicked_photo: null,
     size_photos: function(){
         this.get('controller').size_photos();
     },
@@ -106,10 +106,11 @@ export default Em.View.extend({
                     console.log('click',e);
                     if (e.shiftKey === true && photo.get('selected')===false){
                         console.log('Shift select!')
-                        var last;
+                        var last,
+                            lcp = _this.get('last_clicked_photo');
 
-                        if (!Em.isNone(last_clicked_photo)) {
-                            last = photos.indexOf(last_clicked_photo);
+                        if (!Em.isNone(lcp)) {
+                            last = photos.indexOf(lcp);
                         }else {
                             last = photos.filter(function(_){
                                 return _.get('selected') ===true && _ !== photo;
@@ -141,7 +142,7 @@ export default Em.View.extend({
                         photo.toggleProperty('selected');
                     }
 
-                    last_clicked_photo = photo;
+                    _this.set('last_clicked_photo',photo);
                 } else {
                     if (photo.get('_selected') === true) {
                         photo.set('_selected', false);
