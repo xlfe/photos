@@ -438,6 +438,7 @@ export default Em.Controller.extend({
             this.get('selected').forEach(function(_){
                 _.set('selected',false);
             });
+            last_clicked_photo = undefined;
         },
         select_all: function(){
             if (Em.isEmpty(this.get('selected')) || this.get('selected.length') < this.get('arrangedContent.length')){

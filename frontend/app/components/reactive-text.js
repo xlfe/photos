@@ -1,6 +1,14 @@
 import Em from 'ember';
 
 export default Em.TextField.extend({
+    attribute: ['readonly'],
+    readonly: function() {
+        //HTMLBars doesn't support full bound syntax WAT? https://github.com/tildeio/htmlbars/issues/68
+        if (this.get('permissions.no_edit') === true){
+            return 'readonly'
+        }
+        return null;
+    }.property('permissions.no_edit'),
     focusIn: function (evt) {
 
         var me = Em.$(evt.target),

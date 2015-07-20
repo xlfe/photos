@@ -1,8 +1,8 @@
 {
   "name": "frontend",
   "dependencies": {
-    "jquery": "^1.11.1",
-    "ember": "1.13.4",
+    "jquery": "^1.11.3",
+    "ember": "1.13.5",
     "ember-data": "1.13.5",
     "ember-resolver": "~0.1.15",
     "loader.js": "ember-cli/loader.js#3.2.0",

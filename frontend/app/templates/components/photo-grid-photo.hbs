@@ -4,10 +4,10 @@
     type="text"
     tabindex=idx
     photo=photo
+    permissions=permissions    
     disabled=permissions.no_edit
-    readonly=permissions.no_edit
     value=photo.title
-    classNameBindings=":photo-title permissions.no_edit::can-edit"
+    class="photo-title"
     }}
 
     {{#if permissions.allow_select}}
