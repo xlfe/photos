@@ -14,7 +14,7 @@ export default Em.Controller.extend({
         } else {
             return false;
         }
-    }.property('model.permissions.@each'),
+    }.property('model.permissions.[]'),
     invites: null,
     invite_list: function() {
 

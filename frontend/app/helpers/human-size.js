@@ -9,6 +9,6 @@ function fileSizeSI(a,b,c,d,e){
     return (a/b.pow(d,e)).toFixed(2) + ' '+(e?'kMGTPEZY'[--e]+'B':'Bytes');
 }
 
-export default Em.Handlebars.makeBoundHelper(function(sz) {
+export default Em.Helper.helper(function(sz) {
     return fileSizeSI(sz);
 });

@@ -4,6 +4,6 @@ import Em from 'ember';
 var tz = "Australia/Sydney",
     datetime_local = 'dddd, MMMM Do YYYY, h:mm:ss a';
 
-export default Em.Handlebars.makeBoundHelper(function(date) {
+export default Em.Helper.helper(function(date) {
     return moment(date,datetime_local).fromNow();
 });

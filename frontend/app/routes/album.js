@@ -34,7 +34,7 @@ export default Em.Route.extend({
                 query_params['cursor'] = more_results;
                 //query_params['limit'] = query_params['limit'] * 2;
 
-                store.query('photo',query_params).then(function(more){
+                store.find('photo',query_params).then(function(more){
                     Em.run.later(function(){
                         get_more(album,more);
                     });

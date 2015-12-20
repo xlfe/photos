@@ -78,7 +78,7 @@ export default Em.Component.extend({
             }
         });
 
-    }.observes('photo.comments.@each.user'),
+    }.observes('photo.comments.[].user'),
     click: function(e){
         var selection = this.get('selection_mode') > 0;
         if (Em.$(e.target).hasClass('photo') === true) {

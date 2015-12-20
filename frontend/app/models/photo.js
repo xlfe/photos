@@ -35,7 +35,7 @@ export default DS.Model.extend(autosave,{
             content: this.get('comments')
         });
 
-    }.property('comments.@each.sorted'),
+    }.property('comments.[].sorted'),
     //Mutable
     title:      DS.attr('string'),
     caption:    DS.attr('string'),

@@ -175,12 +175,12 @@ export default Em.Controller.extend({
                 })
             });
         }
-    }.property('path','search_mode','_search','search_paths.@each.disabled','model.id'),
+    }.property('path','search_mode','_search','search_paths.[].disabled','model.id'),
     selected: function() {
         return this.get('arrangedContent').filter(function(_){
             return _.get('selected') === true;
         });
-    }.property('arrangedContent.@each.selected'),
+    }.property('arrangedContent.[].selected'),
     album_class: function() {
         var base_class='your-photos photo-wall';
 
@@ -248,7 +248,7 @@ export default Em.Controller.extend({
             Folders[fpath] = folder;
             return folder;
         });
-    }.property('path', 'model.photos.@each.path','search_mode'),
+    }.property('path', 'model.photos.[].path','search_mode'),
     breadcrumbs: function () {
         var cp = this.get('path'),
             paths = [];
@@ -347,7 +347,7 @@ export default Em.Controller.extend({
     },
     size_photos: function() {
         Em.run.debounce(this, this._size_photos, 150);
-    }.observes('arrangedContent.@each', 'minHeight', 'path','folders.@each'),
+    }.observes('arrangedContent.[]', 'minHeight', 'path','folders.[]'),
     permissions: function(){
         var anon = this.get('session.isAuthenticated') === false,
             my_id = +this.get('session.secure.id'),
@@ -370,7 +370,7 @@ export default Em.Controller.extend({
 
         return perms[0];
 
-    }.property('model.permissions.@each','session.isAuthenticated'),
+    }.property('model.permissions.[]','session.isAuthenticated'),
     vis_check: function () {
         this.get('arrangedContent').forEach(function (photo) {
             if (photo.get('visible')){

@@ -63,7 +63,7 @@ export default Em.Controller.extend({
             }
         }
 
-    }.property('model.name', 'files.@each._status', 'uploading'),
+    }.property('model.name', 'files.[]._status', 'uploading'),
     files: [],
     concurrent_uploads: 3,
     prepare_upload: function (file) {
@@ -396,7 +396,7 @@ export default Em.Controller.extend({
             return;
         }
 
-    }.observes('files.@each._status','files.length'),
+    }.observes('files.[]._status','files.length'),
     save_caption: 'Upload',
     close_caption: 'Cancel',
     cancel: false,
@@ -408,7 +408,7 @@ export default Em.Controller.extend({
             r += +f.get('bytes');
         });
         return r;
-    }.property('files.@each.bytes'),
+    }.property('files.[].bytes'),
     toggleValue: false,
     toggle: function() {
 

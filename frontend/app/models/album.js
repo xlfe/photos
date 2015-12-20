@@ -27,7 +27,7 @@ export default DS.Model.extend(autosave,{
                 return _p;
             });
 
-    }.property('permissions.@each'),
+    }.property('permissions.[]'),
     resolved_permissions: function() {
         var owner = this.get('owner');
 
@@ -46,7 +46,7 @@ export default DS.Model.extend(autosave,{
             _user: owner
         })].concat(this.get('_resolved_permissions'));
 
-    }.property('permissions.@each'),
+    }.property('permissions.[]'),
     //Self generated
     photos: [],
     more_results: true,
