@@ -1,10 +1,10 @@
 import Em from 'ember';
-import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
 import config from '../config/environment';
 
-export default Em.Controller.extend(LoginControllerMixin, {
+export default Em.Controller.extend({
     authenticator: 'authenticator:custom',
     queryParams: ['do'],
+    session: Ember.inject.service('session'),
 
     processing: false,
 
@@ -30,7 +30,10 @@ export default Em.Controller.extend(LoginControllerMixin, {
 
             ga('send', 'event', 'action', 'authenticate');
 
-            this._super().then(function () {
+            let { identification, password } = this.getProperties('identification', 'password');
+
+            this.get('session').authenticate('authenticator:custom', {identification: identification, password: password})
+            .then(function () {
 
                 if (Em.isNone(invite) === false){
                     _this.transitionToRoute('invite',invite);
@@ -40,6 +43,7 @@ export default Em.Controller.extend(LoginControllerMixin, {
                 ga('send', 'event', 'action', 'authentication-error');
                 _this.set('error', error.error);
             });
+
         },
         register: function () {
             var _this = this;

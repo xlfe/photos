@@ -4,15 +4,9 @@
         Welcome to Slidenight
     </h1>
 
-    {{#if session.isAuthenticated}}
-        You're logged in as {{session.secure.full_name}}
-    {{else}}
-        {{#link-to 'login'}}
-            Please login or register
-        {{/link-to}}
-    {{/if}}
-
-    {{validation-reminder resend="resend_validation"}}
+    {{#link-to 'login'}}
+        Please login or register
+    {{/link-to}}
 
     <hr>
 

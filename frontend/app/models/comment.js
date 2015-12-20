@@ -1,6 +1,6 @@
 import DS from 'ember-data';
 import Em from 'ember';
-import Session from 'simple-auth/session';
+import Session from 'ember-simple-auth/session';
 
 
 var attr = DS.attr;
