@@ -47,13 +47,13 @@ function add_file(file, folders, files,album) {
         }
     };
 
-    fileReader.onerror = function (e) {
+    fileReader.onerror = function () {
         console.log("Couldn't read file");
     };
 
     Em.run.later(function(){
         fileReader.readAsArrayBuffer(file);
-    })
+    });
 }
 
 

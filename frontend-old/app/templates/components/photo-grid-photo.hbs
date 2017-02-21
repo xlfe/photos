@@ -1,0 +1,76 @@
+<div class="sheet">
+
+    {{reactive-text
+    type="text"
+    tabindex=idx
+    photo=photo
+    permissions=permissions    
+    disabled=permissions.no_edit
+    value=photo.title
+    class="photo-title"
+    }}
+
+    {{#if permissions.allow_select}}
+        <span title="Select this photo" class="select-icon" {{action 'selection'}}>
+            <i class="fa fa-check-circle fa-2x"></i>
+        </span>
+    {{/if}}
+
+
+    {{#if permissions.edit}}
+        <span title="Add a new tag to this photo" class="add-tag-icon" {{action 'add_tag'}}>
+            <i class="fa fa-plus-circle fa-2x"></i>
+        </span>
+    {{/if}}
+
+    {{#each photo.tags as |tag|}}
+        <div class="tag">
+            {{tag}}
+            {{#if permissions.edit}}
+                <i class="fa fa-remove" {{action 'remove_tag' tag}}></i>
+            {{/if}}
+        </div>
+    {{/each}}
+
+    <div class="{{if photo.comments.length 'always-visible'}} comments-icon" {{action 'show_comments'}}>
+         <span class="fa-stack fa">
+            <i class="fa fa-comment fa-stack-2x"></i>
+            <strong class="fa-stack-1x fa-stack-text fa-inverse">
+                {{photo.comments.length}}
+            </strong>
+        </span>
+    </div>
+</div>
+
+{{#if photo.show_comments}}
+    <div class="expanded-details">
+
+        {{#if permissions.comment}}
+            {{new-comment photo=photo resize_details="resize_details" add_comment="add_comment"}}
+        {{/if}}
+
+        {{#if photo.comments}}
+
+            <div class="table-responsive">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>
+                            Comment
+                        </th>
+                        <th class="small">
+                        </th>
+                        <th class="small">
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {{#each photo.sorted_comments as |comment|}}
+                            {{show-comment comment=comment remove_comment="remove_comment"}}
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{/if}}
+    </div>
+{{/if}}

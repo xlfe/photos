@@ -1,0 +1,18 @@
+<div class="who">
+    Commenting as
+    {{#if session.isAuthenticated}}
+
+        {{session.secure.full_name}}
+    {{else}}
+        Anonymous
+    {{/if}}
+</div>
+
+<div class="input-group wide">
+    {{input type="text" value=text class="form-control" enter="add_comment"}}
+    <span class="input-group-addon">
+        <i {{action 'add_comment'}} class="fa fa-save fa-lg">
+        </i>
+    </span>
+</div>
+

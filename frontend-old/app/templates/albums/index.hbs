@@ -1,0 +1,73 @@
+<div class="container">
+
+    {{validation-reminder resend="resend_validation"}}
+
+    <h3>
+        You're logged in as {{session.data.secure.full_name}}
+    </h3>
+
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Photos</th>
+            <th>Size</th>
+            <th>Permissions</th>
+            <th>Created</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each model key="id" as |album|}}
+            <tr>
+                <td>
+                    {{#link-to 'album' album.id}}
+                        {{album.name}}
+                    {{/link-to}}
+                </td>
+                <td>
+                    {{album.photo_count}}
+                </td>
+                <td>
+                    {{human-size album.total_size}}
+                </td>
+                <td>
+                    {{#link-to 'permissions' album.id}}
+                        <i class="fa fa-lg fa-users"></i>
+                        Permissions
+                    {{/link-to}}
+
+                </td>
+                <td>
+                    {{album.created}}
+                </td>
+                <td>
+                    {{#if album.am_i_owner}}
+
+                        <a href="" {{action 'delete_album' album}}>
+                            <i class="fa fa-lg fa-trash"></i>
+
+                        </a>
+                    {{/if}}
+                </td>
+            </tr>
+        {{/each}}
+        <tr>
+            <td>
+
+                <a href="" {{action 'new_album'}}>
+                    <i class="fa fa-lg fa-plus"></i>
+                    New album
+                </a>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+

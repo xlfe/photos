@@ -6,7 +6,7 @@ export var endpoint = [config.api_host, config.api_endpoint,'login'].join('/');
 
 
 export default Base.extend({
-    restore: function (options) {
+    restore: function () {
 
         return new Em.RSVP.Promise(function (resolve, reject) {
 
@@ -44,7 +44,7 @@ export default Base.extend({
             });
         });
     },
-    invalidate: function (options) {
+    invalidate: function () {
 
         return new Em.RSVP.Promise(function (resolve, reject) {
             Em.$.ajax({
@@ -53,7 +53,7 @@ export default Base.extend({
                 xhrFields: {
                     withCredentials: true
                 },
-                success: function(data){
+                success: function(){
                     resolve({});
                 },
                 error: function(error){

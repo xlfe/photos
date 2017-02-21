@@ -1,0 +1,242 @@
+<div class="container">
+    <h3>
+        {{#if view_only}}
+            View permissions for
+        {{else}}
+            Edit permissions for
+        {{/if}}
+        {{#link-to 'album' model.id}}
+            <strong>
+                {{model.name}}
+            </strong>
+        {{/link-to}}
+    </h3>
+
+
+    <form class="form-horizontal" role="form">
+
+        {{#unless view_only}}
+            <div class="form-group">
+
+                <label class="col-sm-3 control-label">
+                    Allow anyone to view the album?
+                </label>
+
+                <div class="col-sm-9">
+                    <div class="checkbox">
+                        <label {{action 'toggle_anon'}}>
+                            {{input type="checkbox" checked=allow_anon}} Anonymous Viewers
+                        </label>
+                    </div>
+                </div>
+            </div>
+        {{/unless}}
+
+        {{#if allow_anon}}
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">
+                    Public sharing URL:
+                </label>
+
+                <div class="col-sm-9">
+                    <p class="form-control-static">
+
+                        <a href={{model.public_url}}>
+                            {{model.public_url}}
+                        </a>
+                    </p>
+
+                </div>
+            </div>
+
+
+        {{/if}}
+
+    </form>
+
+    <hr>
+
+    <h4>
+        {{#if view_only}}
+            View User Permissions
+        {{else}}
+            Manage User Permissions
+        {{/if}}
+    </h4>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+
+            <th class="col-sm-3">Name</th>
+            <th>View</th>
+            <th>Add/edit details</th>
+            <th>Comment</th>
+            <th>Sort/order</th>
+            <th>Move folders</th>
+            <th>Upload</th>
+            <th>Delete</th>
+            <th>Owner</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {{#each model.resolved_permissions as |perm|}}
+            <tr>
+                {{#if perm.owner}}
+                    <td>
+                        {{perm._user.full_name}}
+                    </td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td><i class="fa fa-check"></i></td>
+                    <td></td>
+                {{else}}
+                    <td>
+                        {{perm._user.full_name}}
+                    </td>
+                    {{check-box save="save" disabled=view_only value=perm.view}}
+                    {{check-box save="save" disabled=view_only value=perm.edit}}
+                    {{check-box save="save" disabled=view_only value=perm.comment}}
+                    {{check-box save="save" disabled=view_only value=perm.sort}}
+                    {{check-box save="save" disabled=view_only value=perm.move}}
+                    {{check-box save="save" disabled=view_only value=perm.upload}}
+                    {{check-box save="save" disabled=view_only value=perm.delete}}
+                    <td></td>
+
+                    {{#if view_only}}
+                        <td></td>
+                    {{else}}
+                        <td class="check-box" {{action 'remove' perm}}><i class="fa fa-trash"></i></td>
+                    {{/if}}
+                {{/if}}
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+
+
+
+
+
+
+    {{#if saved_invites}}
+        <hr>
+        <h4>
+            Invites awaiting responses
+        </h4>
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th class="col-sm-3">Email</th>
+                <th>View</th>
+                <th>Add/edit details</th>
+                <th>Comment</th>
+                <th>Sort/order</th>
+                <th>Move folders</th>
+                <th>Upload</th>
+                <th>Delete</th>
+                <th>Last emailed</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {{#each saved_invites as |perm|}}
+                <tr>
+                    <td>
+                        {{perm.email}}
+                    </td>
+                    {{check-box disabled=true value=perm.permissions.view}}
+                    {{check-box disabled=true value=perm.permissions.edit}}
+                    {{check-box disabled=true value=perm.permissions.comment}}
+                    {{check-box disabled=true value=perm.permissions.sort}}
+                    {{check-box disabled=true value=perm.permissions.move}}
+                    {{check-box disabled=true value=perm.permissions.upload}}
+                    {{check-box disabled=true value=perm.permissions.delete}}
+                    <td>
+                        {{#if perm.last_emailed}}
+                            {{from-now perm.last_emailed}}
+                        {{else}}
+                            Never
+                        {{/if}}
+
+                        <a title="Send the invite email again" {{action 'send_again' perm}} class="check-box">
+
+                            Send again <i class="fa fa-forward"></i>
+                        </a>
+
+                    </td>
+                    <td class="check-box" {{action 'delete' perm}}><i class="fa fa-trash"></i></td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    {{/if}}
+
+    {{#unless view_only}}
+
+        <hr>
+        <h4>
+            Invite people to collaborate
+        </h4>
+
+        <p>
+            Paste their emails below
+
+        </p>
+
+        {{textarea value=invites class="email-input col-lg-5"}}
+
+        {{#if invite_list}}
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th class="col-sm-3">Email</th>
+                    <th>View</th>
+                    <th>Add/edit details</th>
+                    <th>Comment</th>
+                    <th>Sort/order</th>
+                    <th>Move folders</th>
+                    <th>Upload</th>
+                    <th>Delete</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {{#each invite_list as |perm|}}
+                    <tr>
+                        <td>
+                            {{perm.email}}
+                        </td>
+                        {{check-box value=perm.view}}
+                        {{check-box value=perm.edit}}
+                        {{check-box value=perm.comment}}
+                        {{check-box value=perm.sort}}
+                        {{check-box value=perm.move}}
+                        {{check-box value=perm.upload}}
+                        {{check-box value=perm.delete}}
+                    </tr>
+                {{/each}}
+                <tr>
+                    <td colspan="6" class="check-box" {{action 'send_invites'}}>
+
+                        <i class="fa fa-lg fa-mail-forward"></i>
+                        Send invites
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        {{/if}}
+
+    {{/unless}}
+
+</div>

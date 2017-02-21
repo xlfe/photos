@@ -1,0 +1,71 @@
+{{#modal-base
+model=model
+title='Sort images in this folder'
+custom_save="Sort"
+custom_close="Cancel"
+sort_check="sort_check"
+save='save'
+close='close'
+closeModal='closeModal'
+}}
+
+    <form class="form-horizontal" role="form">
+
+        <div class="form-group">
+
+            <label class="col-sm-2 control-label">
+                Sort by
+            </label>
+
+            <div class="col-sm-10">
+
+                <ul class="list-unstyled list-group">
+
+                    {{#each sortOptions as |option|}}
+                        <label class="col-sm-12" {{action 'sort_check' option on="mouseUp"}}>
+                        <li class="list-group-item">
+
+                                {{input type="radio" name="sort-options" value=option.val checked=option.checked}}
+                                {{option.name}}
+                        </li>
+                        </label>
+
+                    {{/each}}
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-sm-2 control-label">
+                Sorting
+            </label>
+
+            <div class="col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        {{input type="checkbox" checked=sortNatural}} Case-insensitive <a href="http://blog.codinghorror.com/sorting-for-humans-natural-sort-order/" target="_blank">natural sorting</a>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label class="col-sm-2 control-label">
+                Direction
+            </label>
+
+            <div class="col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        {{input type="checkbox" checked=sortDescending}} Sort descending
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+{{/modal-base}}

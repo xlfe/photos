@@ -47,7 +47,9 @@ export default Em.Component.extend({
 
         var pos, size, sizes, urls,repeats;
 
-        urls = 'url(' + background.map(function(_){ return _.get_image(Math.max(h / 2, w / 2))}).join('), url(') +')';
+      urls = 'url(' + background.map(function (_) {
+          return _.get_image(Math.max(h / 2, w / 2));
+        }).join('), url(') + ')';
 
         if (background.get('length') ===4 ) {
             pos = '0 0, ' + (w / 2) + 'px 0px, 0px ' + (h / 2) + 'px, ' + (w / 2) + 'px ' + (h / 2) + 'px';
@@ -100,7 +102,7 @@ export default Em.Component.extend({
             photo = album.get('drag.photo'),
 
         //Before or after?
-            pos = album.get('drag.position'),
+        //     pos = album.get('drag.position'),
 
         //multiple photos?
             multi = !Em.isEmpty(this.get('selected')),

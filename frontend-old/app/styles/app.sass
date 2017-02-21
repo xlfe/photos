@@ -1,0 +1,369 @@
+
+@import mixins
+
+
+body
+  padding-top: 55px
+  margin-bottom: 30px
+  width: 100%
+  overflow-y: scroll
+
+
+
+html,body
+  @include transition(scrollTop, 1s, ease-out)
+
+
+.app-footer
+  font-weight: normal
+  font-size: smaller
+  color: grey
+
+  background-color: #fff
+
+  margin-top: 50px
+  min-height: 20px
+  padding-top: 5px
+  padding-bottom: 5px
+  border-top: solid darkgrey 1px
+
+.edge-to-edge
+  padding-left: 0
+  padding-right: 0
+
+.app-footer a:hover
+  color: #8dc63f
+
+.app-footer a
+  color: #d1d3d4
+
+.footer-item
+  display: inline
+  padding-right: 20px
+
+.navbar
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+li.header-img-link, li.menu-link, .action-pointer
+  cursor: pointer
+
+li.slider
+  //display: inline-block
+  //width: 175px
+  a
+    div.spacer
+      display: inline-block
+      width: 10px
+    span
+      vertical-align: middle
+    input
+      vertical-align: middle
+      display: inline-block
+      width: 90px
+
+span.title
+  display: block
+
+.saving
+  opacity: 0.4
+
+.album-cover
+  width: 200px
+  height: 200px
+  border: 1px solid black
+
+.box-middle-center
+  display: table
+  width: 50%
+  height: 300px
+  margin: auto
+  margin-top: 100px
+  background-color: #e9e9e9
+  border: 1px solid white
+  text-align: center
+
+  span
+    vertical-align: middle
+    display: table-cell
+    color: black
+    font-size: x-large
+    font-weight: bold
+    padding-bottom: 1em
+
+div.modal-body
+  padding: 5px
+
+
+
+@import photos
+
+div.upload
+  height: 360px !important
+  position: relative
+  overflow-y: auto
+  overflow-x: hidden
+  padding: 0
+  width: 100%
+  border: 1px solid lightgrey
+  text-align: center
+  vertical-align: middle
+
+  .hint-pos
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+    border: 1px dashed rgba(128, 40, 0, 0.55)
+    .hint
+      font-weight: bold
+      font-size: larger
+      padding-top: 150px
+
+  .file
+    font-weight: normal
+    width: 100%
+    text-align: left
+    padding-left: 10px
+    height: 24px
+    border-top: 1px solid lightgray
+    display: inline-block
+
+    div
+      //position: absolute
+      font-weight: normal
+
+    .name,.size,.status
+      display: inline-block
+
+    .name
+      left: 5px
+      width: 380px
+      overflow: hidden
+      text-overflow: ellipsis
+      white-space: nowrap
+
+    .size,.status
+      float: right
+      text-align: right
+      margin-left: 0
+
+    .size
+      width: 75px
+      margin-right: 10px
+
+    .status
+      width: 80px
+      margin-right: 5px
+
+
+
+    .progress
+      position: absolute
+      height: 24px
+      left: 0
+      background-color: rgba(29, 210, 0, 0.25)
+
+.upload input[type=file]
+  position: absolute
+  top: 0
+  right: 0
+  min-width: 100%
+  min-height: 100%
+  filter: alpha(opacity=0)
+  opacity: 0
+  outline: none
+  background: white
+  cursor: inherit
+  display: block
+
+.folder
+  .title
+    color: white
+    background-color: rgba(0, 0, 0, 0.51)
+    padding-left: 0.5em
+    text-shadow: 0 0 5px #000
+    z-index: 1000
+    white-space: nowrap
+    overflow: hidden
+
+  .folder-icon
+    float: left
+    overflow: hidden
+    width: 100%
+    opacity: 0.90
+    color: #FFF
+
+.folder
+
+  &:hover
+    cursor: pointer
+    font-weight: bold
+
+    .folder-icon
+      font-weight: bold
+
+#lightbox-overlay
+  background-color: rgba(0, 0, 0, .95)
+  position: fixed
+  z-index: 9998
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+
+  .details
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    height: 25px
+    background-color: black
+    text-align: center
+    .title
+      color: white
+      font-size: 18px
+
+#lightbox
+  position: fixed
+  z-index: 10000
+  -ms-touch-action: none
+  touch-action: none
+
+
+
+$d3-colours: #1f77b4 #ff7f0e #2ca02c #d62728 #9467bd #8c564b #e377c2 #7f7f7f #bcbd22 #17becf
+//Fancy spinner
+//colors
+$white_33: rgba(255, 255, 255, 0.33)
+$color_outer: nth($d3-colours, 1)
+$color_inner: nth($d3-colours, 1)
+$color_middle: nth($d3-colours, 1)
+$loader_sz: 200px
+
+//@extend-elements
+//original selectors
+//#loader, #loading
+.extend_1
+  display: block
+  position: relative
+  left: 45%
+  top: 45%
+
+#loader-wrapper
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  z-index: 1000
+  background-color: $white_33
+
+#loader
+  @extend .extend_1
+  width: $loader_sz
+  height: $loader_sz
+  margin: -$loader_sz/2 0 0 -$loader_sz/2
+  border-radius: 50%
+  border: 5px solid transparent
+  border-top-color: $color_outer
+  -webkit-animation: spin 2s linear infinite
+  animation: spin 5s linear infinite
+  &:before
+    content: ""
+    position: absolute
+    top: 5px
+    left: 5px
+    right: 5px
+    bottom: 5px
+    border-radius: 50%
+    border: inherit
+    border-top-color: $color_middle
+    animation: spin 3s linear infinite
+    -webkit-animation: spin 3s linear infinite
+
+  &:after
+    content: ""
+    position: absolute
+    top: 15px
+    left: 15px
+    right: 15px
+    bottom: 15px
+    border-radius: 50%
+    border: inherit
+    border-top-color: $color_inner
+    animation: spin 1.5s linear infinite
+    -webkit-animation: spin 1.5s linear infinite
+
+#loading
+  @extend .extend_1
+  //margin-left: -2em
+  font-weight: bold
+  width: $loader_sz
+  text-align: center
+  background: none
+
+@-webkit-keyframes spin
+  0%
+    -webkit-transform: rotate(0deg)
+    -ms-transform: rotate(0deg)
+    transform: rotate(0deg)
+
+  100%
+    -webkit-transform: rotate(360deg)
+    -ms-transform: rotate(360deg)
+    transform: rotate(360deg)
+
+@keyframes spin
+  0%
+    -webkit-transform: rotate(0deg)
+    -ms-transform: rotate(0deg)
+    transform: rotate(0deg)
+
+  100%
+    -webkit-transform: rotate(360deg)
+    -ms-transform: rotate(360deg)
+    transform: rotate(360deg)
+
+body.modal-open
+  overflow-y: scroll
+  padding-right: 0 !important
+
+
+
+@import login
+.check-box
+  cursor: pointer
+  &:hover
+    *
+      text-decoration: underline
+.email-input
+  height: 6em
+  border-radius: 6px
+  padding-left: 4px
+  border: 1px solid darkgrey
+  display: block
+
+
+.navbar-nav
+  li.slider
+    a
+      padding-top: 12px
+      padding-bottom: 0
+.nav
+  li
+    a
+      padding-left: 9px
+      padding-right: 9px
+.lbread
+  border-left: 1px solid rgba(68, 160, 243, 0.17)
+.head-input
+  padding-top: 8px !important
+  padding-bottom: 0 !important
+  input
+    padding: 0

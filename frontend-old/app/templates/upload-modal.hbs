@@ -1,0 +1,62 @@
+{{#modal-base
+    model=model
+    save='save'
+    title=title
+    close='close'
+    custom_save=save_caption
+    save_disabled=save_disabled
+    custom_close=close_caption
+    toggle=toggle
+    toggleVal='toggleVal'
+    closeModal='closeModal'
+}}
+
+    <div class="upload">
+
+        {{#each files as |file|}}
+
+            <div class="file">
+                <div class="progress" style={{file.progress}}></div>
+
+                <div class="name">
+                    {{file.name}}
+                </div>
+
+                <div class="status">
+                    {{file.status}}
+                </div>
+
+                <div class="size">
+                    {{file.hSize}}
+                </div>
+            </div>
+
+
+        {{/each}}
+
+        {{#unless uploading}}
+
+            <div class="hint-pos">
+
+                {{#unless files}}
+                    <label class="hint">Drop
+                        {{#if accept_folders}}
+                            folders
+                        {{else}}
+                            files
+                        {{/if}}
+                        here (or click to browse)
+                    </label>
+                {{/unless}}
+
+            </div>
+
+            {{#if accept_folders}}
+                <input type="file" id="file_input" directory webkitdirectory/>
+            {{else}}
+                <input type="file" id="file_input" accept="image/*" multiple="multiple"/>
+            {{/if}}
+        {{/unless}}
+    </div>
+
+{{/modal-base}}

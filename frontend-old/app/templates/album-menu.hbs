@@ -1,0 +1,160 @@
+<ul class="nav navbar-nav">
+    {{#unless search_mode}}
+
+        {{#link-to "album" model (query-params path="") tagName="li" class="menu-link" tabindex="-1"}}
+            <a>
+                <strong>
+                    {{model.name}}
+                </strong>
+            </a>
+        {{/link-to}}
+
+        {{#each breadcrumbs as |p|}}
+            {{#link-to "album" model (query-params path=p.path) tagName="li" class="menu-link lbread" tabindex="-1"}}
+                <a>
+                    {{p.name}}
+                </a>
+            {{/link-to}}
+        {{/each}}
+
+    <li class="menu-link">
+        <a href="#" title="Open search mode" {{action 'search'}} tabindex="-1">
+            <i class="fa fa-search fa-lg"></i>
+        </a>
+    </li>
+    {{else}}
+
+
+        <li class="menu-link">
+            <a href="#" title="Cancel search mode" {{action 'search'}} tabindex="-1">
+                <i class="fa fa-close fa-lg"></i>
+            </a>
+        </li>
+
+        <li class="menu-link">
+            <a tabindex="-1" class="head-input">
+                {{input class="form-control" type="text" value=search}}
+            </a>
+        </li>
+
+        {{#each search_paths as |sp|}}
+            <li class="{{if sp.disabled 'disabled'}} menu-link">
+                <a title="Set search param" {{action 'toggle_search_path' sp}} href="#">
+                    <i class="fa fa-search fa-lg"></i>
+                    {{sp.name}}
+                </a>
+            </li>
+        {{/each}}
+
+    {{/unless}}
+</ul>
+<ul class="nav navbar-nav navbar-right">
+
+    {{#unless selected}}
+    {{else}}
+        <li class="menu-link">
+            <a href="#" title="Clear the current selection" {{action 'cancel_selection'}} tabindex="-1">
+
+                {{selected.length}} selected
+                <i class="fa fa-close fa-lg"></i>
+            </a>
+        </li>
+
+        {{#if permissions.edit}}
+
+            <li class="menu-link">
+                <a href="#" title="Add tags to the selected photos" {{action 'add_tags'}} tabindex="-1">
+                    <i class="fa fa-lg fa-tags"></i>
+                </a>
+            </li>
+        {{/if}}
+        {{#if permissions.move}}
+
+
+            <li class="menu-link">
+                <a href="#" title="Move selected photos" {{action 'move_selection'}} tabindex="-1">
+                    <i class="fa fa-folder-open fa-lg"></i>
+                </a>
+            </li>
+        {{/if}}
+
+        {{#if permissions.delete}}
+            <li class="menu-link">
+                <a href="#" title="Delete selected photos" {{action 'delete_selection'}} tabindex="-1">
+                    <i class="fa fa-trash fa-lg"></i>
+                    {{#if confirm_delete}}
+
+                        <span class="alert-danger" role="alert">
+                        Please confirm deleting {{selected.length}} photos?
+                        </span>
+
+                    {{/if}}
+
+                </a>
+            </li>
+
+        {{/if}}
+
+    {{/unless}}
+
+
+
+    <li class="menu-link">
+        <a tabindex="-1" title="Select all photos in folder" {{action 'select_all'}}>
+            {{#if model.more_results}}
+                <i class="fa fa-spin fa-spinner"></i>
+            {{/if}}
+            <span>
+                {{model.photos.length}} photos - ({{arrangedContent.length}} in folder)
+            </span>
+        </a>
+    </li>
+
+    {{#if permissions.sort}}
+
+        <li class="menu-link">
+            <a href="#" title="Sort photos in this folder" {{action 'openModalModel' 'sort-modal' model}} tabindex="-1">
+                <i class="fa fa-lg fa-sort"></i>
+            </a>
+        </li>
+    {{/if}}
+
+    {{#if permissions.upload}}
+
+        {{#if session.secure.validated}}
+            <li class="menu-link">
+                <a href="#" title="Upload" {{action 'openModalModel' 'upload-modal' model}} tabindex="-1">
+                    <i class="fa fa-lg fa-upload"></i>
+                </a>
+            </li>
+        {{else}}
+            <li class="menu-link disabled">
+                <a title="Please validate your email to upload photos" tabindex="-1">
+                    <i class="fa fa-lg fa-upload"></i>
+                </a>
+            </li>
+        {{/if}}
+
+    {{/if}}
+
+    {{#if permissions.owner}}
+
+        {{#link-to "permissions" model.id tagName="li" title="Album permissions" class="menu-link" tabindex="-1"}}
+            <a>
+                <i class="fa fa-users fa-lg"></i>
+            </a>
+        {{/link-to}}
+
+    {{/if}}
+
+
+    <li class="menu-link slider">
+        <a>
+            <span {{action 'smaller'}}class="fa fa-image" tabindex="-1"></span>
+            {{input type="range" min=150 max=800 steps=50 value=minHeight tabindex="-1"}}
+            <span {{action 'larger'}} class="fa fa-image fa-2x" tabindex="-1"></span>
+        </a>
+    </li>
+
+</ul>
+

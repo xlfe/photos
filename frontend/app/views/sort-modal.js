@@ -8,4 +8,4 @@ export default Em.View.extend({
         c.set('sortDescending',false);
         c.set('sortNatural',true);
     }
-})
+});

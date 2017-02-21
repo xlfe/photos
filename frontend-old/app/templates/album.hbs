@@ -1,0 +1,87 @@
+<div class="container-fluid edge-to-edge">
+
+    <div id="photos" class="{{album_class}}">
+
+        <div class="photo-select"><span></span></div>
+
+        <div class="view-options">
+
+
+            <div class="left-icons">
+                <span class="mouse-action" {{action 'toggle_tags'}}>
+
+                    {{#if show_tags}}
+                        <i class="fa fa-check"></i>
+                    {{else}}
+                        <i class="fa fa-square-o"></i>
+                    {{/if}}
+                    Show tags
+                </span>
+            </div>
+
+            <div class="right-icons">
+                <i class="fa fa-bars"></i>
+            </div>
+
+        </div>
+
+        {{#each folders as |folder|}}
+            {{photo-grid-folder
+            folder=folder
+            path="path"
+            canDrop=permissions.move
+            selected=selected
+            album=model
+            }}
+        {{/each}}
+
+        {{#each arrangedContent key="id" as |photo index|}}
+            {{photo-grid-photo
+            photo=photo
+            _idx=index
+            selection_mode=selected.length
+            selected=selected
+            last_clicked_photo=last_clicked_photo
+            album=model
+            arrangedContent=arrangedContent
+            permissions=permissions
+            transition="transition"
+            add_comment="add_comment"
+            size_immediate="size_immediate"
+            save="save"}}
+        {{/each}}
+
+        {{#unless folders}}
+            {{#unless arrangedContent}}
+                <div class="box-middle-center">
+                    <span>
+                        {{#if search_mode}}
+                            No photos found - enter search terms at the top of the screen.
+                        {{else}}
+
+                            {{#if model.more_results}}
+                                Please wait - we're loading some photos...
+
+                            {{else}}
+                                {{validation-reminder}}
+                                No photos found ...<br>
+                                {{#if permissions.upload}}
+                                    Would you like to
+                                                <a href="#" {{action 'openModalModel' 'upload-modal' model}}>
+                                                    upload some photos
+                                                </a>?
+
+                                {{else}}
+                                    (you don't have upload permissions to this album)
+                                {{/if}}
+                            {{/if}}
+                        {{/if}}
+                    </span>
+                </div>
+
+            {{/unless}}
+        {{/unless}}
+    </div>
+</div>
+
+{{outlet}}
