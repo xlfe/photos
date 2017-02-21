@@ -20,7 +20,7 @@ export default Em.Route.extend({
                     _this.transitionTo('album',_data.album);
                 },
                 error: function (error) {
-                    alert("Something wen't wrong. Please try again!");
+                    alert("Something wen't wrong." + error + " Please try again!");
                 }
             });
         }

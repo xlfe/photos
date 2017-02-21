@@ -1,5 +1,6 @@
 import Em from 'ember';
 import ApplicationRouteMixin from 'ember-simple-auth/mixins/application-route-mixin';
+/* global ga */
 
 export default Em.Route.extend(ApplicationRouteMixin, {
     actions: {
@@ -24,7 +25,7 @@ export default Em.Route.extend(ApplicationRouteMixin, {
 
             if (error.status === 401) {
                 ga('send', 'exception', { 'exDescription': 'Authentication failed to ' + transition.targetName, 'exFatal': true});
-                transition.abort()
+                transition.abort();
                 return this.transitionTo('login');
             } else {
                 ga('send', 'exception', { 'exDescription': 'Unknown exception ' + error.status + ' on ' + transition.targetName,

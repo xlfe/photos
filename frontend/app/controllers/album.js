@@ -34,13 +34,15 @@ var search_paths = [
     }
 ];
 
-function search_photo(_paths,term,_){
-    var words = term.split(' ').filter(function(w){return Em.$.trim(w).length >0}).map(function(w){
-            return new RegExp(RegExp.quote(w), "gi");
+function search_photo(_paths, term, _) {
+  var words = term.split(' ').filter(function (w) {
+      return Em.$.trim(w).length > 0;
+    }).map(function (w) {
+      return new RegExp(RegExp.quote(w), "gi");
         }),
         match = 0,
-        search = null,
-        matched = 0;
+        search = null;
+        // matched = 0;
 
     _paths.forEach(function(sp) {
         //match = 0;
@@ -73,7 +75,7 @@ function search_photo(_paths,term,_){
     //    }
 
     return match > 0;
-    return matched > 0;
+    // return matched > 0;
 }
 
 export function below_folder(path, folder) {

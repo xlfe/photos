@@ -1,6 +1,7 @@
 import Em from 'ember';
 import Channel from '../subscribers/channel';
 import config from '../config/environment';
+/* global ga */
 
 export var endpoint = [config.api_host, config.api_endpoint,'photos'].join('/');
 
@@ -84,7 +85,7 @@ export default Em.Route.extend({
                 });
         });
     },
-    afterModel: function(resolved,transition) {
+    afterModel: function(resolved) {
         Em.$(document).attr('title', resolved.get('name') + ' | Slidenight');
         ga('send', 'pageview', {
             'page': '/album',
@@ -100,7 +101,7 @@ export default Em.Route.extend({
             alert('Sorry you do not have permission to view that album');
             ga('send', 'exception', { 'exDescription': 'Authentication failed to ' + transition.targetName, 'exFatal': true});
             transition.abort();
-            this.transitionTo('login')
+            this.transitionTo('login');
             return false;
         }
     }

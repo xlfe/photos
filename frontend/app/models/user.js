@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import Em from 'ember';
+// import Em from 'ember';
 import autosave from '../models/autosave';
 
 var attr = DS.attr;

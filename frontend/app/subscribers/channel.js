@@ -1,6 +1,6 @@
 import Em from 'ember';
 import config from '../config/environment';
-import Photo from '../models/photo';
+// import Photo from '../models/photo';
 var endpoint = [config.api_host, config.api_endpoint, 'channel'].join('/');
 /* global goog */
 
@@ -23,18 +23,19 @@ function onOpen() {
 function onMessage(data) {
     data =JSON.parse(data.data);
 
-    var from_user = data.user,
+    var //from_user = data.user,
         _type = data.type,
-        kind = data.model,
+        // kind = data.model,
+        photo,
         d = data.data;
 
     if (_type === 'DEL') {
-        var photo = store.getById('photo',d);
+        photo = store.getById('photo',d);
         if (Em.isPresent(photo)){
             photo.deleteRecord();
         }
     } else if (_type === 'UPD') {
-        var photo = store.getById('photo',d['id']);
+        photo = store.getById('photo',d['id']);
 
         if (Em.isPresent(photo)){
             photo.set('_saving',true);
@@ -61,7 +62,7 @@ function onError() {
     error_count += 1;
 }
 
-function onClose(data) {
+function onClose() {
     channel_id = undefined;
     subscriptions=[];
 }

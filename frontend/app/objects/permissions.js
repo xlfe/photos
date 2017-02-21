@@ -17,8 +17,8 @@ var _relies_on = function (vals) {
         }
 
         return s;
-    }
-}
+    };
+};
 
 export default Em.Object.extend({
 

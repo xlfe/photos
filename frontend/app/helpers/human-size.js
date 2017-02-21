@@ -1,5 +1,5 @@
 import Em from 'ember';
-/* global moment */
+// /* global moment */
 
 function fileSizeSI(a,b,c,d,e){
     b=Math;

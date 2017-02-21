@@ -1,6 +1,7 @@
 import Em from 'ember';
 import config from '../config/environment';
 /* global SparkMD5 */
+/* global ga */
 
 
 //    error -1
@@ -40,12 +41,12 @@ var cancel_file = function(c,file){
 export default Em.Controller.extend({
     title: function () {
         var files = this.get('files').filter(function (_) {
-                return [6, -1].indexOf(_.get('_status')) == -1;
+                return [6, -1].indexOf(_.get('_status')) === -1;
             }),
             total_size = 0;
 
         files.forEach(function (_) {
-            total_size += +_.get('bytes')
+            total_size += +_.get('bytes');
         });
 
 
@@ -57,7 +58,7 @@ export default Em.Controller.extend({
             }
         } else {
             if (Em.isEmpty(files)){
-                return 'Select some files to upload to ' + this.get('model.name')
+                return 'Select some files to upload to ' + this.get('model.name');
             } else {
                 return 'Upload ' + files.length + ' photos (' + fileSizeSI(total_size) + ') to album "' + this.get('model.name') + '"';
             }
@@ -122,7 +123,7 @@ export default Em.Controller.extend({
     },
     add_file: function(file,_id) {
         var _this = this;
-        this.store.find('photo',_id).then(function(photo){
+        this.store.find('photo',_id).then(function(){
             file.set('status','Complete');
             file.set('_status',6);
             _this.set('model.photo_count',_this.get('model.photos.length'));

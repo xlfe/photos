@@ -1,10 +1,10 @@
 import Em from 'ember';
-import DS from 'ember-data';
+// import DS from 'ember-data';
 
 
-if (typeof String.prototype.endsWith != 'function') {
+if (typeof String.prototype.endsWith !== 'function') {
     String.prototype.endsWith = function (str){
-        return this.slice(-str.length) == str;
+        return this.slice(-str.length) === str;
     };
 }
 // attach the .equals method to Array's prototype to call it on any array
@@ -22,17 +22,17 @@ var compare_arrays = function (a,b) {
 
     //check b has all items in a and vice versa
     for (var i=0; i< l_a; i++){
-        if (b.indexOf(a[i]) == -1){
+        if (b.indexOf(a[i]) === -1){
             return false;
         }
 
-        if (a.indexOf(b[i]) == -1){
+        if (a.indexOf(b[i]) === -1){
             return false;
         }
     }
 
     return true;
-}
+};
 
 export default Em.Mixin.create({
     //define these
@@ -85,19 +85,19 @@ export default Em.Mixin.create({
         });
     },
     _saving: true,
-    _keep_watch: function (sender,key,value) {
+    _keep_watch: function (sender,key) {
         if (this.get('_saving') === true){
             return;
         }
 
         //Need to check the list for changes
         if (key.endsWith('.length') === true) {
-            var k = key.split('.')[0],
+            var _ = key.split('.')[0],
                 prev = this.get('__' + k),
                 now = this.get(k),
                 same = compare_arrays(prev,now);
 
-            this.set('__'+k,JSON.parse(JSON.stringify(now.toArray())));
+            this.set('__'+_,JSON.parse(JSON.stringify(now.toArray())));
 
             if (same === true && this.get('hasDirtyAttributes') === false){
                 return;

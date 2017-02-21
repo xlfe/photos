@@ -2,8 +2,8 @@ import Em from 'ember';
 
 //selection
 //photo_elem
-function doObjectsCollide(s, p,margin) { // a and b are your objects
-    var margin = margin||20,
+function doObjectsCollide(s, p) { // a and b are your objects
+    var margin = 20,
         aTop = s.offset().top - margin,
         aLeft = s.offset().left - margin,
         bTop = p.offset().top - margin,
@@ -105,7 +105,7 @@ export default Em.View.extend({
                 if (result === true && click === true){
                     console.log('click',e);
                     if (e.shiftKey === true && photo.get('selected')===false){
-                        console.log('Shift select!')
+                        console.log('Shift select!');
                         var last,
                             lcp = _this.get('last_clicked_photo');
 
@@ -120,7 +120,7 @@ export default Em.View.extend({
                                 last=undefined;
                             } else {
                                 if (last.get('length')>1) {
-                                    console.log("Hmm")
+                                    console.log("Hmm");
                                 }
                                 last = photos.indexOf(last[0]);
                             }
@@ -129,7 +129,7 @@ export default Em.View.extend({
                         var current = photos.indexOf(photo);
 
                         if (Em.isNone(last) || Em.isNone(current)){
-                            console.log(last,current,'NONE')
+                            console.log(last,current,'NONE');
                             return;
                         }
 
@@ -191,7 +191,7 @@ export default Em.View.extend({
             Em.run.debounce(this,selectElements,25);
         }
 
-        function selectElements(e) {
+        function selectElements() {
             var photos = _this.get('controller.model.photos'),
                 selection = Em.$(".photo-select");
 
