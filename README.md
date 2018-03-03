@@ -16,6 +16,7 @@ Features:
 * Photos lazily loaded just below the browser window viewport
 * Lightbox supporting lazy loading of full-size images with left/right pre-fetch
 * Arbitrary tagging support
+* Smart upload to galleries (Duplicate detection client side, parallel uploads)
 * Comments support
 * live gallery syncronisation of changes between users using Channel API
 * Fine grained permissions
