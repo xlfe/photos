@@ -3,7 +3,7 @@
 ![screenshot](slidenight.png)
 
 Slidenight was a project to create a Google Photos style photo hosting
-site on the Google Cloud Platform using Google App Engine.
+site on the Google Cloud Platform using Google App Engine Python.
 
 It is no longer in development
 
@@ -18,4 +18,13 @@ Features:
 * Arbitrary tagging support
 * Comments support
 * Fine grained permissions
+ * comment
+ * delete
+ * edit
+ * move
+ * sort
+ * upload
+ * user add/delete
+ 
+You can view an [example gallery here](https://slide-night.appspot.com/albums/5759409141579776).
 
